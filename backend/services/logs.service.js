@@ -1,5 +1,5 @@
 // Servicio de logs (esqueleto)
-const Log = require('../../database/log.model');
+const Log = require('../database/log.model');
 
 module.exports = {
   crearLog: async (data) => {

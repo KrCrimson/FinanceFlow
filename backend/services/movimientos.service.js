@@ -1,5 +1,5 @@
 // Servicio de movimientos (esqueleto)
-const Movimiento = require('../../database/movimiento.model');
+const Movimiento = require('../database/movimiento.model');
 
 module.exports = {
   crearMovimiento: async (data) => {

@@ -1,6 +1,6 @@
 
 const bcrypt = require('bcryptjs');
-const Usuario = require('../../database/usuario.model');
+const Usuario = require('../database/usuario.model');
 
 module.exports = {
   // Registro seguro de usuario
