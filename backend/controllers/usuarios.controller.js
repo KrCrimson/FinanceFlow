@@ -86,4 +86,37 @@ module.exports = {
       res.status(400).json({ message: error.message });
     }
   },
+
+  // Solicitar recuperación de contraseña
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+      await usuariosService.forgotPassword(email);
+      res.json({ message: 'Email de recuperación enviado exitosamente' });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  // Verificar token de recuperación
+  verifyResetToken: async (req, res) => {
+    try {
+      const { token } = req.body;
+      await usuariosService.verifyResetToken(token);
+      res.json({ message: 'Token válido' });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  // Resetear contraseña
+  resetPassword: async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      await usuariosService.resetPassword(token, newPassword);
+      res.json({ message: 'Contraseña actualizada exitosamente' });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
 };

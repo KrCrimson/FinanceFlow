@@ -30,6 +30,14 @@ const usuarioSchema = new mongoose.Schema({
 		enum: ['activo', 'inactivo'],
 		default: 'activo',
 	},
+	resetPasswordToken: {
+		type: String,
+		default: null,
+	},
+	resetPasswordExpires: {
+		type: Date,
+		default: null,
+	},
 });
 
 usuarioSchema.pre('save', function () {

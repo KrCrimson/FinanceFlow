@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getReportes } from '../services/reportesService';
 import { getMovimientos } from '../services/movimientosService';
 import { useNavigate } from 'react-router-dom';
 import { GraficoBarras, GraficoLinea, GraficoCircular } from '../components/Graficos';
+import logger from '../utils/logger';
 
 function ReportesPage() {
   const navigate = useNavigate();
-  const [logs, setLogs] = useState([]);
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -19,15 +18,18 @@ function ReportesPage() {
       try {
         setLoading(true);
         setError('');
-        const [logsData, movimientosData] = await Promise.all([
-          getReportes().catch(() => []),
-          getMovimientos().catch(() => [])
-        ]);
-        setLogs(Array.isArray(logsData) ? logsData : []);
+        logger.info('Cargando datos de reportes');
+        
+        const movimientosData = await getMovimientos();
         setMovimientos(Array.isArray(movimientosData) ? movimientosData : []);
+        
+        logger.info('Datos de reportes cargados exitosamente', { 
+          movimientosCount: Array.isArray(movimientosData) ? movimientosData.length : 0 
+        });
       } catch (e) {
-        setError('Error al cargar los datos');
-        console.error('Error:', e);
+        const errorMessage = 'Error al cargar los datos de reportes';
+        setError(errorMessage);
+        logger.logApiError('getMovimientos', e, { context: 'ReportesPage' });
       } finally {
         setLoading(false);
       }
@@ -192,8 +194,7 @@ function ReportesPage() {
             {[
               { id: 'resumen', label: '📈 Resumen General', icon: '📈' },
               { id: 'graficos', label: '📊 Gráficos', icon: '📊' },
-              { id: 'movimientos', label: '💰 Movimientos', icon: '💰' },
-              { id: 'logs', label: '📋 Historial', icon: '📋' }
+              { id: 'movimientos', label: '💰 Movimientos', icon: '💰' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -470,34 +471,6 @@ function ReportesPage() {
                     <div className="text-6xl mb-4">📝</div>
                     <p className="text-xl font-medium mb-2">No hay movimientos</p>
                     <p>Con los filtros aplicados no se encontraron resultados</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'logs' && (
-              <div>
-                {logs.length > 0 ? (
-                  <div className="space-y-3">
-                    {logs.slice(0, 20).map((log, index) => (
-                      <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">{log.accion || 'Acción no especificada'}</p>
-                            <p className="text-sm text-gray-600 mt-1">{log.descripcion || 'Sin descripción'}</p>
-                          </div>
-                          <span className="text-xs text-gray-500 ml-4">
-                            {log.fecha ? new Date(log.fecha).toLocaleDateString() : 'Sin fecha'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <div className="text-6xl mb-4">📋</div>
-                    <p className="text-xl font-medium mb-2">No hay historial disponible</p>
-                    <p>Los logs del sistema aparecerán aquí</p>
                   </div>
                 )}
               </div>

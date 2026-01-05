@@ -5,13 +5,16 @@ Un sistema completo de gestión financiera personal desarrollado con React y Nod
 ## 🌟 Características Principales
 
 - ✅ **Autenticación segura** con JWT y encriptación de contraseñas
-- 💰 **Gestión de movimientos financieros** (ingresos y egresos)
+- � **Recuperación de contraseña** por email con tokens seguros
+- 💰 **Gestión de movimientos financieros** (ingresos y egresos)  
 - 📊 **Dashboard interactivo** con estadísticas en tiempo real
-- 📈 **Reportes y análisis detallados** por categorías y períodos
+- 📈 **Reportes y gráficos avanzados** con visualizaciones interactivas
+- 🎯 **Planificador de compras inteligente** con cálculos por mes específico
+- 🚨 **Sistema de alertas** para control de gastos y análisis financiero
 - 👤 **Gestión de perfil de usuario**
 - 📱 **Diseño responsive** para móviles y escritorio
 - 🔍 **Filtros avanzados** para búsqueda y análisis
-- 📝 **Sistema de logs** para auditoría
+- 🐛 **Sistema de logging** para debugging y monitoreo de errores
 - 🖼️ **Subida de imágenes** para comprobantes (funcionalidad preparada)
 
 ## 🛠️ Tecnologías Utilizadas
@@ -23,6 +26,8 @@ Un sistema completo de gestión financiera personal desarrollado con React y Nod
 - **Mongoose** - ODM para MongoDB
 - **JWT** - Autenticación con tokens
 - **bcryptjs** - Encriptación de contraseñas
+- **nodemailer** - Envío de emails para recuperación de contraseña
+- **crypto** - Generación de tokens seguros
 - **CORS** - Habilitación de requests cross-origin
 - **Helmet** - Seguridad HTTP
 - **Jest** - Testing framework
@@ -63,6 +68,11 @@ MONGODB_URI=mongodb://localhost:27017/sistema-balance
 # JWT Secret (cambiar por una clave segura)
 JWT_SECRET=tu_clave_secreta_super_segura_aqui
 
+# Configuración de Email (para recuperación de contraseña)
+EMAIL_USER=tu-email@gmail.com
+EMAIL_PASS=tu-contraseña-de-aplicación
+FRONTEND_URL=http://localhost:3001
+
 # Puerto del servidor (opcional, por defecto 3000)
 PORT=3000
 
@@ -97,7 +107,28 @@ npm install
 3. Obtener la cadena de conexión
 4. Actualizar `MONGODB_URI` en el archivo `.env`
 
-### 5. Ejecutar la Aplicación
+### 5. Configurar Email (Para Recuperación de Contraseña)
+
+#### Opción A: Gmail (Recomendado)
+1. Habilitar **verificación en 2 pasos** en tu cuenta de Gmail
+2. Crear una **contraseña de aplicación**:
+   - Ir a Configuración de Google → Seguridad
+   - En "Verificación en 2 pasos" → "Contraseñas de aplicaciones"
+   - Seleccionar "Correo" y "Otro" como dispositivo
+   - Copiar la contraseña generada (16 caracteres)
+3. Actualizar variables de entorno:
+   ```env
+   EMAIL_USER=tu-email@gmail.com
+   EMAIL_PASS=contraseña-de-16-caracteres-generada
+   ```
+
+#### Opción B: Otros Proveedores
+- **Outlook/Hotmail**: Usar configuración SMTP similar
+- **Servicios dedicados**: SendGrid, Mailgun, AWS SES (recomendado para producción)
+
+⚠️ **Importante**: Nunca uses tu contraseña real de Gmail, siempre usa contraseñas de aplicación.
+
+### 6. Ejecutar la Aplicación
 
 #### Desarrollo
 
@@ -180,11 +211,17 @@ sistema-de-balance/
 │   │   ├── components/        # Componentes reutilizables
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── ProtectedRoute.jsx
-│   │   │   └── LogoutButton.jsx
+│   │   │   ├── LogoutButton.jsx
+│   │   │   ├── Graficos.jsx
+│   │   │   ├── AlertasComponent.jsx
+│   │   │   ├── PlanificadorCompras.jsx
+│   │   │   └── DevLogger.jsx
 │   │   ├── pages/             # Páginas de la aplicación
 │   │   │   ├── DashboardPage.jsx
 │   │   │   ├── LoginPage.jsx
 │   │   │   ├── RegisterPage.jsx
+│   │   │   ├── ForgotPasswordPage.jsx
+│   │   │   ├── ResetPasswordPage.jsx
 │   │   │   ├── ProfilePage.jsx
 │   │   │   ├── MovimientoFormPage.jsx
 │   │   │   ├── ReportesPage.jsx

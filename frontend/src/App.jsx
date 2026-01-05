@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
 import MovimientoFormPage from './pages/MovimientoFormPage';
@@ -11,6 +13,7 @@ import ReportesPage from './pages/ReportesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import DevLogger from './components/DevLogger';
 
 function App() {
   return (
@@ -19,6 +22,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/perfil" element={
           <ProtectedRoute>
             <ProfilePage />
@@ -41,6 +46,9 @@ function App() {
         } />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      
+      {/* Dev Logger - Solo visible en desarrollo */}
+      <DevLogger />
     </Router>
   );
 }
