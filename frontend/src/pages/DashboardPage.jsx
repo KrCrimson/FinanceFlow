@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
+import { useAnalisisGastos } from '../hooks/useAnalisisGastos';
 import { inhabilitarMovimiento } from '../services/movimientosService';
+import AlertasComponent from '../components/AlertasComponent';
+import PlanificadorCompras from '../components/PlanificadorCompras';
 
 function DashboardPage() {
 
   const { movimientos, loading, error } = useMovimientos();
+  const { alertas, estadisticasPorCategoria, resumenMensual, calcularTiempoParaCompra, obtenerSugerenciasAhorro } = useAnalisisGastos();
   const [actualizando, setActualizando] = useState(null);
   const [feedback, setFeedback] = useState('');
+  const [vistaActiva, setVistaActiva] = useState('dashboard'); // 'dashboard' o 'planificador'
 
   const handleInhabilitar = async (id) => {
     setActualizando(id);
@@ -108,22 +113,54 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Feedback */}
-        {feedback && (
-          <div className={`p-4 rounded-xl animate-fade-in ${
-            feedback.includes('Error') 
-              ? 'bg-red-50 border border-red-200 text-red-700' 
-              : 'bg-green-50 border border-green-200 text-green-700'
-          }`}>
-            <div className="flex items-center">
-              <span className="mr-2">{feedback.includes('Error') ? '❌' : '✅'}</span>
-              {feedback}
-            </div>
+        {/* Navegación por pestañas */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setVistaActiva('dashboard')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                vistaActiva === 'dashboard' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              📊 Dashboard
+            </button>
+            <button
+              onClick={() => setVistaActiva('planificador')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                vistaActiva === 'planificador' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              🎯 Planificador de Compras
+            </button>
           </div>
-        )}
+        </div>
 
-        {/* Tabla de movimientos mejorada */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        {/* Contenido según la pestaña activa */}
+        {vistaActiva === 'dashboard' && (
+          <>
+            {/* Alertas de gastos */}
+            <AlertasComponent alertas={alertas} />
+
+            {/* Feedback */}
+            {feedback && (
+              <div className={`p-4 rounded-xl animate-fade-in mb-6 ${
+                feedback.includes('Error') 
+                  ? 'bg-red-50 border border-red-200 text-red-700' 
+                  : 'bg-green-50 border border-green-200 text-green-700'
+              }`}>
+                <div className="flex items-center">
+                  <span className="mr-2">{feedback.includes('Error') ? '❌' : '✅'}</span>
+                  {feedback}
+                </div>
+              </div>
+            )}
+
+            {/* Tabla de movimientos mejorada */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-800">💳 Movimientos Recientes</h3>
@@ -249,6 +286,17 @@ function DashboardPage() {
             </div>
           )}
         </div>
+          </>
+        )}
+
+        {vistaActiva === 'planificador' && (
+          <PlanificadorCompras 
+            resumenMensual={resumenMensual}
+            estadisticasPorCategoria={estadisticasPorCategoria}
+            calcularTiempoParaCompra={calcularTiempoParaCompra}
+            obtenerSugerenciasAhorro={obtenerSugerenciasAhorro}
+          />
+        )}
       </div>
     </div>
   );
