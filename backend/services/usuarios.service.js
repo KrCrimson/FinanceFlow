@@ -119,7 +119,7 @@ module.exports = {
 
   // Configuración del transportador de email
   createMailTransporter: () => {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       service: 'gmail', // Puedes cambiarlo por otro proveedor
       auth: {
         user: process.env.EMAIL_USER || 'tu-email@gmail.com',
@@ -132,6 +132,12 @@ module.exports = {
   forgotPassword: async (email) => {
     if (!email || typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email)) {
       throw new Error('Email inválido');
+    }
+
+    // Verificar configuración de email
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || 
+        process.env.EMAIL_USER === 'tu-email-real@gmail.com') {
+      throw new Error('El sistema de email no está configurado. Contacta al administrador.');
     }
 
     const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
@@ -212,13 +218,30 @@ module.exports = {
     // Enviar email
     try {
       const transporter = module.exports.createMailTransporter();
+      console.log('Enviando email a:', usuario.email);
+      console.log('Configuración de email:', {
+        service: 'gmail',
+        user: process.env.EMAIL_USER ? '***configurado***' : 'NO_CONFIGURADO',
+        pass: process.env.EMAIL_PASS ? '***configurado***' : 'NO_CONFIGURADO'
+      });
+      
       await transporter.sendMail(mailOptions);
+      console.log('Email enviado exitosamente a:', usuario.email);
     } catch (error) {
+      console.error('Error detallado al enviar email:', {
+        message: error.message,
+        code: error.code,
+        command: error.command,
+        response: error.response,
+        responseCode: error.responseCode
+      });
+      
       // Limpiar token si falla el envío
       usuario.resetPasswordToken = null;
       usuario.resetPasswordExpires = null;
       await usuario.save();
-      throw new Error('Error al enviar el email. Inténtalo de nuevo más tarde.');
+      
+      throw new Error(`Error al enviar el email: ${error.message}. Verifica la configuración de EMAIL_USER y EMAIL_PASS.`);
     }
 
     return { message: 'Email de recuperación enviado exitosamente' };

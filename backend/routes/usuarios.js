@@ -19,6 +19,20 @@ router.post('/forgot-password', usuariosController.forgotPassword);
 router.post('/verify-reset-token', usuariosController.verifyResetToken);
 router.post('/reset-password', usuariosController.resetPassword);
 
+// Ruta de prueba para verificar configuración de email (solo desarrollo)
+router.get('/test-email-config', (req, res) => {
+  const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS && 
+                          process.env.EMAIL_USER !== 'tu-email@gmail.com';
+  
+  res.json({
+    emailConfigured,
+    environment: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+    emailUser: process.env.EMAIL_USER ? '***configurado***' : 'NO_CONFIGURADO',
+    emailPass: process.env.EMAIL_PASS ? '***configurado***' : 'NO_CONFIGURADO'
+  });
+});
+
 // Crear usuario (legacy)
 router.post('/', usuariosController.crearUsuario);
 // Listar usuarios

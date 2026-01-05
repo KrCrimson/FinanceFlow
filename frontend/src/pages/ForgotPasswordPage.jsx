@@ -46,7 +46,16 @@ function ForgotPasswordPage() {
         throw new Error(data.message || 'Error al enviar email de recuperación');
       }
     } catch (err) {
-      const errorMessage = err.message || 'Error al procesar la solicitud';
+      let errorMessage = 'Error al procesar la solicitud';
+      
+      if (err.message.includes('configuración')) {
+        errorMessage = 'Error de configuración del servidor. Contacta al administrador.';
+      } else if (err.message.includes('EMAIL_USER')) {
+        errorMessage = 'El servidor no está configurado para enviar emails. Contacta al administrador.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
       setError(errorMessage);
       logger.logApiError('/usuarios/forgot-password', err, { email });
     } finally {
