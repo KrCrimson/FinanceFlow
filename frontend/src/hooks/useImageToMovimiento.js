@@ -436,27 +436,25 @@ export function useImageToMovimiento() {
     return 0;
   };
 
-  // Función para determinar categoría basada en contenido
+  // Función para determinar categoría basada en contenido - versión simplificada
   const inferirCategoria = (text) => {
     const textLower = text.toLowerCase();
     
-    if (textLower.includes('universidad') || textLower.includes('pension') || textLower.includes('educacion')) {
-      return 'Educación';
-    }
-    if (textLower.includes('comida') || textLower.includes('restaurant') || textLower.includes('delivery')) {
+    // Solo categorías básicas
+    if (textLower.includes('comida') || textLower.includes('restaurant') || textLower.includes('delivery') || textLower.includes('almuerzo') || textLower.includes('cena')) {
       return 'Comida';
     }
-    if (textLower.includes('transporte') || textLower.includes('taxi') || textLower.includes('bus')) {
+    if (textLower.includes('transporte') || textLower.includes('taxi') || textLower.includes('bus') || textLower.includes('uber')) {
       return 'Transporte';
     }
-    if (textLower.includes('entretenimiento') || textLower.includes('bar') || textLower.includes('cerveza') || textLower.includes('diversión') || textLower.includes('bardos')) {
+    if (textLower.includes('vivienda') || textLower.includes('alquiler') || textLower.includes('casa') || textLower.includes('luz') || textLower.includes('agua')) {
+      return 'Vivienda';
+    }
+    if (textLower.includes('entretenimiento') || textLower.includes('bar') || textLower.includes('cerveza') || textLower.includes('diversión') || textLower.includes('cine')) {
       return 'Entretenimiento';
     }
-    if (textLower.includes('salud') || textLower.includes('farmacia') || textLower.includes('medico')) {
+    if (textLower.includes('salud') || textLower.includes('farmacia') || textLower.includes('medico') || textLower.includes('medicina')) {
       return 'Salud';
-    }
-    if (textLower.includes('vivienda') || textLower.includes('alquiler') || textLower.includes('casa')) {
-      return 'Vivienda';
     }
     return 'Otros';
   };

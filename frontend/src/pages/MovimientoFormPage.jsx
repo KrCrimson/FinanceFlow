@@ -9,20 +9,30 @@ function MovimientoFormPage() {
   const [nombre, setNombre] = useState('');
   const [monto, setMonto] = useState('');
   const [categoria, setCategoria] = useState('');
+  const [categoriaPersonalizada, setCategoriaPersonalizada] = useState('');
+  const [mostrarCategoriaPersonalizada, setMostrarCategoriaPersonalizada] = useState(false);
   const [descripcion, setDescripcion] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { processImage, result, loading: loadingImg, error: ocrError } = useImageToMovimiento();
 
+  // Categorías simplificadas - solo las más comunes
   const categorias = {
-    ingreso: ['Sueldo', 'Freelance', 'Ventas', 'Inversiones', 'Regalos', 'Otros'],
-    egreso: ['Comida', 'Transporte', 'Vivienda', 'Entretenimiento', 'Salud', 'Educación', 'Otros']
+    ingreso: ['Sueldo', 'Freelance', 'Ventas', 'Otros'],
+    egreso: ['Comida', 'Transporte', 'Vivienda', 'Entretenimiento', 'Salud', 'Otros']
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!nombre.trim() || !monto || monto <= 0) {
+    
+    // Determinar la categoría final a usar
+    let categoriaFinal = categoria;
+    if (categoria === 'Otros' && categoriaPersonalizada.trim()) {
+      categoriaFinal = categoriaPersonalizada.trim();
+    }
+    
+    if (!nombre.trim() || !monto || monto <= 0 || !categoriaFinal) {
       setError('Por favor complete todos los campos requeridos correctamente');
       return;
     }
@@ -35,7 +45,7 @@ function MovimientoFormPage() {
         tipo, 
         nombre: nombre.trim(), 
         monto: Number(monto), 
-        categoria: categoria || categorias[tipo][0], 
+        categoria: categoriaFinal, 
         descripcion: descripcion.trim() 
       });
       setSuccess('¡Movimiento registrado exitosamente!');
@@ -60,6 +70,8 @@ function MovimientoFormPage() {
     setNombre('');
     setMonto('');
     setCategoria('');
+    setCategoriaPersonalizada('');
+    setMostrarCategoriaPersonalizada(false);
     setDescripcion('');
     setError('');
     setSuccess('');
@@ -191,14 +203,39 @@ function MovimientoFormPage() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría</label>
               <select 
                 value={categoria} 
-                onChange={e => setCategoria(e.target.value)}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  setCategoria(valor);
+                  if (valor === 'Otros') {
+                    setMostrarCategoriaPersonalizada(true);
+                  } else {
+                    setMostrarCategoriaPersonalizada(false);
+                    setCategoriaPersonalizada('');
+                  }
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
+                required
               >
                 <option value="">Seleccionar categoría</option>
                 {categorias[tipo].map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
+              
+              {/* Campo para categoría personalizada */}
+              {mostrarCategoriaPersonalizada && (
+                <div className="mt-3">
+                  <input 
+                    type="text"
+                    placeholder="Escriba su categoría personalizada"
+                    value={categoriaPersonalizada}
+                    onChange={(e) => setCategoriaPersonalizada(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-blue-50"
+                    required
+                  />
+                  <p className="text-xs text-blue-600 mt-1">💡 Esta categoría se guardará para futuros usos</p>
+                </div>
+              )}
             </div>
           </div>
 
