@@ -295,6 +295,7 @@ function DashboardPage() {
             estadisticasPorCategoria={estadisticasPorCategoria}
             calcularTiempoParaCompra={calcularTiempoParaCompra}
             obtenerSugerenciasAhorro={obtenerSugerenciasAhorro}
+            movimientos={movimientos}
           />
         )}
       </div>

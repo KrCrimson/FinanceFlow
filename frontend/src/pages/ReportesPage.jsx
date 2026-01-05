@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getReportes } from '../services/reportesService';
 import { getMovimientos } from '../services/movimientosService';
 import { useNavigate } from 'react-router-dom';
+import { GraficoBarras, GraficoLinea, GraficoCircular } from '../components/Graficos';
 
 function ReportesPage() {
   const navigate = useNavigate();
@@ -89,6 +90,75 @@ function ReportesPage() {
     { value: 9, label: 'Octubre' }, { value: 10, label: 'Noviembre' }, { value: 11, label: 'Diciembre' }
   ];
 
+  // Procesar datos para gráficos
+  const procesarDatosGraficos = () => {
+    if (!movimientos || movimientos.length === 0) {
+      return {
+        gastosPorCategoria: [],
+        ingresosPorCategoria: [],
+        tendenciaMensual: [],
+        balancePorMes: []
+      };
+    }
+
+    // Gastos por categoría
+    const gastosPorCategoria = movimientosActivos
+      .filter(m => m.tipo === 'egreso')
+      .reduce((acc, mov) => {
+        const categoria = mov.categoria || 'Sin categoría';
+        acc[categoria] = (acc[categoria] || 0) + Math.abs(mov.monto);
+        return acc;
+      }, {});
+
+    // Ingresos por categoría
+    const ingresosPorCategoria = movimientosActivos
+      .filter(m => m.tipo === 'ingreso')
+      .reduce((acc, mov) => {
+        const categoria = mov.categoria || 'Sin categoría';
+        acc[categoria] = (acc[categoria] || 0) + mov.monto;
+        return acc;
+      }, {});
+
+    // Tendencia mensual (últimos 6 meses)
+    const ahora = new Date();
+    const tendenciaMensual = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+      const mes = fecha.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+      
+      const movimientosMes = movimientosActivos.filter(m => {
+        const fechaMov = new Date(m.creadoEn);
+        return fechaMov.getMonth() === fecha.getMonth() && 
+               fechaMov.getFullYear() === fecha.getFullYear();
+      });
+
+      const totalGastos = movimientosMes
+        .filter(m => m.tipo === 'egreso')
+        .reduce((sum, m) => sum + Math.abs(m.monto), 0);
+      
+      const totalIngresos = movimientosMes
+        .filter(m => m.tipo === 'ingreso')
+        .reduce((sum, m) => sum + m.monto, 0);
+
+      tendenciaMensual.push({
+        label: mes,
+        gastos: totalGastos,
+        ingresos: totalIngresos,
+        balance: totalIngresos - totalGastos
+      });
+    }
+
+    return {
+      gastosPorCategoria: Object.entries(gastosPorCategoria).map(([label, valor]) => ({ label, valor })),
+      ingresosPorCategoria: Object.entries(ingresosPorCategoria).map(([label, valor]) => ({ label, valor })),
+      tendenciaMensual,
+      balancePorMes: tendenciaMensual.map(t => ({ label: t.label, valor: t.balance }))
+    };
+  };
+
+  const datosGraficos = procesarDatosGraficos();
+
   return (
     <div className="min-h-[80vh] bg-background p-4">
       <div className="max-w-6xl mx-auto">
@@ -121,6 +191,7 @@ function ReportesPage() {
           <div className="flex border-b border-gray-200">
             {[
               { id: 'resumen', label: '📈 Resumen General', icon: '📈' },
+              { id: 'graficos', label: '📊 Gráficos', icon: '📊' },
               { id: 'movimientos', label: '💰 Movimientos', icon: '💰' },
               { id: 'logs', label: '📋 Historial', icon: '📋' }
             ].map(tab => (
@@ -197,6 +268,118 @@ function ReportesPage() {
                     <p className="text-gray-500 text-center py-8">No hay movimientos categorizados</p>
                   )}
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'graficos' && (
+              <div className="space-y-8">
+                {/* Descripción */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <h3 className="font-bold text-blue-900 mb-2">📊 Análisis Visual de Finanzas</h3>
+                  <p className="text-blue-800 text-sm">
+                    Visualiza tus patrones de gastos e ingresos con gráficos interactivos para tomar mejores decisiones financieras.
+                  </p>
+                </div>
+
+                {movimientos.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <div className="text-6xl mb-4">📊</div>
+                    <p className="text-xl font-medium mb-2">No hay datos para mostrar</p>
+                    <p>Agrega algunos movimientos para ver los gráficos</p>
+                    <button 
+                      onClick={() => navigate('/movimiento')}
+                      className="mt-4 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg transition-colors"
+                    >
+                      ➕ Agregar Movimiento
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Gráfico de gastos por categoría */}
+                    {datosGraficos.gastosPorCategoria.length > 0 && (
+                      <GraficoCircular 
+                        datos={datosGraficos.gastosPorCategoria}
+                        titulo="💸 Distribución de Gastos por Categoría"
+                      />
+                    )}
+
+                    {/* Gráfico de ingresos por categoría */}
+                    {datosGraficos.ingresosPorCategoria.length > 0 && (
+                      <GraficoBarras 
+                        datos={datosGraficos.ingresosPorCategoria}
+                        titulo="💰 Ingresos por Categoría"
+                        colorPrimario="#10B981"
+                      />
+                    )}
+
+                    {/* Tendencia mensual */}
+                    {datosGraficos.tendenciaMensual.length > 0 && (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <GraficoLinea 
+                          datos={datosGraficos.tendenciaMensual.map(t => ({
+                            label: t.label,
+                            valor: t.gastos
+                          }))}
+                          titulo="📉 Tendencia de Gastos (6 meses)"
+                          color="#EF4444"
+                        />
+                        <GraficoLinea 
+                          datos={datosGraficos.tendenciaMensual.map(t => ({
+                            label: t.label,
+                            valor: t.ingresos
+                          }))}
+                          titulo="📈 Tendencia de Ingresos (6 meses)"
+                          color="#10B981"
+                        />
+                      </div>
+                    )}
+
+                    {/* Balance mensual */}
+                    {datosGraficos.balancePorMes.length > 0 && (
+                      <GraficoBarras 
+                        datos={datosGraficos.balancePorMes}
+                        titulo="⚖️ Balance Mensual (Últimos 6 meses)"
+                        colorPrimario="#3B82F6"
+                        colorSecundario="#EF4444"
+                      />
+                    )}
+
+                    {/* Resumen estadístico */}
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">📋 Resumen Estadístico</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-white rounded-lg p-4 border">
+                          <h4 className="font-semibold text-gray-700 mb-2">💸 Gasto Promedio Mensual</h4>
+                          <p className="text-2xl font-bold text-red-600">
+                            ${datosGraficos.tendenciaMensual.length > 0 ? 
+                              (datosGraficos.tendenciaMensual.reduce((sum, t) => sum + t.gastos, 0) / datosGraficos.tendenciaMensual.length).toLocaleString() : 0
+                            }
+                          </p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border">
+                          <h4 className="font-semibold text-gray-700 mb-2">💰 Ingreso Promedio Mensual</h4>
+                          <p className="text-2xl font-bold text-green-600">
+                            ${datosGraficos.tendenciaMensual.length > 0 ? 
+                              (datosGraficos.tendenciaMensual.reduce((sum, t) => sum + t.ingresos, 0) / datosGraficos.tendenciaMensual.length).toLocaleString() : 0
+                            }
+                          </p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border">
+                          <h4 className="font-semibold text-gray-700 mb-2">⚖️ Balance Promedio</h4>
+                          <p className={`text-2xl font-bold ${
+                            datosGraficos.balancePorMes.length > 0 && 
+                            datosGraficos.balancePorMes.reduce((sum, t) => sum + t.valor, 0) / datosGraficos.balancePorMes.length >= 0 ? 
+                            'text-blue-600' : 'text-orange-600'
+                          }`}>
+                            ${datosGraficos.balancePorMes.length > 0 ? 
+                              (datosGraficos.balancePorMes.reduce((sum, t) => sum + t.valor, 0) / datosGraficos.balancePorMes.length).toLocaleString() : 0
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

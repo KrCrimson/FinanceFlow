@@ -1,10 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function PlanificadorCompras({ resumenMensual, estadisticasPorCategoria, calcularTiempoParaCompra, obtenerSugerenciasAhorro }) {
+function PlanificadorCompras({ resumenMensual, estadisticasPorCategoria, calcularTiempoParaCompra, obtenerSugerenciasAhorro, movimientos }) {
   const [precioDeseado, setPrecioDeseado] = useState('');
   const [nombreProducto, setNombreProducto] = useState('');
   const [resultado, setResultado] = useState(null);
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
+  const [mesSeleccionado, setMesSeleccionado] = useState('');
+  const [datosCalculados, setDatosCalculados] = useState(resumenMensual);
+
+  // Función para calcular datos específicos del mes
+  const calcularDatosPorMes = (mes) => {
+    if (!movimientos || !mes) {
+      return resumenMensual;
+    }
+
+    const [year, month] = mes.split('-').map(Number);
+    const movimientosMes = movimientos.filter(mov => {
+      const fechaMov = new Date(mov.fecha || mov.creadoEn);
+      return fechaMov.getFullYear() === year && fechaMov.getMonth() === month - 1;
+    });
+
+    const ingresosMes = movimientosMes
+      .filter(m => m.tipo === 'ingreso')
+      .reduce((sum, m) => sum + (m.monto || 0), 0);
+    
+    const gastosMes = movimientosMes
+      .filter(m => m.tipo === 'egreso')
+      .reduce((sum, m) => sum + (m.monto || 0), 0);
+    
+    const ahorroMes = ingresosMes - gastosMes;
+
+    return {
+      ingresoPromedio: ingresosMes,
+      gastoPromedio: gastosMes,
+      ahorroPromedio: ahorroMes
+    };
+  };
+
+  // Efecto para actualizar datos cuando cambie el mes
+  useEffect(() => {
+    if (mesSeleccionado) {
+      const nuevosDatos = calcularDatosPorMes(mesSeleccionado);
+      setDatosCalculados(nuevosDatos);
+    } else {
+      setDatosCalculados(resumenMensual);
+    }
+  }, [mesSeleccionado, movimientos, resumenMensual]);
 
   const handleCalcular = () => {
     if (!precioDeseado || precioDeseado <= 0) {
@@ -12,13 +53,57 @@ function PlanificadorCompras({ resumenMensual, estadisticasPorCategoria, calcula
       return;
     }
 
-    const calculo = calcularTiempoParaCompra(Number(precioDeseado));
+    // Crear un cálculo temporal basado en los datos del mes seleccionado
+    const calcularTiempoTemp = (precio) => {
+      const ahorroMensual = datosCalculados.ahorroPromedio;
+      
+      if (ahorroMensual <= 0) {
+        return {
+          esviable: false,
+          mensaje: 'No es posible con el ahorro actual',
+          sugerencia: 'Necesitas reducir gastos o aumentar ingresos'
+        };
+      }
+      
+      const mesesNecesarios = Math.ceil(precio / ahorroMensual);
+      const fechaEstimada = new Date();
+      fechaEstimada.setMonth(fechaEstimada.getMonth() + mesesNecesarios);
+      
+      return {
+        esviable: true,
+        mesesNecesarios,
+        fechaEstimada,
+        ahorroMensualNecesario: precio / mesesNecesarios,
+        mensaje: `Podrías comprarlo en ${mesesNecesarios} ${mesesNecesarios === 1 ? 'mes' : 'meses'}`,
+        sugerencia: `Con tu ahorro mensual actual de S/${ahorroMensual.toFixed(2)}, podrás comprarlo pronto`
+      };
+    };
+
+    const calculo = calcularTiempoTemp(Number(precioDeseado));
     setResultado({
       ...calculo,
       precio: Number(precioDeseado),
       producto: nombreProducto || 'Producto deseado'
     });
     setMostrarSugerencias(true);
+  };
+
+  // Generar opciones de meses (últimos 12 meses)
+  const generarOpcionesMeses = () => {
+    const opciones = [];
+    const hoy = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const valor = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}`;
+      const texto = fecha.toLocaleDateString('es-PE', { 
+        year: 'numeric', 
+        month: 'long'
+      });
+      opciones.push({ valor, texto });
+    }
+    
+    return opciones;
   };
 
   const sugerenciasAhorro = obtenerSugerenciasAhorro();
@@ -39,6 +124,31 @@ function PlanificadorCompras({ resumenMensual, estadisticasPorCategoria, calcula
           <h2 className="text-xl font-bold text-gray-800">Planificador de Compras</h2>
           <p className="text-gray-600 text-sm">Calcula cuánto tiempo necesitas para comprar algo</p>
         </div>
+      </div>
+
+      {/* Selector de mes */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          📅 Elegir mes para cálculos
+        </label>
+        <select
+          value={mesSeleccionado}
+          onChange={(e) => setMesSeleccionado(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+        >
+          <option value="">📊 Usar promedio general</option>
+          {generarOpcionesMeses().map(({ valor, texto }) => (
+            <option key={valor} value={valor}>
+              {texto}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500 mt-1">
+          {mesSeleccionado ? 
+            `Usando datos específicos de ${generarOpcionesMeses().find(m => m.valor === mesSeleccionado)?.texto}` : 
+            'Usando promedio de todos los meses'
+          }
+        </p>
       </div>
 
       {/* Formulario de entrada */}
@@ -79,17 +189,23 @@ function PlanificadorCompras({ resumenMensual, estadisticasPorCategoria, calcula
       {/* Resumen financiero */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
         <div className="text-center">
-          <p className="text-sm text-gray-600">Ingresos Promedio</p>
-          <p className="text-lg font-bold text-green-600">S/{resumenMensual.ingresoPromedio.toFixed(2)}</p>
+          <p className="text-sm text-gray-600">
+            {mesSeleccionado ? 'Ingresos del Mes' : 'Ingresos Promedio'}
+          </p>
+          <p className="text-lg font-bold text-green-600">S/{datosCalculados.ingresoPromedio.toFixed(2)}</p>
         </div>
         <div className="text-center">
-          <p className="text-sm text-gray-600">Gastos Promedio</p>
-          <p className="text-lg font-bold text-red-600">S/{resumenMensual.gastoPromedio.toFixed(2)}</p>
+          <p className="text-sm text-gray-600">
+            {mesSeleccionado ? 'Gastos del Mes' : 'Gastos Promedio'}
+          </p>
+          <p className="text-lg font-bold text-red-600">S/{datosCalculados.gastoPromedio.toFixed(2)}</p>
         </div>
         <div className="text-center">
-          <p className="text-sm text-gray-600">Ahorro Actual</p>
-          <p className={`text-lg font-bold ${resumenMensual.ahorroPromedio >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-            S/{resumenMensual.ahorroPromedio.toFixed(2)}
+          <p className="text-sm text-gray-600">
+            {mesSeleccionado ? 'Ahorro del Mes' : 'Ahorro Actual'}
+          </p>
+          <p className={`text-lg font-bold ${datosCalculados.ahorroPromedio >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+            S/{datosCalculados.ahorroPromedio.toFixed(2)}
           </p>
         </div>
       </div>

@@ -27,9 +27,14 @@ function AlertasComponent({ alertas }) {
             <div className="flex-1">
               <h3 className="font-semibold text-red-800 mb-1">{alerta.mensaje}</h3>
               <p className="text-red-600 text-sm mb-2">{alerta.descripcion}</p>
-              {alerta.porcentaje && (
+              {alerta.porcentaje && alerta.porcentaje !== 'nuevo' && (
                 <div className="bg-red-100 px-3 py-1 rounded-full text-xs font-medium text-red-700 inline-block">
                   {alerta.porcentaje}% del promedio
+                </div>
+              )}
+              {alerta.porcentaje === 'nuevo' && (
+                <div className="bg-blue-100 px-3 py-1 rounded-full text-xs font-medium text-blue-700 inline-block">
+                  📍 Categoría nueva
                 </div>
               )}
             </div>
@@ -44,9 +49,14 @@ function AlertasComponent({ alertas }) {
             <div className="flex-1">
               <h3 className="font-semibold text-yellow-800 mb-1">{alerta.mensaje}</h3>
               <p className="text-yellow-600 text-sm mb-2">{alerta.descripcion}</p>
-              {alerta.porcentaje && (
+              {alerta.porcentaje && alerta.porcentaje !== 'nuevo' && (
                 <div className="bg-yellow-100 px-3 py-1 rounded-full text-xs font-medium text-yellow-700 inline-block">
                   {alerta.porcentaje}% del promedio
+                </div>
+              )}
+              {alerta.porcentaje === 'nuevo' && (
+                <div className="bg-blue-100 px-3 py-1 rounded-full text-xs font-medium text-blue-700 inline-block">
+                  📍 Categoría nueva
                 </div>
               )}
             </div>

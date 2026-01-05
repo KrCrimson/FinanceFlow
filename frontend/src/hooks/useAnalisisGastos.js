@@ -97,11 +97,18 @@ export function useAnalisisGastos() {
       const actual = stats[categoria].gastoActual;
       const promedio = stats[categoria].promedioAnterior;
       
-      if (actual > promedio * 1.5) {
+      if (promedio === 0) {
+        // Categoría nueva - solo alertar si el gasto es significativo
+        if (actual > 100) { // Gasto mayor a S/100 en categoría nueva
+          stats[categoria].tendencia = 'alto';
+        } else {
+          stats[categoria].tendencia = 'normal';
+        }
+      } else if (actual > promedio * 1.5) {
         stats[categoria].tendencia = 'muy_alto';
       } else if (actual > promedio * 1.2) {
         stats[categoria].tendencia = 'alto';
-      } else if (actual < promedio * 0.8 && promedio > 0) {
+      } else if (actual < promedio * 0.8) {
         stats[categoria].tendencia = 'bajo';
       } else {
         stats[categoria].tendencia = 'normal';
@@ -141,22 +148,30 @@ export function useAnalisisGastos() {
     // Alertas por categoría
     Object.entries(stats).forEach(([categoria, data]) => {
       if (data.tendencia === 'muy_alto') {
+        const porcentaje = data.promedioAnterior > 0 ? 
+          ((data.gastoActual / data.promedioAnterior) * 100).toFixed(0) : 
+          'nuevo';
+        
         alertas.push({
           tipo: 'gasto_elevado',
           categoria,
           mensaje: `¡Gasto muy elevado en ${categoria}!`,
-          descripcion: `Has gastado S/${data.gastoActual.toFixed(2)} este mes vs S/${data.promedioAnterior.toFixed(2)} de promedio.`,
+          descripcion: `Has gastado S/${data.gastoActual.toFixed(2)} este mes${data.promedioAnterior > 0 ? ` vs S/${data.promedioAnterior.toFixed(2)} de promedio` : ' (categoría nueva)'}.`,
           severidad: 'alta',
-          porcentaje: ((data.gastoActual / data.promedioAnterior) * 100).toFixed(0)
+          porcentaje: porcentaje
         });
       } else if (data.tendencia === 'alto') {
+        const porcentaje = data.promedioAnterior > 0 ? 
+          ((data.gastoActual / data.promedioAnterior) * 100).toFixed(0) : 
+          'nuevo';
+          
         alertas.push({
           tipo: 'gasto_alto',
           categoria,
           mensaje: `Gasto elevado en ${categoria}`,
-          descripcion: `Estás gastando S/${data.gastoActual.toFixed(2)} vs S/${data.promedioAnterior.toFixed(2)} de promedio.`,
+          descripcion: `Estás gastando S/${data.gastoActual.toFixed(2)}${data.promedioAnterior > 0 ? ` vs S/${data.promedioAnterior.toFixed(2)} de promedio` : ' (categoría nueva)'}.`,
           severidad: 'media',
-          porcentaje: ((data.gastoActual / data.promedioAnterior) * 100).toFixed(0)
+          porcentaje: porcentaje
         });
       }
     });
