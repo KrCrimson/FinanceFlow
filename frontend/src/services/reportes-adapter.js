@@ -54,7 +54,7 @@ class ReportesAdapter {
     }
 
     try {
-      const BalanceSDK = require('../../sdk/src/index.js');
+      const BalanceSDK = require('../sdk/index.js');
       this.sdk = new BalanceSDK(this.config.sdkConfig);
 
       // Configurar token si existe
