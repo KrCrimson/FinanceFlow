@@ -5,7 +5,7 @@
  * Incluye manejo de autenticación, interceptors, retry logic y estadísticas.
  */
 
-import axios from 'axios';
+const axios = require('axios');
 
 class HttpClient {
   constructor(config) {
@@ -209,4 +209,4 @@ class HttpClient {
   }
 }
 
-export default HttpClient;
+module.exports = HttpClient;

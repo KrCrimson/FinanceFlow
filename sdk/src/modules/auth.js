@@ -234,4 +234,4 @@ class AuthModule {
   }
 }
 
-export default AuthModule;
+module.exports = AuthModule;
