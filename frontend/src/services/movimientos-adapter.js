@@ -27,9 +27,11 @@ class MovimientosAdapter {
     
     // Configuración desde variables de entorno o localStorage
     this.config = {
-      enableSDK: process.env.REACT_APP_ENABLE_SDK === 'true' || 
-                 (typeof localStorage !== 'undefined' && localStorage.getItem('enable_sdk') === 'true'),
-      apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+      enableSDK: process.env.REACT_APP_ENABLE_SDK !== 'false' && 
+                 (process.env.REACT_APP_ENABLE_SDK === 'true' || 
+                  (typeof localStorage !== 'undefined' && localStorage.getItem('enable_sdk') !== 'false') ||
+                  process.env.NODE_ENV === 'production'), // Habilitado por defecto en production
+      apiUrl: process.env.REACT_APP_API_URL || window.location.origin,
       debug: process.env.REACT_APP_SDK_DEBUG === 'true' || false
     };
 

@@ -5,51 +5,87 @@
  * manteniendo la compatibilidad con ES6 modules del frontend.
  */
 
-// Importar adaptador CommonJS usando dynamic import
-let adapterInstance = null;
+// Import estático directo del adaptador
+import movimientosAdapter from './movimientos-adapter.js';
 
-async function getAdapter() {
-  if (!adapterInstance) {
-    try {
-      const adapter = await import('./movimientos-adapter.js');
-      adapterInstance = adapter.default || adapter;
-    } catch (error) {
-      console.error('Error cargando adaptador Movimientos:', error);
-      throw new Error('Adaptador Movimientos no disponible');
-    }
-  }
-  return adapterInstance;
-}
-
-// Exportar métodos principales
-
+// Exportar métodos principales directamente
 export async function getMovimientos(...args) {
-  const adapter = await getAdapter();
-  return adapter.getMovimientos(...args);
+  try {
+    return await movimientosAdapter.getMovimientos(...args);
+  } catch (error) {
+    console.error('Error en getMovimientos:', error);
+    throw error;
+  }
 }
 
 export async function createMovimiento(...args) {
-  const adapter = await getAdapter();
-  return adapter.createMovimiento(...args);
+  try {
+    return await movimientosAdapter.createMovimiento(...args);
+  } catch (error) {
+    console.error('Error en createMovimiento:', error);
+    throw error;
+  }
 }
 
 export async function updateMovimiento(...args) {
-  const adapter = await getAdapter();
-  return adapter.updateMovimiento(...args);
+  try {
+    return await movimientosAdapter.updateMovimiento(...args);
+  } catch (error) {
+    console.error('Error en updateMovimiento:', error);
+    throw error;
+  }
 }
 
 export async function inhabilitarMovimiento(...args) {
-  const adapter = await getAdapter();
-  return adapter.inhabilitarMovimiento(...args);
+  try {
+    return await movimientosAdapter.inhabilitarMovimiento(...args);
+  } catch (error) {
+    console.error('Error en inhabilitarMovimiento:', error);
+    throw error;
+  }
 }
 
-// Exportar métodos adicionales si están disponibles
+// Métodos adicionales
+export async function getMovimientoById(...args) {
+  try {
+    return await movimientosAdapter.getMovimientoById(...args);
+  } catch (error) {
+    console.error('Error en getMovimientoById:', error);
+    throw error;
+  }
+}
+
+export async function getIngresos(...args) {
+  try {
+    return await movimientosAdapter.getIngresos(...args);
+  } catch (error) {
+    console.error('Error en getIngresos:', error);
+    throw error;
+  }
+}
+
+export async function getEgresos(...args) {
+  try {
+    return await movimientosAdapter.getEgresos(...args);
+  } catch (error) {
+    console.error('Error en getEgresos:', error);
+    throw error;
+  }
+}
+
+export async function getResumen(...args) {
+  try {
+    return await movimientosAdapter.getResumen(...args);
+  } catch (error) {
+    console.error('Error en getResumen:', error);
+    throw error;
+  }
+}
+
+// Exportar métodos de control
 export async function updateToken(token) {
   try {
-    const adapter = await getAdapter();
-    if (adapter.updateToken) {
-      return adapter.updateToken(token);
-    }
+    return movimientosAdapter.updateToken(token);
   } catch (error) {
     console.warn('updateToken no disponible en adaptador Movimientos');
   }
@@ -57,10 +93,7 @@ export async function updateToken(token) {
 
 export async function getAdapterStats() {
   try {
-    const adapter = await getAdapter();
-    if (adapter.getAdapterStats) {
-      return adapter.getAdapterStats();
-    }
+    return movimientosAdapter.getAdapterStats();
   } catch (error) {
     console.warn('getAdapterStats no disponible en adaptador Movimientos');
   }

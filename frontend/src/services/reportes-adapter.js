@@ -37,9 +37,9 @@ class ReportesAdapter {
     } catch (error) {
       this.log('Error cargando configuración, usando defaults', 'warning');
       return {
-        enableSDK: false,
-        sdkConfig: { baseURL: 'http://localhost:3000/api' },
-        debug: false
+        enableSDK: process.env.NODE_ENV === 'production' || process.env.REACT_APP_ENABLE_SDK === 'true', // Habilitado por defecto en production
+        sdkConfig: { baseURL: process.env.REACT_APP_API_URL || window.location.origin + '/api' },
+        debug: process.env.REACT_APP_SDK_DEBUG === 'true' || false
       };
     }
   }
