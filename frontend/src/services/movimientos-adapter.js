@@ -13,9 +13,9 @@
  */
 
 // Importar servicio original para fallback
-import * as originalService from '../../frontend/src/services/movimientosService.js';
+import * as originalService from './movimientosService.js';
 // Importar SDK nuevo
-const BalanceSDK = require('../src/index.js');
+const BalanceSDK = require('../../sdk/src/index.js');
 
 class MovimientosAdapter {
   constructor() {
