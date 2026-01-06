@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SDK Migration Monitor</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 SDK Migration Monitor</h1>
+    
+    <div id="status" class="status">
+        <h3>Estado del Sistema</h3>
+        <p>Cargando...</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-card">
+            <h4>Requests SDK</h4>
+            <p id="sdk-requests">-</p>
+        </div>
+        <div class="stat-card">
+            <h4>Requests Fallback</h4>
+            <p id="fallback-requests">-</p>
+        </div>
+        <div class="stat-card">
+            <h4>Success Rate</h4>
+            <p id="success-rate">-</p>
+        </div>
+        <div class="stat-card">
+            <h4>Rollout %</h4>
+            <p id="rollout-percentage">-</p>
+        </div>
+    </div>
+    
+    <script>
+        // TODO: Implementar monitoreo en tiempo real
+        console.log('Monitoring dashboard loaded');
+        
+        function updateStats() {
+            // Obtener stats del localStorage o API
+            if (typeof localStorage !== 'undefined') {
+                const config = JSON.parse(localStorage.getItem('balance_adapter_config') || '{}');
+                document.getElementById('rollout-percentage').textContent = 
+                    (config.migration?.rolloutPercentage || 0) + '%';
+            }
+        }
+        
+        updateStats();
+        setInterval(updateStats, 5000);
+    </script>
+</body>
+</html>
+    

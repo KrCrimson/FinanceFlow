@@ -1,0 +1,22 @@
+{
+  "phase": 3,
+  "startTime": "2026-01-06T15:30:43.648Z",
+  "services": {
+    "reportes": {
+      "completed": true,
+      "timestamp": "2026-01-06T16:23:14.556Z",
+      "filesChanged": 1,
+      "importsChanged": 1,
+      "method": "wrapper-es6"
+    },
+    "movimientos": {
+      "completed": true,
+      "timestamp": "2026-01-06T16:15:08.846Z",
+      "filesChanged": 0,
+      "importsChanged": 4
+    }
+  },
+  "backups": {},
+  "currentService": null,
+  "lastUpdate": "2026-01-06T16:15:08.846Z"
+}

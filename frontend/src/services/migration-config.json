@@ -1,0 +1,35 @@
+{
+  "mode": "safe",
+  "sdk": {
+    "enabled": false,
+    "baseURL": "http://localhost:3000/api"
+  },
+  "migration": {
+    "phase": "disabled",
+    "rolloutPercentage": 0,
+    "featureFlags": {
+      "sdk-movimientos": true,
+      "sdk-auth": true,
+      "sdk-usuarios": true,
+      "sdk-reportes": true
+    }
+  },
+  "services": {
+    "auth": {
+      "migrated": true,
+      "timestamp": "2026-01-06T15:19:45.278Z",
+      "version": "1.0.0"
+    },
+    "usuarios": {
+      "migrated": true,
+      "timestamp": "2026-01-06T15:19:50.815Z",
+      "version": "1.0.0"
+    },
+    "reportes": {
+      "migrated": true,
+      "timestamp": "2026-01-06T15:19:53.999Z",
+      "version": "1.0.0"
+    }
+  },
+  "timestamp": "2026-01-06T15:19:53.999Z"
+}

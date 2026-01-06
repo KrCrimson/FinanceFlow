@@ -1,102 +1,67 @@
-// Servicio para movimientos
-import logger from '../utils/logger';
+/**
+ * 🔄 Wrapper ES6 para Movimientos - FASE 3
+ * 
+ * Este archivo redirige las llamadas al adaptador CommonJS
+ * manteniendo la compatibilidad con ES6 modules del frontend.
+ */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-const API_BASE = `${API_BASE_URL}/api`;
+// Importar adaptador CommonJS usando dynamic import
+let adapterInstance = null;
 
-function getToken() {
-  return localStorage.getItem('token');
-}
-
-function getHeaders() {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
-
-export async function getMovimientos() {
-  try {
-    logger.debug('Obteniendo movimientos');
-    const response = await fetch(`${API_BASE}/movimientos`, {
-      headers: getHeaders()
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+async function getAdapter() {
+  if (!adapterInstance) {
+    try {
+      const adapter = await import('./movimientos-adapter.js');
+      adapterInstance = adapter.default || adapter;
+    } catch (error) {
+      console.error('Error cargando adaptador Movimientos:', error);
+      throw new Error('Adaptador Movimientos no disponible');
     }
-    
-    const data = await response.json();
-    logger.debug('Movimientos obtenidos exitosamente', { count: data?.length || 0 });
-    return data || []; // Asegurar que siempre retorne un array
+  }
+  return adapterInstance;
+}
+
+// Exportar métodos principales
+
+export async function getMovimientos(...args) {
+  const adapter = await getAdapter();
+  return adapter.getMovimientos(...args);
+}
+
+export async function createMovimiento(...args) {
+  const adapter = await getAdapter();
+  return adapter.createMovimiento(...args);
+}
+
+export async function updateMovimiento(...args) {
+  const adapter = await getAdapter();
+  return adapter.updateMovimiento(...args);
+}
+
+export async function inhabilitarMovimiento(...args) {
+  const adapter = await getAdapter();
+  return adapter.inhabilitarMovimiento(...args);
+}
+
+// Exportar métodos adicionales si están disponibles
+export async function updateToken(token) {
+  try {
+    const adapter = await getAdapter();
+    if (adapter.updateToken) {
+      return adapter.updateToken(token);
+    }
   } catch (error) {
-    logger.logApiError('/movimientos', error);
-    throw error;
+    console.warn('updateToken no disponible en adaptador Movimientos');
   }
 }
 
-export async function createMovimiento(data) {
+export async function getAdapterStats() {
   try {
-    logger.debug('Creando movimiento', { data });
-    const response = await fetch(`${API_BASE}/movimientos`, {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Error HTTP ${response.status}`);
+    const adapter = await getAdapter();
+    if (adapter.getAdapterStats) {
+      return adapter.getAdapterStats();
     }
-    
-    const result = await response.json();
-    logger.info('Movimiento creado exitosamente', { id: result._id, tipo: data.tipo });
-    return result;
   } catch (error) {
-    logger.logApiError('/movimientos (POST)', error, data);
-    throw error;
-  }
-}
-
-export async function updateMovimiento(id, data) {
-  try {
-    logger.debug('Actualizando movimiento', { id, data });
-    const response = await fetch(`${API_BASE}/movimientos/${id}`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Error HTTP ${response.status}`);
-    }
-    
-    const result = await response.json();
-    logger.info('Movimiento actualizado exitosamente', { id });
-    return result;
-  } catch (error) {
-    logger.logApiError(`/movimientos/${id} (PUT)`, error, { id, data });
-    throw error;
-  }
-}
-
-export async function inhabilitarMovimiento(id) {
-  try {
-    const response = await fetch(`${API_BASE}/movimientos/${id}/inactivar`, {
-      method: 'PATCH',
-      headers: getHeaders()
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al inhabilitar movimiento');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error en inhabilitarMovimiento:', error);
-    throw error;
+    console.warn('getAdapterStats no disponible en adaptador Movimientos');
   }
 }
