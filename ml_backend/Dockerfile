@@ -15,9 +15,10 @@ RUN apt-get update && apt-get install -y \
 # Configurar directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias de Python
+# Instalar dependencias de Python optimizando memoria
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copiar el resto del código
 COPY . .
@@ -25,5 +26,5 @@ COPY . .
 # Exponer el puerto
 EXPOSE 8000
 
-# Iniciar FastAPI leyendo la variable PORT que inyecta Render
-CMD sh -c "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Iniciar FastAPI leyendo la variable PORT
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
