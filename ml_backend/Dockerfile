@@ -4,12 +4,10 @@ FROM python:3.10-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Instalar dependencias del sistema operativo (Requeridas por OpenCV y Tesseract)
+# Instalar dependencias del sistema operativo (Requeridas por Tesseract)
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-spa \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Configurar directorio de trabajo
