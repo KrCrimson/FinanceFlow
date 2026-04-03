@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 import cv2
 import numpy as np
 import pytesseract
-from PIL import Image
-import io
+import joblib
+import os
 
 app = FastAPI(title="Bank Sync & ML Classifier API")
 
@@ -24,21 +24,36 @@ class CategorizeRequest(BaseModel):
     description: str
     amount: float
 
-# --- MODELO ML CLASIFICADOR ---
+# --- Cargar el Modelo de Machine Learning Entrenado ---
+modelo_ruta = os.path.join(os.path.dirname(__file__), 'modelo_clasificador.pkl')
+ml_model = None
+
+try:
+    ml_model = joblib.load(modelo_ruta)
+    print("✅ Modelo Machine Learning cargado correctamente en memoria.")
+except Exception as e:
+    print(f"⚠️  Advertencia: Modelo ML no encontrado. Se usará modo fallback ({e})")
+
 def predict_category(description: str) -> str:
+    # 1. Inferencia del Modelo ML Real
+    if ml_model is not None:
+        try:
+            prediccion = ml_model.predict([description])[0]
+            
+            # Obtener el porcentaje de probabilidad predictiva (Confianza)
+            probabilidades = ml_model.predict_proba([description])[0]
+            confianza = max(probabilidades)
+            
+            # Si el modelo matemático duda (confianza < 35%), mandarlo a Otros
+            if confianza < 0.35:
+                return "Otros"
+            return prediccion
+        except:
+            pass
+
+    # 2. Fallback de emergencia si el archivo .pkl fue borrado
     desc = description.lower()
-    if any(word in desc for word in ['yape', 'transferencia', 'plin', 'deposito']):
-        return "Otros" 
-    elif any(word in desc for word in ['kfc', 'mcdonalds', 'starbucks', 'restaurante', 'rappi', 'pedidosya', 'bodega']):
-        return "Comida"
-    elif any(word in desc for word in ['uber', 'taxi', 'tren', 'metro', 'grifo', 'repsol', 'primax']):
-        return "Transporte"
-    elif any(word in desc for word in ['farmacia', 'inkafarma', 'mifarma', 'clinica', 'medico', 'salud']):
-        return "Salud"
-    elif any(word in desc for word in ['netflix', 'spotify', 'cineplanet', 'steam']):
-        return "Entretenimiento"
-    elif any(word in desc for word in ['sedapal', 'enel', 'telefonica', 'claro', 'entel', 'alquiler', 'mantenimiento']):
-        return "Vivienda"
+    if any(word in desc for word in ['kfc', 'rappi', 'restaurante']): return "Comida"
     return "Otros"
 
 # --- NUEVO: OCR MACHINE LEARNING (Procesador de Imagen) ---
