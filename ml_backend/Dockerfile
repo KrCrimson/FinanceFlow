@@ -25,5 +25,5 @@ COPY . .
 # Exponer el puerto
 EXPOSE 8000
 
-# Iniciar FastAPI con Uvicorn (usando el puerto dinámico de Render)
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Iniciar FastAPI leyendo la variable PORT que inyecta Render
+CMD sh -c "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
