@@ -89,9 +89,16 @@ async def analyze_receipt(file: UploadFile = File(...)):
         text_clean = text_raw.lower()
 
         # 4. Extracción de Información (NLP / Regex)
-        # Soporta montos con o sin decimales (Ej: 's/ 60' o 's/ 60.50')
-        amount_match = re.search(r'(?:s/|s\.|sl|s\$|soles)\s*(\d+(?:[\.\,]\d{1,2})?)', text_clean)
+        # Regex super permisivo para OCR: S/, S /, s/, 5/ (Ocasionalmente Tesseract confunde la S con 5 o ignora el /)
+        amount_match = re.search(r'(?:s|5|g)[\/\.\s]*(\d+(?:[\.\,]\d{1,2})?)', text_clean)
         amount = float(amount_match.group(1).replace(',', '.')) if amount_match else 0.0
+
+        # Si aún falla el monto pero vemos un número grande arriba
+        if amount == 0.0:
+            # Busca cualquier número solitario entre 1 y 4 dígitos (Ej. " 20 ")
+            backup_match = re.search(r'\b(\d+(?:[\.\,]\d{1,2})?)\b', text_clean)
+            if backup_match:
+                 amount = float(backup_match.group(1).replace(',', '.'))
 
         # Heurística para Extraer Nombre y Fecha
         description = "Movimiento Detectado"
