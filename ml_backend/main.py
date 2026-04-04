@@ -89,16 +89,32 @@ async def analyze_receipt(file: UploadFile = File(...)):
         text_clean = text_raw.lower()
 
         # 4. Extracción de Información (NLP / Regex)
-        amount_match = re.search(r'(?:s/|s\.|sl|s\$|soles)\s*(\d+[\.\,]\d{2})', text_clean)
+        # Soporta montos con o sin decimales (Ej: 's/ 60' o 's/ 60.50')
+        amount_match = re.search(r'(?:s/|s\.|sl|s\$|soles)\s*(\d+(?:[\.\,]\d{1,2})?)', text_clean)
         amount = float(amount_match.group(1).replace(',', '.')) if amount_match else 0.0
 
-        # Heurística para Extraer Nombre y Fecha 
+        # Heurística para Extraer Nombre y Fecha
         description = "Movimiento Detectado"
         if "yape" in text_clean or "yapeaste" in text_clean:
-            description = "Transferencia Yape"
-            # Buscar al lado de "a" o "yapeaste a"
-            match_name = re.search(r'yapeaste a\s*([a-z\s]+)', text_clean)
-            if match_name:
+            # Buscar el nombre debajo de Yapeaste y el monto en el texto raw
+            lines = [line.strip() for line in text_raw.split('\n') if line.strip()]
+            
+            # Intento de extraer el nombre de la persona (suele estar después del monto en Yape)
+            extracted_name = None
+            for i, line in enumerate(lines):
+                if re.search(r'(?:s/|s\.|sl|s\$|soles)\s*\d+', line.lower()) and i + 1 < len(lines):
+                    # La siguiente línea suele ser el nombre
+                    extracted_name = lines[i+1]
+                    break
+            
+            if extracted_name and len(extracted_name) > 3 and not "fecha" in extracted_name.lower():
+                description = "Yape a " + extracted_name.title()
+            else:
+                description = "Transferencia Yape"
+                
+            # Fallback a la regla anterior por si acaso
+            match_name = re.search(r'yapeaste a\s*([a-z\s]+)', text_clean)      
+            if match_name and description == "Transferencia Yape":
                 description = "Yape a " + match_name.group(1).strip().title()
 
         date_str = datetime.now().isoformat() + "Z"
