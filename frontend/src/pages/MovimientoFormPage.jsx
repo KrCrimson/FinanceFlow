@@ -17,11 +17,61 @@ function MovimientoFormPage() {
   const [loading, setLoading] = useState(false);
   const { processImage, result, loading: loadingImg, error: ocrError } = useImageToMovimiento();
 
-  // Categorías simplificadas - solo las más comunes
-  const categorias = {
+  // Categorías dinámicas ordenadas por uso
+  const [categorias, setCategorias] = useState({
     ingreso: ['Sueldo', 'Freelance', 'Ventas', 'Otros'],
     egreso: ['Comida', 'Transporte', 'Vivienda', 'Entretenimiento', 'Salud', 'Otros']
-  };
+  });
+
+  React.useEffect(() => {
+    // Cargar historial de movimientos para ordenar categorías por uso y mostrar las personalizadas
+    const fetchUserCategories = async () => {
+      try {
+        const { getMovimientos } = await import('../services/movimientosService');
+        const movs = await getMovimientos();
+        if (!movs || movs.length === 0) return;
+
+        const conteoIngreso = {};
+        const conteoEgreso = {};
+        
+        movs.forEach(m => {
+          if (!m.categoria) return;
+          if (m.tipo === 'ingreso') {
+            conteoIngreso[m.categoria] = (conteoIngreso[m.categoria] || 0) + 1;
+          } else if (m.tipo === 'egreso') {
+            conteoEgreso[m.categoria] = (conteoEgreso[m.categoria] || 0) + 1;
+          }
+        });
+
+        // Convierte el mapeo en un array ordenado por frecuencia
+        const sortCategorias = (conteo, defaultCats) => {
+          const sortedByFreq = Object.entries(conteo)
+            .sort((a, b) => b[1] - a[1]) // Mayor a menor frecuencia
+            .map(entry => entry[0]);
+          
+          // Agrega las categorías por defecto que no hayan sido usadas (y que no sean 'Otros')
+          defaultCats.forEach(cat => {
+            if (!sortedByFreq.includes(cat) && cat !== 'Otros') {
+              sortedByFreq.push(cat);
+            }
+          });
+          
+          // Asegurar que 'Otros' siempre sea la última opción
+          const finalSorted = sortedByFreq.filter(c => c !== 'Otros');
+          return [...finalSorted.slice(0, 15), 'Otros']; // Mantenemos un máximo de opciones
+        };
+
+        setCategorias({
+          ingreso: sortCategorias(conteoIngreso, ['Sueldo', 'Freelance', 'Ventas']),
+          egreso: sortCategorias(conteoEgreso, ['Comida', 'Transporte', 'Vivienda', 'Entretenimiento', 'Salud'])
+        });
+      } catch (err) {
+        console.error("Error al cargar categorías del usuario:", err);
+      }
+    };
+    
+    fetchUserCategories();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,19 +130,17 @@ function MovimientoFormPage() {
   // Si hay resultado de imagen, autocompletar campos
   React.useEffect(() => {
     if (result) {
-      setTipo(result.tipo || 'egreso');
+      const safeTipo = (result.tipo || 'egreso').toLowerCase();
+      setTipo(safeTipo === 'ingreso' ? 'ingreso' : 'egreso');
       setNombre(result.nombre || '');
       setDescripcion(result.descripcion || '');
       setMonto(result.monto || '');
       setCategoria(result.categoria || '');
-      
+
       if (result.monto > 0) {
         setSuccess(`¡OCR exitoso! Detectado: ${result.nombre} - S/${result.monto}`);
       } else {
         setSuccess('¡Texto extraído! Verifica el monto manualmente.');
-      }
-      
-      setTimeout(() => setSuccess(''), 5000);
     }
   }, [result]);
 
@@ -217,9 +265,9 @@ function MovimientoFormPage() {
                 required
               >
                 <option value="">Seleccionar categoría</option>
-                {categorias[tipo].map(cat => (
+                {categorias[tipo] ? categorias[tipo].map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
-                ))}
+                )) : null}
               </select>
               
               {/* Campo para categoría personalizada */}
