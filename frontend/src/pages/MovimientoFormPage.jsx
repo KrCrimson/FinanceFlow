@@ -141,6 +141,9 @@ function MovimientoFormPage() {
         setSuccess(`¡OCR exitoso! Detectado: ${result.nombre} - S/${result.monto}`);
       } else {
         setSuccess('¡Texto extraído! Verifica el monto manualmente.');
+      }
+
+      setTimeout(() => setSuccess(''), 5000);
     }
   }, [result]);
 
