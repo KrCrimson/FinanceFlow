@@ -91,14 +91,38 @@ function MovimientoFormPage() {
     setError('');
     setSuccess('');
     try {
-      await createMovimiento({ 
-        tipo, 
-        nombre: nombre.trim(), 
-        monto: Number(monto), 
-        categoria: categoriaFinal, 
-        descripcion: descripcion.trim() 
+      await createMovimiento({
+        tipo,
+        nombre: nombre.trim(),
+        monto: Number(monto),
+        categoria: categoriaFinal,
+        descripcion: descripcion.trim()
       });
       setSuccess('¡Movimiento registrado exitosamente!');
+
+      // CONTINUOUS LEARNING: Sincronización transparente en segundo plano      
+      try {
+        const { getMovimientos } = await import('../services/movimientosService');
+        const movs = await getMovimientos();
+        const trainingData = movs
+          .filter(m => m.nombre && m.categoria)
+          .map(m => ({
+            descripcion: m.descripcion ? `${m.nombre} ${m.descripcion}` : m.nombre,
+            categoria: m.categoria
+          }));
+        
+        if (trainingData.length > 5) {
+          const API_URL = process.env.REACT_APP_ML_URL || 'http://localhost:8000';
+          fetch(`${API_URL}/retrain`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: trainingData })
+          }).catch(err => console.warn('Background ML Sync Error:', err));
+        }
+      } catch(e) {
+        console.warn('Silent ML Training failed:', e);
+      }
+
       setTimeout(() => navigate('/'), 1500);
     } catch (err) {
       setError(err.message || 'Error al registrar el movimiento');
