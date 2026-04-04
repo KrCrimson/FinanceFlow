@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List
 import random
 import re
 from datetime import datetime, timedelta
@@ -9,6 +10,10 @@ import numpy as np
 import pytesseract
 import joblib
 import os
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import make_pipeline
 
 app = FastAPI(title="Bank Sync & ML Classifier API")
 
@@ -23,6 +28,13 @@ app.add_middleware(
 class CategorizeRequest(BaseModel):
     description: str
     amount: float
+
+class TrainingData(BaseModel):
+    descripcion: str
+    categoria: str
+
+class RetrainRequest(BaseModel):
+    data: List[TrainingData]
 
 # --- Cargar el Modelo de Machine Learning Entrenado ---
 modelo_ruta = os.path.join(os.path.dirname(__file__), 'modelo_clasificador.pkl')
@@ -108,6 +120,30 @@ async def analyze_receipt(file: UploadFile = File(...)):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error analizando la imagen: {str(e)}")
+
+# --- NUEVO: RE-ENTRENAMIENTO (CONTINUOUS LEARNING) ---
+@app.post("/retrain")
+async def retrain_model(payload: RetrainRequest):
+    global ml_model
+    try:
+        # Convertir JSON a DataFrame de Pandas
+        df = pd.DataFrame([item.dict() for item in payload.data])
+        
+        # Crear PIPELINE desde cero (Matemáticas TF-IDF -> Algoritmo Naive Bayes)
+        new_model = make_pipeline(TfidfVectorizer(ngram_range=(1, 2)), MultinomialNB())
+        
+        # ENTRENAR con la data enviada! (Eje X: Textos, Eje Y: Categorías verdaderas)
+        new_model.fit(df['descripcion'], df['categoria'])
+        
+        # SOBRESCRIBIR MODELO ACTUAL
+        ml_model = new_model
+        
+        # Guardar en Disco (.pkl)
+        joblib.dump(ml_model, modelo_ruta)
+        
+        return {"status": "success", "message": f"Modelo ML reentrenado y guardado con {len(df)} registros frescos."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al reentrenar: {str(e)}")
 
 # --- OPEN BANKING SIMULADOR ---
 @app.get("/sync/{bank}")
