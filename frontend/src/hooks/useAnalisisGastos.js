@@ -15,18 +15,20 @@ export function useAnalisisGastos() {
   useEffect(() => {
     if (movimientos.length === 0) return;
 
+    const activos = movimientos.filter(m => m.estado !== 'inactivo');
+
     const ahora = new Date();
     const mesActual = ahora.getMonth();
     const añoActual = ahora.getFullYear();
 
     // Separar movimientos por períodos
-    const movimientosActuales = movimientos.filter(m => {
-      const fecha = new Date(m.creadoEn);
+    const movimientosActuales = activos.filter(m => {
+      const fecha = new Date(m.creadoEn || m.fecha);
       return fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual;
     });
 
-    const movimientosAnteriores = movimientos.filter(m => {
-      const fecha = new Date(m.creadoEn);
+    const movimientosAnteriores = activos.filter(m => {
+      const fecha = new Date(m.creadoEn || m.fecha);
       return !(fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual);
     });
 
@@ -35,7 +37,7 @@ export function useAnalisisGastos() {
     setEstadisticasPorCategoria(stats);
 
     // Calcular resumen mensual
-    const resumen = calcularResumenMensual(movimientos);
+    const resumen = calcularResumenMensual(activos);
     setResumenMensual(resumen);
 
     // Generar alertas
@@ -67,7 +69,7 @@ export function useAnalisisGastos() {
 
     // Calcular promedio de meses anteriores
     const mesesUnicos = [...new Set(anteriores.map(m => {
-      const fecha = new Date(m.creadoEn);
+      const fecha = new Date(m.creadoEn || m.fecha);
       return `${fecha.getFullYear()}-${fecha.getMonth()}`;
     }))];
 
@@ -120,7 +122,7 @@ export function useAnalisisGastos() {
 
   const calcularResumenMensual = (todosMovimientos) => {
     const mesesUnicos = [...new Set(todosMovimientos.map(m => {
-      const fecha = new Date(m.creadoEn);
+      const fecha = new Date(m.creadoEn || m.fecha || new Date());
       return `${fecha.getFullYear()}-${fecha.getMonth()}`;
     }))];
 
