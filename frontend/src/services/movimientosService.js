@@ -69,8 +69,8 @@ export async function updateMovimiento(id, movimiento) {
 
 export async function inhabilitarMovimiento(id) {
   try {
-    return await apiCall(`/movimientos/${id}`, {
-      method: 'DELETE'
+    return await apiCall(`/movimientos/${id}/inhabilitar`, {
+      method: 'PATCH'
     });
   } catch (error) {
     console.error('Error en inhabilitarMovimiento:', error);
