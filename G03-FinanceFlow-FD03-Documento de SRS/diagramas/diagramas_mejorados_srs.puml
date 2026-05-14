@@ -1,0 +1,479 @@
+@startuml
+left to right direction
+title 01. Vision general de FinanceFlow
+actor Usuario
+rectangle FinanceFlow
+Usuario --> FinanceFlow : registro, login y gestion financiera
+FinanceFlow --> Usuario : dashboard, reportes y alertas
+@enduml
+
+@startuml
+left to right direction
+title 02. Proceso actual de finanzas personales
+start
+:Datos en Excel, notas o papel;
+:Registro disperso y manual;
+:Errores de captura;
+:Falta de analisis y alertas;
+stop
+@enduml
+
+@startuml
+left to right direction
+title 03. Proceso propuesto con FinanceFlow
+start
+:Usuario accede al sistema;
+:Se autentica con JWT;
+:Registra ingresos y egresos;
+:Consulta dashboard y reportes;
+:Recibe apoyo de IA y alertas;
+stop
+@enduml
+
+@startuml
+left to right direction
+title 04. Flujo de autenticacion
+actor Usuario
+participant LoginPage
+participant authService
+participant Backend
+participant usuariosService
+database MongoDB
+Usuario -> LoginPage : ingresar credenciales
+LoginPage -> authService : login()
+authService -> Backend : POST /login
+Backend -> usuariosService : autenticar
+usuariosService -> MongoDB : buscar usuario
+MongoDB --> usuariosService : documento
+usuariosService --> Backend : JWT
+Backend --> authService : sesion activa
+authService --> LoginPage : redirigir a dashboard
+@enduml
+
+@startuml
+title 05. Flujo de registro de usuario
+actor Usuario
+participant RegisterPage
+participant authService
+participant usuariosController as Controller
+participant usuariosService as Service
+database MongoDB
+Usuario -> RegisterPage : completar formulario
+RegisterPage -> authService : register(datos)
+authService -> Controller : POST /register
+Controller -> Service : validar y registrar
+Service -> MongoDB : findOne(email)
+Service -> MongoDB : save(usuario)
+MongoDB --> Service : usuario creado
+Service --> Controller : respuesta 201
+Controller --> authService : exito
+authService --> RegisterPage : mensaje y redireccion
+@enduml
+
+@startuml
+title 06. Flujo de inicio de sesion
+actor Usuario
+participant LoginPage
+participant authService
+participant usuariosController as Controller
+participant usuariosService as Service
+database MongoDB
+Usuario -> LoginPage : email y password
+LoginPage -> authService : login(datos)
+authService -> Controller : POST /login
+Controller -> Service : validar credenciales
+Service -> MongoDB : findOne(email)
+MongoDB --> Service : usuario
+Service -> Service : comparar hash
+Service --> Controller : JWT o error
+Controller --> authService : respuesta
+authService --> LoginPage : acceso o error
+@enduml
+
+@startuml
+title 07. Recuperacion de contraseña
+start
+:Usuario abre "Olvide mi contrasena";
+:Ingresa correo registrado;
+:Sistema valida existencia;
+:Genera token temporal;
+:Envio de enlace de recuperacion;
+stop
+@enduml
+
+@startuml
+title 08. Restablecimiento de contraseña
+actor Usuario
+participant RecoveryPage
+participant authService
+participant Controller
+participant Service
+database MongoDB
+Usuario -> RecoveryPage : nueva clave
+RecoveryPage -> authService : resetPassword(token, pass)
+authService -> Controller : POST /reset
+Controller -> Service : validar token
+Service -> MongoDB : actualizar passwordHash
+MongoDB --> Service : ok
+Service --> Controller : contrasena actualizada
+Controller --> authService : 200 OK
+authService --> RecoveryPage : volver a login
+@enduml
+
+@startuml
+title 09. Registro manual de movimiento
+actor Usuario
+participant MovimientoFormPage as UI
+participant movimientosService as Service
+participant movimientosController as Controller
+participant movimientosBusiness as Business
+database MongoDB
+Usuario -> UI : ingresa monto y categoria
+UI -> Service : crearMovimiento(datos)
+Service -> Controller : POST /movimientos
+Controller -> Business : validar datos
+Business -> MongoDB : save(movimiento)
+MongoDB --> Business : ok
+Business --> Controller : movimiento creado
+Controller --> Service : 201 Created
+Service --> UI : actualizar dashboard
+@enduml
+
+@startuml
+title 10. OCR para comprobantes
+actor Usuario
+participant UI as MovimientoFormPage
+participant API as MicroservicioPython
+participant OCR as Tesseract
+participant ML as Clasificador
+Usuario -> UI : sube imagen
+UI -> API : enviar archivo
+API -> OCR : extraer texto
+OCR --> API : contenido
+API -> ML : predecir categoria
+ML --> API : categoria sugerida
+API --> UI : autocompletar formulario
+@enduml
+
+@startuml
+title 11. Visualizacion del dashboard
+actor Usuario
+participant DashboardPage as UI
+participant Service
+participant Backend
+database MongoDB
+Usuario -> UI : abrir dashboard
+UI -> Service : cargar resumen
+Service -> Backend : GET /dashboard
+Backend -> MongoDB : consultar movimientos
+MongoDB --> Backend : datos
+Backend --> Service : resumen y graficos
+Service --> UI : renderizar indicadores
+@enduml
+
+@startuml
+title 12. Edicion de movimiento
+actor Usuario
+participant ReportesPage as UI
+participant Service
+participant Controller
+participant Business
+database MongoDB
+Usuario -> UI : editar movimiento
+UI -> Service : updateMovimiento(id)
+Service -> Controller : PUT /movimientos/:id
+Controller -> Business : validar propiedad
+Business -> MongoDB : actualizar documento
+MongoDB --> Business : ok
+Business --> Controller : actualizado
+Controller --> Service : 200 OK
+@enduml
+
+@startuml
+title 13. Inactivacion de movimiento
+start
+:Usuario confirma eliminar;
+:Sistema valida ownership;
+:Cambia estado a inactivo;
+:Recalcula balance;
+:Actualiza la vista;
+stop
+@enduml
+
+@startuml
+title 14. Filtro de reportes
+start
+:Usuario abre Reportes;
+:Selecciona rango y categoria;
+:Envía filtros;
+:Backend consulta datos;
+:Renderiza tabla y graficos;
+stop
+@enduml
+
+@startuml
+title 15. Reentrenamiento silencioso
+participant Backend
+participant MicroservicioPython
+participant ModeloML
+Backend -> MicroservicioPython : /retrain
+MicroservicioPython -> ModeloML : partial_fit(datos)
+ModeloML --> MicroservicioPython : modelo actualizado
+MicroservicioPython --> Backend : ok
+@enduml
+
+@startuml
+title 16. Cierre de sesion
+start
+:Usuario selecciona cerrar sesion;
+:Se elimina token local;
+:Se limpia el contexto;
+:Se redirige a login;
+stop
+@enduml
+
+@startuml
+title 17. Perfil de usuario
+start
+:Usuario abre perfil;
+:Consulta datos basicos;
+:Edita nombre o avatar;
+:Guarda cambios;
+:Se refresca la sesion;
+stop
+@enduml
+
+@startuml
+title 18. Auditoria y logs
+actor Administrador
+participant LogsPage as UI
+participant logsController as Controller
+participant logsService as Service
+database MongoDB
+Administrador -> UI : abrir auditoria
+UI -> Controller : GET /logs
+Controller -> Service : listar eventos
+Service -> MongoDB : find()
+MongoDB --> Service : logs
+Service --> Controller : respuesta JSON
+Controller --> UI : mostrar trazas
+@enduml
+
+@startuml
+title 19. Modelo de usuario
+class Usuario {
+  +ObjectId _id
+  +String nombre
+  +String email
+  +String passwordHash
+  +String estado
+  +Date creadoEn
+  +Date actualizadoEn
+}
+@enduml
+
+@startuml
+title 20. Modelo de movimiento
+class Usuario
+class Movimiento {
+  +ObjectId _id
+  +ObjectId userId
+  +Number monto
+  +String descripcion
+  +String categoria
+  +Date fecha
+  +String estado
+}
+Usuario "1" --> "many" Movimiento
+@enduml
+
+@startuml
+title 21. Modelo de log
+class Log {
+  +ObjectId _id
+  +String nivel
+  +String mensaje
+  +String stack
+  +String endpoint
+  +String metodo
+  +Number statusCode
+}
+@enduml
+
+@startuml
+title 22. Relacion de entidades
+rectangle Usuario
+rectangle Movimiento
+rectangle Log
+rectangle Dashboard
+rectangle Reportes
+rectangle Auditoria
+Usuario --> Movimiento
+Usuario --> Log
+Movimiento --> Dashboard
+Movimiento --> Reportes
+Log --> Auditoria
+@enduml
+
+@startuml
+title 23. Validacion de formulario
+start
+:Usuario escribe datos;
+:React Hook Form valida;
+if (Zod correcto?) then (si)
+  :Enviar solicitud;
+else (no)
+  :Mostrar error inline;
+endif
+stop
+@enduml
+
+@startuml
+title 24. Secuencia de registro con validacion
+actor Usuario
+participant RegisterPage
+participant authService
+participant Backend
+Usuario -> RegisterPage : llena datos
+RegisterPage -> authService : submit
+authService -> Backend : register
+Backend --> authService : response
+authService --> RegisterPage : mostrar estado
+@enduml
+
+@startuml
+title 25. Secuencia de dashboard en tiempo real
+participant DashboardPage
+participant movimientosService
+participant Backend
+database MongoDB
+DashboardPage -> movimientosService : cargarResumen()
+movimientosService -> Backend : GET /dashboard
+Backend -> MongoDB : consultar datos
+MongoDB --> Backend : resumen
+Backend --> movimientosService : datos
+movimientosService --> DashboardPage : renderizar graficos
+@enduml
+
+@startuml
+title 26. Secuencia de OCR y autocompletado
+participant MovimientoFormPage
+participant MicroservicioPython
+participant ModeloML
+MovimientoFormPage -> MicroservicioPython : enviar imagen
+MicroservicioPython -> ModeloML : extraer categoria
+ModeloML --> MicroservicioPython : categoria sugerida
+MicroservicioPython --> MovimientoFormPage : autocompletar campos
+@enduml
+
+@startuml
+title 27. Secuencia de eliminacion logica
+actor Usuario
+participant ReportesPage
+participant Backend
+database MongoDB
+Usuario -> ReportesPage : confirma eliminar
+ReportesPage -> Backend : PATCH /movimientos/:id
+Backend -> MongoDB : estado = inactivo
+MongoDB --> Backend : ok
+Backend --> ReportesPage : actualizar lista
+@enduml
+
+@startuml
+title 28. Secuencia de filtros y reportes
+actor Usuario
+participant ReportesPage
+participant Backend
+database MongoDB
+Usuario -> ReportesPage : aplica filtros
+ReportesPage -> Backend : GET /reportes?filtro
+Backend -> MongoDB : consultar datos filtrados
+MongoDB --> Backend : resultados
+Backend --> ReportesPage : graficos y tabla
+@enduml
+
+@startuml
+title 29. Secuencia de cambio de contrasena
+actor Usuario
+participant RecoveryPage
+participant Backend
+database MongoDB
+Usuario -> RecoveryPage : ingresa nueva clave
+RecoveryPage -> Backend : POST /reset-password
+Backend -> MongoDB : actualizar hash
+MongoDB --> Backend : ok
+Backend --> RecoveryPage : acceso renovado
+@enduml
+
+@startuml
+title 30. Secuencia de cierre de sesion
+actor Usuario
+participant Navbar
+participant authService
+participant Router
+Usuario -> Navbar : clic en cerrar sesion
+Navbar -> authService : logout()
+authService --> Navbar : token eliminado
+Navbar -> Router : navigate('/login')
+@enduml
+
+@startuml
+title 31. Secuencia de perfil
+actor Usuario
+participant ProfilePage
+participant Backend
+database MongoDB
+Usuario -> ProfilePage : cambia datos
+ProfilePage -> Backend : PUT /profile
+Backend -> MongoDB : actualizar usuario
+MongoDB --> Backend : ok
+Backend --> ProfilePage : perfil actualizado
+@enduml
+
+@startuml
+title 32. Secuencia de logs
+actor Administrador
+participant LogsPage
+participant Backend
+database MongoDB
+Administrador -> LogsPage : abrir auditoria
+LogsPage -> Backend : GET /logs
+Backend -> MongoDB : obtener eventos
+MongoDB --> Backend : logs
+Backend --> LogsPage : mostrar trazas
+@enduml
+
+@startuml
+title 33. Ciclo de vida de un movimiento
+[*] --> Borrador
+Borrador --> Activo : guardar
+Activo --> Inactivo : eliminar logico
+Inactivo --> [*]
+@enduml
+
+@startuml
+title 34. Despliegue logico del sistema
+left to right direction
+rectangle Frontend
+rectangle Backend
+rectangle Datos
+rectangle IA
+Frontend --> Backend
+Backend --> Datos
+Frontend --> IA
+Backend --> IA
+@enduml
+
+@startuml
+title 35. Resumen de calidad del sistema
+rectangle "FinanceFlow" as F {
+  rectangle Seguridad
+  rectangle Usabilidad
+  rectangle Rendimiento
+  rectangle Mantenibilidad
+}
+F --> Seguridad
+F --> Usabilidad
+F --> Rendimiento
+F --> Mantenibilidad
+@enduml

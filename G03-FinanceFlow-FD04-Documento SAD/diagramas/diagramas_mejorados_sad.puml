@@ -1,0 +1,241 @@
+@startuml
+title 01. Modelo 4+1
+rectangle FinanceFlow {
+  rectangle "Casos de uso"
+  rectangle "Logica"
+  rectangle "Implementacion"
+  rectangle "Procesos"
+  rectangle "Despliegue"
+}
+FinanceFlow --> "Casos de uso"
+FinanceFlow --> "Logica"
+FinanceFlow --> "Implementacion"
+FinanceFlow --> "Procesos"
+FinanceFlow --> "Despliegue"
+@enduml
+
+@startuml
+title 02. Vista de casos de uso
+actor Usuario
+actor Administrador
+actor MotorPython
+rectangle FinanceFlow {
+  Usuario --> (Registro / Login)
+  Usuario --> (Movimientos)
+  Usuario --> (Dashboard)
+  Usuario --> (Reportes)
+  Usuario --> (Perfil)
+  Usuario --> (Logout)
+  Administrador --> (Logs)
+  MotorPython --> (OCR y ML)
+}
+@enduml
+
+@startuml
+title 03. Vista logica de subsistemas
+left to right direction
+rectangle Frontend
+rectangle SDK
+rectangle Backend
+rectangle MongoDB
+rectangle FastAPI
+Frontend --> SDK
+SDK --> Backend
+Backend --> MongoDB
+Frontend --> FastAPI
+Backend --> FastAPI
+@enduml
+
+@startuml
+title 04. Secuencia de autenticacion
+actor Usuario
+participant LoginPage
+participant authService
+participant ExpressAPI
+participant usuariosService
+database MongoDB
+Usuario -> LoginPage : credenciales
+LoginPage -> authService : login()
+authService -> ExpressAPI : POST /login
+ExpressAPI -> usuariosService : autenticar
+usuariosService -> MongoDB : findOne(email)
+MongoDB --> usuariosService : usuario
+usuariosService --> ExpressAPI : JWT
+ExpressAPI --> authService : 200 OK
+authService --> LoginPage : sesion activa
+@enduml
+
+@startuml
+title 05. Secuencia OCR
+actor Usuario
+participant MovimientoForm
+participant FastAPI
+participant Tesseract
+participant NaiveBayes
+Usuario -> MovimientoForm : sube recibo
+MovimientoForm -> FastAPI : enviar imagen
+FastAPI -> Tesseract : extraer texto
+Tesseract --> FastAPI : contenido
+FastAPI -> NaiveBayes : predecir categoria
+NaiveBayes --> FastAPI : categoria
+FastAPI --> MovimientoForm : autocompletar
+@enduml
+
+@startuml
+title 06. Secuencia dashboard
+actor Usuario
+participant DashboardPage
+participant Backend
+database MongoDB
+Usuario -> DashboardPage : abrir dashboard
+DashboardPage -> Backend : GET /dashboard
+Backend -> MongoDB : consultar movimientos
+MongoDB --> Backend : datos agregados
+Backend --> DashboardPage : saldo y graficos
+@enduml
+
+@startuml
+title 07. Colaboracion entre objetos
+object Usuario
+object LoginPage
+object authService
+object SDKauth
+object Backend
+object Controller
+object Service
+database MongoDB
+Usuario --> LoginPage
+LoginPage --> authService
+authService --> SDKauth
+SDKauth --> Backend
+Backend --> Controller
+Controller --> Service
+Service --> MongoDB
+@enduml
+
+@startuml
+title 08. Diagrama de objetos
+object SesionUsuario
+object MovimientoActivo
+object MovimientoInactivo
+SesionUsuario --> MovimientoActivo
+SesionUsuario --> MovimientoInactivo
+@enduml
+
+@startuml
+title 09. Diagrama de clases
+class Usuario {
+  +register()
+  +login()
+}
+class Movimiento {
+  +create()
+  +update()
+  +softDelete()
+}
+class Log {
+  +create()
+}
+class AuthService {
+  +login()
+  +register()
+}
+class MovimientoService {
+  +listar()
+  +guardar()
+}
+Usuario --> AuthService
+MovimientoService --> Movimiento
+Usuario --> Log
+@enduml
+
+@startuml
+title 10. Base de datos
+entity USERS
+entity MOVIMIENTOS
+entity LOGS
+USERS ||--o{ MOVIMIENTOS
+USERS ||--o{ LOGS
+USERS : nombre
+USERS : email
+USERS : passwordHash
+MOVIMIENTOS : monto
+MOVIMIENTOS : categoria
+MOVIMIENTOS : estado
+LOGS : nivel
+LOGS : mensaje
+@enduml
+
+@startuml
+title 11. Arquitectura de software por paquetes
+left to right direction
+folder documentacion
+folder frontend
+folder sdk
+folder backend
+folder database
+folder ml_backend
+documentacion --> frontend
+frontend --> sdk
+sdk --> backend
+backend --> database
+backend --> ml_backend
+@enduml
+
+@startuml
+title 12. Arquitectura de componentes
+left to right direction
+component Browser
+component ReactApp
+component SDKAdapter
+component NodeAPI
+component MongooseModels
+component Logging
+component FastAPIOCR
+component ScikitLearn
+Browser --> ReactApp
+ReactApp --> SDKAdapter
+SDKAdapter --> NodeAPI
+NodeAPI --> MongooseModels
+NodeAPI --> Logging
+ReactApp --> FastAPIOCR
+FastAPIOCR --> ScikitLearn
+@enduml
+
+@startuml
+title 13. Proceso OCR y registro
+start
+:Subir comprobante;
+:Ejecutar OCR;
+:Extraer datos;
+:Validar campos;
+:Guardar movimiento;
+:Actualizar dashboard;
+stop
+@enduml
+
+@startuml
+title 14. Proceso de silent training
+start
+:Movimiento confirmado;
+:Enviar datos corregidos;
+:Invocar /retrain;
+:Aplicar partial_fit;
+:Persistir modelo;
+stop
+@enduml
+
+@startuml
+title 15. Despliegue fisico
+left to right direction
+node Usuario
+node Vercel
+node RenderNode
+node RenderPython
+database MongoDBAtlas
+Usuario --> Vercel
+Vercel --> RenderNode
+Vercel --> RenderPython
+RenderNode --> MongoDBAtlas
+RenderPython --> MongoDBAtlas
+@enduml
