@@ -134,12 +134,6 @@ module.exports = {
       throw new Error('Email inválido');
     }
 
-    // Verificar configuración de email
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || 
-        process.env.EMAIL_USER === 'tu-email-real@gmail.com') {
-      throw new Error('El sistema de email no está configurado. Contacta al administrador.');
-    }
-
     const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     if (!usuario) {
       throw new Error('No existe un usuario con ese email');
@@ -158,6 +152,32 @@ module.exports = {
     // Configurar email
     const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3001';
     const resetURL = `${frontendURL}/reset-password?token=${resetToken}`;
+
+    // Verificar si el email está configurado
+    const isEmailUnconfigured = !process.env.EMAIL_USER || !process.env.EMAIL_PASS || 
+                                 process.env.EMAIL_USER === 'tu-email-real@gmail.com';
+
+    if (isEmailUnconfigured) {
+      if (process.env.NODE_ENV === 'development') {
+        const fs = require('fs');
+        const path = require('path');
+        const logMsg = `[${new Date().toISOString()}] Email: ${usuario.email} | URL: ${resetURL}\n`;
+        fs.appendFileSync(path.join(__dirname, '../dev_recovery_links.log'), logMsg);
+        
+        console.log('----------------------------------------------------');
+        console.log('🛠️ [MODO DESARROLLO] Enlace de recuperación simulado:');
+        console.log(`Email: ${usuario.email}`);
+        console.log(`Enlace: ${resetURL}`);
+        console.log('----------------------------------------------------');
+        
+        return { 
+          message: 'Simulación de envío activa en modo desarrollo.', 
+          devResetUrl: resetURL 
+        };
+      } else {
+        throw new Error('El sistema de email no está configurado. Contacta al administrador.');
+      }
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER || 'noreply@financeflow.com',

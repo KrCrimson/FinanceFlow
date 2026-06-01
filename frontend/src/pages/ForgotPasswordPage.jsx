@@ -40,8 +40,23 @@ function ForgotPasswordPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Se ha enviado un enlace de recuperación a tu email. Revisa tu bandeja de entrada.');
-        logger.info('Password reset email sent successfully', { email });
+        if (data.devResetUrl) {
+          setMessage(
+            <span>
+              <strong>🛠️ [MODO DESARROLLO]</strong> Enlace generado con éxito. Haz clic en el siguiente enlace para restablecer tu contraseña:<br />
+              <a 
+                href={data.devResetUrl} 
+                className="text-blue-600 hover:text-blue-800 underline break-all font-bold mt-2 inline-block"
+              >
+                🔑 Restablecer Contraseña Directamente
+              </a>
+              <span className="block text-xs text-gray-500 mt-1 font-normal break-all">{data.devResetUrl}</span>
+            </span>
+          );
+        } else {
+          setMessage('Se ha enviado un enlace de recuperación a tu email. Revisa tu bandeja de entrada.');
+        }
+        logger.info('Password reset email processed successfully', { email });
       } else {
         throw new Error(data.message || 'Error al enviar email de recuperación');
       }
