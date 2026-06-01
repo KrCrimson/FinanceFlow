@@ -248,9 +248,42 @@ module.exports = {
     };
 
     // Enviar email
+    
+    // 1. Intentar con Resend (Vía API REST HTTPS - Inmune a bloqueos de puertos en Render)
+    if (process.env.RESEND_API_KEY) {
+      try {
+        console.log('Intentando enviar email con Resend a:', usuario.email);
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+          },
+          body: JSON.stringify({
+            from: 'FinanceFlow <onboarding@resend.dev>',
+            to: usuario.email,
+            subject: '🔐 Recuperación de Contraseña - FinanceFlow',
+            html: mailOptions.html
+          })
+        });
+
+        const resendData = await response.json();
+
+        if (response.ok) {
+          console.log('Email enviado exitosamente con Resend:', resendData.id);
+          return { message: 'Email de recuperación enviado exitosamente' };
+        } else {
+          console.warn('Resend devolvió un error (intentando fallback a Gmail SMTP):', resendData);
+        }
+      } catch (resendError) {
+        console.error('Error al conectar con Resend (intentando fallback a Gmail SMTP):', resendError.message);
+      }
+    }
+
+    // 2. Fallback a Gmail SMTP (Nodemailer)
     try {
       const transporter = module.exports.createMailTransporter();
-      console.log('Enviando email a:', usuario.email);
+      console.log('Enviando email vía Gmail SMTP a:', usuario.email);
       console.log('Configuración de email:', {
         service: 'gmail',
         user: process.env.EMAIL_USER ? '***configurado***' : 'NO_CONFIGURADO',
@@ -258,7 +291,7 @@ module.exports = {
       });
       
       await transporter.sendMail(mailOptions);
-      console.log('Email enviado exitosamente a:', usuario.email);
+      console.log('Email enviado exitosamente vía Gmail SMTP a:', usuario.email);
       
       return { message: 'Email de recuperación enviado exitosamente' };
     } catch (error) {
