@@ -40,22 +40,25 @@ function ForgotPasswordPage() {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.devResetUrl) {
-          setMessage(
-            <span>
-              <strong>🛠️ [MODO DEMO / DESARROLLO]</strong> Enlace generado con éxito. Haz clic en el siguiente enlace para restablecer tu contraseña:<br />
-              <a 
-                href={data.devResetUrl} 
-                className="text-blue-600 hover:text-blue-800 underline break-all font-bold mt-2 inline-block"
-              >
-                🔑 Restablecer Contraseña Directamente
-              </a>
-              <span className="block text-xs text-gray-500 mt-1 font-normal break-all">{data.devResetUrl}</span>
-            </span>
-          );
-        } else {
-          setMessage('Se ha enviado un enlace de recuperación a tu email. Revisa tu bandeja de entrada.');
-        }
+        setMessage(
+          <div className="space-y-3 text-left text-sm leading-relaxed">
+            <p className="text-gray-800 font-medium">
+              <strong>¡Enlace enviado con éxito!</strong> Se han enviado las instrucciones para restablecer tu contraseña a tu correo electrónico. Por favor, revisa tu bandeja de entrada y la carpeta de correo no deseado (spam).
+            </p>
+            {data.devResetUrl && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <span className="font-bold text-blue-800 block mb-1 text-xs">🛠️ Acceso rápido para demostración:</span>
+                <p className="text-gray-600 text-xs mb-2">Para fines de pruebas y evaluación rápida, puedes usar el siguiente enlace directo:</p>
+                <a 
+                  href={data.devResetUrl} 
+                  className="text-blue-700 hover:text-blue-900 underline font-bold text-xs inline-block"
+                >
+                  🔑 Restablecer Contraseña Directamente →
+                </a>
+              </div>
+            )}
+          </div>
+        );
         logger.info('Password reset email processed successfully', { email });
       } else {
         throw new Error(data.message || 'Error al enviar email de recuperación');
