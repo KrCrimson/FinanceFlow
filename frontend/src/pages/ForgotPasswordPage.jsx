@@ -43,7 +43,7 @@ function ForgotPasswordPage() {
         if (data.devResetUrl) {
           setMessage(
             <span>
-              <strong>🛠️ [MODO DESARROLLO]</strong> Enlace generado con éxito. Haz clic en el siguiente enlace para restablecer tu contraseña:<br />
+              <strong>🛠️ [MODO DEMO / DESARROLLO]</strong> Enlace generado con éxito. Haz clic en el siguiente enlace para restablecer tu contraseña:<br />
               <a 
                 href={data.devResetUrl} 
                 className="text-blue-600 hover:text-blue-800 underline break-all font-bold mt-2 inline-block"

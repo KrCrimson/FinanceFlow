@@ -158,25 +158,28 @@ module.exports = {
                                  process.env.EMAIL_USER === 'tu-email-real@gmail.com';
 
     if (isEmailUnconfigured) {
-      if (process.env.NODE_ENV === 'development') {
-        const fs = require('fs');
-        const path = require('path');
-        const logMsg = `[${new Date().toISOString()}] Email: ${usuario.email} | URL: ${resetURL}\n`;
+      // Activar simulación/fallback amigable tanto en desarrollo como en producción si no hay SMTP configurado
+      const fs = require('fs');
+      const path = require('path');
+      const logMsg = `[${new Date().toISOString()}] Email: ${usuario.email} | URL: ${resetURL}\n`;
+      
+      try {
         fs.appendFileSync(path.join(__dirname, '../dev_recovery_links.log'), logMsg);
-        
-        console.log('----------------------------------------------------');
-        console.log('🛠️ [MODO DESARROLLO] Enlace de recuperación simulado:');
-        console.log(`Email: ${usuario.email}`);
-        console.log(`Enlace: ${resetURL}`);
-        console.log('----------------------------------------------------');
-        
-        return { 
-          message: 'Simulación de envío activa en modo desarrollo.', 
-          devResetUrl: resetURL 
-        };
-      } else {
-        throw new Error('El sistema de email no está configurado. Contacta al administrador.');
+      } catch (err) {
+        // Ignorar si el sistema de archivos es de solo lectura (como en algunas plataformas serverless)
+        console.log('Aviso: No se pudo escribir en el log local (sistema de archivos de solo lectura).');
       }
+      
+      console.log('----------------------------------------------------');
+      console.log('🛠️ [MODO DEMO/FALLBACK] Enlace de recuperación simulado:');
+      console.log(`Email: ${usuario.email}`);
+      console.log(`Enlace: ${resetURL}`);
+      console.log('----------------------------------------------------');
+      
+      return { 
+        message: 'Simulación de envío activa (Servidor SMTP no configurado).', 
+        devResetUrl: resetURL 
+      };
     }
 
     const mailOptions = {

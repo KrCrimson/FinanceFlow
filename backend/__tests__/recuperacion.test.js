@@ -35,7 +35,7 @@ describe('Recuperación de Contraseña con Developer Fallback', () => {
     process.env.EMAIL_USER = originalEmailUser;
   });
 
-  it('debe fallar en producción si el correo no está configurado', async () => {
+  it('debe activar el fallback amigable en producción si el correo no está configurado', async () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
     
@@ -46,8 +46,9 @@ describe('Recuperación de Contraseña con Developer Fallback', () => {
       .post('/api/usuarios/forgot-password')
       .send({ email });
 
-    expect(res.statusCode).toBe(400);
-    expect(res.body.message).toContain('El sistema de email no está configurado');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.devResetUrl).toBeDefined();
+    expect(res.body.devResetUrl).toContain('/reset-password?token=');
 
     process.env.NODE_ENV = originalNodeEnv;
     process.env.EMAIL_USER = originalEmailUser;
