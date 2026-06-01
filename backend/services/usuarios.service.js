@@ -249,7 +249,46 @@ module.exports = {
 
     // Enviar email
     
-    // 1. Intentar con Resend (Vía API REST HTTPS - Inmune a bloqueos de puertos en Render)
+    // 1. Intentar con Brevo (Vía API REST HTTPS - Permite enviar a CUALQUIER correo en plan gratuito sin dominio verificado)
+    if (process.env.BREVO_API_KEY) {
+      try {
+        console.log('Intentando enviar email con Brevo a:', usuario.email);
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: {
+              name: 'FinanceFlow',
+              email: process.env.EMAIL_USER || 'sebastianarce2010@gmail.com'
+            },
+            to: [
+              {
+                email: usuario.email,
+                name: usuario.nombre
+              }
+            ],
+            subject: '🔐 Recuperación de Contraseña - FinanceFlow',
+            htmlContent: mailOptions.html
+          })
+        });
+
+        const brevoData = await response.json();
+
+        if (response.ok) {
+          console.log('Email enviado exitosamente con Brevo:', brevoData.messageId);
+          return { message: 'Email de recuperación enviado exitosamente' };
+        } else {
+          console.warn('Brevo devolvió un error (intentando fallback a Resend):', brevoData);
+        }
+      } catch (brevoError) {
+        console.error('Error al conectar con Brevo (intentando fallback a Resend):', brevoError.message);
+      }
+    }
+
+    // 2. Intentar con Resend (Vía API REST HTTPS - Inmune a bloqueos de puertos en Render)
     if (process.env.RESEND_API_KEY) {
       try {
         console.log('Intentando enviar email con Resend a:', usuario.email);
