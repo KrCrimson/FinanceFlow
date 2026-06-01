@@ -9,11 +9,32 @@ const app = express();
 
 app.use(express.json());
 app.use(helmet());
-// CORS configurado para desarrollo y producción
+// CORS configurado dinámicamente para soportar desarrollo local y despliegues en Vercel
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN ? 
-    [process.env.CORS_ORIGIN, 'http://localhost:3001', 'http://127.0.0.1:3001'] :
-    ['http://localhost:3001', 'http://127.0.0.1:3001'],
+  origin: (origin, callback) => {
+    // Permitir peticiones sin origen (como Postman o curl)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      'http://localhost:3001',
+      'http://127.0.0.1:3001',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000'
+    ];
+
+    if (process.env.CORS_ORIGIN) {
+      allowedOrigins.push(process.env.CORS_ORIGIN);
+    }
+
+    // Permitir cualquier subdominio de Vercel (.vercel.app)
+    const isVercel = /\.vercel\.app$/.test(origin);
+
+    if (allowedOrigins.includes(origin) || isVercel) {
+      callback(null, true);
+    } else {
+      callback(new Error('Bloqueado por CORS: Origen no permitido'));
+    }
+  },
   credentials: true
 };
 
