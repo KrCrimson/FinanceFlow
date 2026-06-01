@@ -129,7 +129,7 @@ module.exports = {
   },
 
   // Solicitar recuperación de contraseña
-  forgotPassword: async (email) => {
+  forgotPassword: async (email, requestOrigin) => {
     if (!email || typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email)) {
       throw new Error('Email inválido');
     }
@@ -150,7 +150,13 @@ module.exports = {
     await usuario.save();
 
     // Configurar email
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3001';
+    let frontendURL = process.env.FRONTEND_URL;
+    if (!frontendURL && requestOrigin) {
+      frontendURL = requestOrigin.replace(/\/$/, '');
+    }
+    if (!frontendURL) {
+      frontendURL = 'http://localhost:3001';
+    }
     const resetURL = `${frontendURL}/reset-password?token=${resetToken}`;
 
     // Verificar si el email está configurado

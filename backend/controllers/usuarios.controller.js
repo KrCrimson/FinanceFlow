@@ -91,7 +91,8 @@ module.exports = {
   forgotPassword: async (req, res) => {
     try {
       const { email } = req.body;
-      const result = await usuariosService.forgotPassword(email);
+      const origin = req.headers.origin || req.headers.referer;
+      const result = await usuariosService.forgotPassword(email, origin);
       res.json(result);
     } catch (error) {
       res.status(400).json({ message: error.message });
