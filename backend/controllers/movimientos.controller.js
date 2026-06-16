@@ -35,4 +35,16 @@ module.exports = {
       res.status(400).json({ error: error.message });
     }
   },
+  crearMovimientoHistorico: async (req, res) => {
+    try {
+      const movimiento = await movimientosService.crearMovimientoHistorico(req.user.id, req.body);
+      res.status(201).json(movimiento);
+    } catch (error) {
+      if (error.message === 'Contraseña incorrecta') {
+        res.status(401).json({ error: error.message });
+      } else {
+        res.status(400).json({ error: error.message });
+      }
+    }
+  },
 };

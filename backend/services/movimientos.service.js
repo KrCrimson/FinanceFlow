@@ -1,5 +1,7 @@
 // Servicio de movimientos (esqueleto)
 const Movimiento = require('../database/movimiento.model');
+const Usuario = require('../database/usuario.model');
+const bcrypt = require('bcryptjs');
 
 module.exports = {
   crearMovimiento: async (data) => {
@@ -27,6 +29,7 @@ module.exports = {
       userId: data.userId,
       fecha: data.fecha ? new Date(data.fecha) : new Date(),
       estado: 'activo',
+      esRecurrente: !!data.esRecurrente,
       creadoEn: new Date(),
       actualizadoEn: new Date(),
     });
@@ -37,15 +40,20 @@ module.exports = {
     return await Movimiento.find({ userId }).sort({ creadoEn: -1 });
   },
   editarMovimiento: async (id, data) => {
+    const updatePayload = {
+      actualizadoEn: new Date(),
+    };
+    if (data.tipo !== undefined) updatePayload.tipo = data.tipo;
+    if (data.nombre !== undefined) updatePayload.nombre = data.nombre;
+    if (data.monto !== undefined) updatePayload.monto = data.monto;
+    if (data.categoria !== undefined) updatePayload.categoria = data.categoria;
+    if (data.fecha !== undefined) updatePayload.fecha = new Date(data.fecha);
+    if (data.esRecurrente !== undefined) updatePayload.esRecurrente = data.esRecurrente;
+    if (data.estado !== undefined) updatePayload.estado = data.estado;
+
     const movimiento = await Movimiento.findByIdAndUpdate(
       id,
-      {
-        tipo: data.tipo,
-        nombre: data.nombre,
-        monto: data.monto,
-        fecha: data.fecha ? new Date(data.fecha) : new Date(),
-        actualizadoEn: new Date(),
-      },
+      updatePayload,
       { new: true }
     );
     if (!movimiento) throw new Error('Movimiento no encontrado');
@@ -59,5 +67,28 @@ module.exports = {
     );
     if (!movimiento) throw new Error('Movimiento no encontrado');
     return movimiento;
+  },
+  crearMovimientoHistorico: async (userId, data) => {
+    if (!data.password) {
+      throw new Error('La contraseña es requerida para validación de seguridad');
+    }
+    const user = await Usuario.findById(userId);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+    const isOk = await bcrypt.compare(data.password, user.passwordHash);
+    if (!isOk) {
+      throw new Error('Contraseña incorrecta');
+    }
+    
+    return await module.exports.crearMovimiento({
+      tipo: data.tipo,
+      nombre: data.nombre,
+      monto: data.monto,
+      categoria: data.categoria,
+      userId: userId,
+      fecha: data.fecha,
+      esRecurrente: data.esRecurrente
+    });
   },
 };

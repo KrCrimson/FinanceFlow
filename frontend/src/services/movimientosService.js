@@ -129,3 +129,15 @@ export function updateToken(token) {
 export function getAdapterStats() {
   return { status: 'Emergency fallback active', mode: 'direct-api' };
 }
+
+export async function createMovimientoHistorico(movimiento) {
+  try {
+    return await apiCall('/movimientos/historico', {
+      method: 'POST',
+      body: JSON.stringify(movimiento)
+    });
+  } catch (error) {
+    console.error('Error en createMovimientoHistorico:', error);
+    throw error;
+  }
+}

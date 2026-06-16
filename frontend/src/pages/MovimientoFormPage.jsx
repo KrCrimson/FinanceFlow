@@ -15,6 +15,7 @@ function MovimientoFormPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [esRecurrente, setEsRecurrente] = useState(false);
   const { processImage, result, loading: loadingImg, error: ocrError } = useImageToMovimiento();
 
   // Categorías dinámicas ordenadas por uso
@@ -96,7 +97,8 @@ function MovimientoFormPage() {
         nombre: nombre.trim(),
         monto: Number(monto),
         categoria: categoriaFinal,
-        descripcion: descripcion.trim()
+        descripcion: descripcion.trim(),
+        esRecurrente: tipo === 'ingreso' ? esRecurrente : false
       });
       setSuccess('¡Movimiento registrado exitosamente!');
 
@@ -147,6 +149,7 @@ function MovimientoFormPage() {
     setCategoriaPersonalizada('');
     setMostrarCategoriaPersonalizada(false);
     setDescripcion('');
+    setEsRecurrente(false);
     setError('');
     setSuccess('');
   };
@@ -260,6 +263,22 @@ function MovimientoFormPage() {
               />
             </div>
           </div>
+
+          {/* Ingreso Constante Checkbox */}
+          {tipo === 'ingreso' && (
+            <div className="flex items-center space-x-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 animate-fade-in">
+              <input
+                id="esRecurrente"
+                type="checkbox"
+                checked={esRecurrente}
+                onChange={e => setEsRecurrente(e.target.checked)}
+                className="h-5 w-5 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
+              />
+              <label htmlFor="esRecurrente" className="text-sm font-semibold text-gray-700 cursor-pointer select-none">
+                🔁 Registrar como Ingreso Constante (Mensual)
+              </label>
+            </div>
+          )}
 
           {/* Nombre y Categoría */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

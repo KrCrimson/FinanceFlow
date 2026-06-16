@@ -1,12 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import ReportesPage from '../pages/ReportesPage';
+import * as movimientosService from '../services/movimientosService';
+
+jest.mock('../services/movimientosService');
 
 describe('ReportesPage', () => {
-  it('muestra cargando', () => {
+  it('renderiza la vista de reportes', async () => {
+    movimientosService.getMovimientos.mockResolvedValue([]);
     render(<ReportesPage />);
-    expect(screen.getByText(/Cargando reportes/i)).toBeInTheDocument();
-  });
-  it('muestra datos de reporte', () => {
-    // Mockear hook/servicio para datos
+    expect(await screen.findByText(/Reportes y Análisis/i)).toBeInTheDocument();
   });
 });

@@ -16,5 +16,7 @@ router.put('/:id', auth, movimientosController.editarMovimiento);
 router.patch('/:id/inhabilitar', auth, movimientosController.inhabilitarMovimiento);
 // Inactivar movimiento (alias para inhabilitar)
 router.patch('/:id/inactivar', auth, movimientosController.inhabilitarMovimiento);
+// Registrar movimiento historico
+router.post('/historico', auth, movimientosController.crearMovimientoHistorico);
 
 module.exports = router;

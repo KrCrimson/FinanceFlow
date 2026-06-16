@@ -35,6 +35,10 @@ const movimientoSchema = new mongoose.Schema({
 		enum: ['activo', 'inactivo'],
 		default: 'activo',
 	},
+	esRecurrente: {
+		type: Boolean,
+		default: false,
+	},
 	creadoEn: {
 		type: Date,
 		default: Date.now,
