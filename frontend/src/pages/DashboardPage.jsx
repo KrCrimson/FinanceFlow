@@ -174,7 +174,19 @@ function DashboardPage() {
   const egresos = activosFiltrados.filter(m => m.tipo === 'egreso').reduce((acc, m) => acc + m.monto, 0);
   const balance = ingresos - egresos;
 
-  const esMesFiltroCerrado = mesFiltro !== 'general' && cierresRealizados.some(c => c.tipo === 'mensual' && c.periodo === mesFiltro);
+  const esMesFiltroManualCerrado = mesFiltro !== 'general' && cierresRealizados.some(c => c.tipo === 'mensual' && c.periodo === mesFiltro);
+  
+  const esMesFiltroAutoCerrado = (() => {
+    if (mesFiltro === 'general') return false;
+    const today = new Date();
+    const currentPeriodo = today.toISOString().slice(0, 7); // YYYY-MM
+    const [y1, m1] = mesFiltro.split('-').map(Number);
+    const [y2, m2] = currentPeriodo.split('-').map(Number);
+    const diferenciaMeses = (y2 - y1) * 12 + (m2 - m1);
+    return diferenciaMeses >= 2;
+  })();
+
+  const esMesFiltroCerrado = esMesFiltroManualCerrado || esMesFiltroAutoCerrado;
 
   return (
     <div className="min-h-[80vh] bg-background py-6 px-4">
@@ -286,17 +298,23 @@ function DashboardPage() {
                   <span className="text-2xl">🔒</span>
                   <div>
                     <h4 className="font-bold text-amber-800 text-sm sm:text-base">Periodo Cerrado: {formatMonthYear(mesFiltro)}</h4>
-                    <p className="text-xs sm:text-sm text-amber-700">Este periodo mensual está cerrado. No puedes añadir nuevos movimientos ni modificar los existentes.</p>
+                    <p className="text-xs sm:text-sm text-amber-700">
+                      {esMesFiltroAutoCerrado 
+                        ? 'Este periodo está cerrado automáticamente por antigüedad (más de 2 meses) y está archivado de forma definitiva.'
+                        : 'Este periodo mensual está cerrado. No puedes añadir nuevos movimientos ni modificar los existentes.'}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 shrink-0">
-                  <button
-                    onClick={() => setModalReabrir({ isOpen: true, tipo: 'mensual', periodo: mesFiltro })}
-                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center gap-1"
-                  >
-                    🔓 Reabrir Periodo
-                  </button>
-                </div>
+                {!esMesFiltroAutoCerrado && (
+                  <div className="flex items-center space-x-2 shrink-0">
+                    <button
+                      onClick={() => setModalReabrir({ isOpen: true, tipo: 'mensual', periodo: mesFiltro })}
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center gap-1"
+                    >
+                      🔓 Reabrir Periodo
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

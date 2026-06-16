@@ -90,15 +90,55 @@ function MovimientoFormPage() {
   const isFechaCerrada = (fechaStr) => {
     if (!fechaStr) return false;
     const mes = fechaStr.slice(0, 7); // YYYY-MM
+    
+    // 1. Auto-cierre por antigüedad >= 2 meses
+    const today = new Date();
+    const currentPeriodo = today.toISOString().slice(0, 7); // YYYY-MM
+    const [y1, m1] = mes.split('-').map(Number);
+    const [y2, m2] = currentPeriodo.split('-').map(Number);
+    const diferenciaMeses = (y2 - y1) * 12 + (m2 - m1);
+    if (diferenciaMeses >= 2) {
+      return true;
+    }
+
+    // 2. Cierre manual
     return cierres.some(c => c.tipo === 'mensual' && c.periodo === mes);
   };
   const esFechaSeleccionadaCerrada = isFechaCerrada(fecha);
 
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const maxDate = todayStr;
+  
+  const minDate = (() => {
+    const today = new Date();
+    const startOfCurrentMonth = new Date(Date.UTC(today.getFullYear(), today.getMonth(), 1));
+    const startOfCurrentMonthStr = startOfCurrentMonth.toISOString().slice(0, 10);
+    
+    let prevYear = today.getFullYear();
+    let prevMonth = today.getMonth(); // 0-indexed
+    if (prevMonth === 0) {
+      prevYear -= 1;
+      prevMonth = 11;
+    }
+    const prevMonthStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
+    
+    // El mes anterior está cerrado si lo está en cierres
+    const isPrevMonthClosed = cierres.some(c => c.tipo === 'mensual' && c.periodo === prevMonthStr);
+    
+    if (isPrevMonthClosed) {
+      return startOfCurrentMonthStr;
+    } else {
+      const startOfPrevMonth = new Date(Date.UTC(prevYear, prevMonth, 1));
+      return startOfPrevMonth.toISOString().slice(0, 10);
+    }
+  })();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (isFechaCerrada(fecha)) {
-      setError('No se pueden registrar movimientos en un periodo mensual cerrado. Por favor reabre el periodo desde el Dashboard.');
+    const isFutura = fecha > todayStr;
+    if (isFechaCerrada(fecha) || isFutura) {
+      setError(isFutura ? 'No se pueden registrar movimientos en fechas futuras.' : 'No se pueden registrar movimientos en un periodo cerrado.');
       return;
     }
 
@@ -295,6 +335,8 @@ function MovimientoFormPage() {
                 type="date" 
                 value={fecha} 
                 onChange={e => setFecha(e.target.value)} 
+                min={minDate}
+                max={maxDate}
                 required 
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
               />
@@ -306,7 +348,28 @@ function MovimientoFormPage() {
             <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl text-sm font-semibold flex items-center gap-2 animate-fade-in">
               <span>⚠️</span>
               <div>
-                <strong>Periodo Cerrado:</strong> El mes seleccionado ({fecha.slice(0, 7)}) está cerrado. Primero reabre este periodo desde el Dashboard para poder registrar movimientos en esta fecha.
+                <strong>Periodo Cerrado:</strong> El mes seleccionado ({fecha.slice(0, 7)}) está cerrado. {
+                  (() => {
+                    const today = new Date();
+                    const currentPeriodo = today.toISOString().slice(0, 7);
+                    const [y1, m1] = fecha.slice(0, 7).split('-').map(Number);
+                    const [y2, m2] = currentPeriodo.split('-').map(Number);
+                    const diff = (y2 - y1) * 12 + (m2 - m1);
+                    return diff >= 2 
+                      ? 'Este periodo está cerrado por antigüedad (mayor a 2 meses) de forma definitiva y no puede reabrirse.'
+                      : 'Primero reabre este periodo desde el Dashboard para poder registrar movimientos en esta fecha.';
+                  })()
+                }
+              </div>
+            </div>
+          )}
+
+          {/* Advertencia de fecha futura */}
+          {fecha > todayStr && (
+            <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl text-sm font-semibold flex items-center gap-2 animate-fade-in">
+              <span>⚠️</span>
+              <div>
+                <strong>Fecha Futura:</strong> No se pueden registrar transacciones en fechas futuras.
               </div>
             </div>
           )}

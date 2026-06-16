@@ -22,8 +22,15 @@ module.exports = {
       throw new Error('userId es requerido');
     }
 
-    // Verificar si el periodo está cerrado
+    // Verificar si la fecha está en el futuro
     const fechaMov = data.fecha ? new Date(data.fecha) : new Date();
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const fechaMovStr = fechaMov.toISOString().slice(0, 10);
+    if (fechaMovStr > todayStr) {
+      throw new Error('No se pueden registrar movimientos en fechas futuras');
+    }
+
+    // Verificar si el periodo está cerrado
     const isClosed = await cierresService.esPeriodoCerrado(data.userId, fechaMov);
     if (isClosed) {
       throw new Error('No se pueden registrar movimientos en un período diario o mensual cerrado');
@@ -56,11 +63,17 @@ module.exports = {
       throw new Error('No se puede modificar un movimiento perteneciente a un período cerrado');
     }
 
-    // Verificar si el nuevo periodo (si se cambia la fecha) está cerrado
+    // Verificar si el nuevo periodo (si se cambia la fecha) está cerrado o en el futuro
     if (data.fecha !== undefined) {
       const isNewPeriodClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, data.fecha);
       if (isNewPeriodClosed) {
         throw new Error('No se puede trasladar un movimiento a un período cerrado');
+      }
+      
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const newFechaStr = new Date(data.fecha).toISOString().slice(0, 10);
+      if (newFechaStr > todayStr) {
+        throw new Error('No se pueden trasladar movimientos a fechas futuras');
       }
     }
 

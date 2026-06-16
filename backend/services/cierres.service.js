@@ -116,7 +116,18 @@ module.exports = {
 
     const periodoMensual = date.toISOString().slice(0, 7); // YYYY-MM
 
-    // Buscar si hay cierres mensuales para este usuario en ese periodo
+    // 1. Auto-cierre automático de meses con más de 2 meses de antigüedad (ej: si hoy es junio 2026, abril 2026 y anteriores están cerrados)
+    const today = new Date();
+    const currentPeriodo = today.toISOString().slice(0, 7); // YYYY-MM
+    const [y1, m1] = periodoMensual.split('-').map(Number);
+    const [y2, m2] = currentPeriodo.split('-').map(Number);
+    const diferenciaMeses = (y2 - y1) * 12 + (m2 - m1);
+    
+    if (diferenciaMeses >= 2) {
+      return true;
+    }
+
+    // 2. Buscar si hay cierres mensuales manuales para este usuario en ese periodo
     const cierre = await Cierre.findOne({
       userId,
       tipo: 'mensual',
