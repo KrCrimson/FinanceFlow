@@ -44,5 +44,18 @@ module.exports = {
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
+  },
+
+  reabrirCierre: async (req, res) => {
+    try {
+      const result = await cierresService.reabrirCierre(req.user.id, req.body);
+      res.json(result);
+    } catch (error) {
+      if (error.message === 'Contraseña incorrecta') {
+        res.status(401).json({ error: error.message });
+      } else {
+        res.status(400).json({ error: error.message });
+      }
+    }
   }
 };

@@ -15,4 +15,7 @@ router.get('/', auth, cierresController.listarCierres);
 // Obtener cierres pendientes
 router.get('/pendientes', auth, cierresController.obtenerPendientes);
 
+// Reabrir un periodo
+router.post('/reabrir', auth, cierresController.reabrirCierre);
+
 module.exports = router;

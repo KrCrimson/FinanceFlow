@@ -8,7 +8,6 @@ function ProfilePage() {
   const [perfil, setPerfil] = useState(null);
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
-  const [fondoFijo, setFondoFijo] = useState(1000);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -25,7 +24,6 @@ function ProfilePage() {
         setPerfil(data);
         setNombre(data.nombre || '');
         setEmail(data.email || '');
-        setFondoFijo(data.fondoFijo || 1000);
       } catch (err) {
         setError(err.message || 'Error al cargar el perfil');
         console.error('Error al cargar perfil:', err);
@@ -49,8 +47,7 @@ function ProfilePage() {
     try {
       const updatedProfile = await updateProfile({ 
         nombre: nombre.trim(), 
-        email: email.trim(),
-        fondoFijo: Number(fondoFijo)
+        email: email.trim()
       });
       setPerfil(updatedProfile);
       setSuccess('✅ Perfil actualizado exitosamente');
@@ -92,7 +89,6 @@ function ProfilePage() {
     if (perfil) {
       setNombre(perfil.nombre || '');
       setEmail(perfil.email || '');
-      setFondoFijo(perfil.fondoFijo || 1000);
       setError('');
       setSuccess('');
     }
@@ -192,23 +188,7 @@ function ProfilePage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                💵 Fondo Fijo de Caja Chica ($)
-              </label>
-              <input 
-                type="number" 
-                value={fondoFijo} 
-                onChange={e => setFondoFijo(e.target.value)} 
-                placeholder="1000"
-                min="0"
-                required 
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Este monto se utilizará como base inicial por defecto para calcular tu arqueo al realizar el cierre.
-              </p>
-            </div>
+
 
             {perfil?.creadoEn && (
               <div>

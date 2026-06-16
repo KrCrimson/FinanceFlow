@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createMovimiento } from '../services/movimientosService';
+import { getCierres } from '../services/cierresService';
 import { useImageToMovimiento } from '../hooks/useImageToMovimiento';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,6 +17,8 @@ function MovimientoFormPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [esRecurrente, setEsRecurrente] = useState(false);
+  const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
+  const [cierres, setCierres] = useState([]);
   const { processImage, result, loading: loadingImg, error: ocrError } = useImageToMovimiento();
 
   // Categorías dinámicas ordenadas por uso
@@ -71,12 +74,34 @@ function MovimientoFormPage() {
       }
     };
     
+    const fetchCierres = async () => {
+      try {
+        const list = await getCierres();
+        setCierres(list || []);
+      } catch (err) {
+        console.error("Error al cargar cierres:", err);
+      }
+    };
+
     fetchUserCategories();
+    fetchCierres();
   }, []);
+
+  const isFechaCerrada = (fechaStr) => {
+    if (!fechaStr) return false;
+    const mes = fechaStr.slice(0, 7); // YYYY-MM
+    return cierres.some(c => c.tipo === 'mensual' && c.periodo === mes);
+  };
+  const esFechaSeleccionadaCerrada = isFechaCerrada(fecha);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (isFechaCerrada(fecha)) {
+      setError('No se pueden registrar movimientos en un periodo mensual cerrado. Por favor reabre el periodo desde el Dashboard.');
+      return;
+    }
+
     // Determinar la categoría final a usar
     let categoriaFinal = categoria;
     if (categoria === 'Otros' && categoriaPersonalizada.trim()) {
@@ -98,6 +123,7 @@ function MovimientoFormPage() {
         monto: Number(monto),
         categoria: categoriaFinal,
         descripcion: descripcion.trim(),
+        fecha: new Date(fecha + 'T12:00:00.000Z'),
         esRecurrente: tipo === 'ingreso' ? esRecurrente : false
       });
       setSuccess('¡Movimiento registrado exitosamente!');
@@ -150,6 +176,7 @@ function MovimientoFormPage() {
     setMostrarCategoriaPersonalizada(false);
     setDescripcion('');
     setEsRecurrente(false);
+    setFecha(new Date().toISOString().slice(0, 10));
     setError('');
     setSuccess('');
   };
@@ -236,8 +263,8 @@ function MovimientoFormPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Tipo de Movimiento */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Tipo de Movimiento, Monto y Fecha */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo de Movimiento</label>
               <select 
@@ -262,7 +289,27 @@ function MovimientoFormPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Registro</label>
+              <input 
+                type="date" 
+                value={fecha} 
+                onChange={e => setFecha(e.target.value)} 
+                required 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
+              />
+            </div>
           </div>
+
+          {/* Advertencia de periodo cerrado */}
+          {esFechaSeleccionadaCerrada && (
+            <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl text-sm font-semibold flex items-center gap-2 animate-fade-in">
+              <span>⚠️</span>
+              <div>
+                <strong>Periodo Cerrado:</strong> El mes seleccionado ({fecha.slice(0, 7)}) está cerrado. Primero reabre este periodo desde el Dashboard para poder registrar movimientos en esta fecha.
+              </div>
+            </div>
+          )}
 
           {/* Ingreso Constante Checkbox */}
           {tipo === 'ingreso' && (
@@ -358,7 +405,7 @@ function MovimientoFormPage() {
             </button>
             <button 
               type="submit" 
-              disabled={loading || !nombre.trim() || !monto}
+              disabled={loading || !nombre.trim() || !monto || esFechaSeleccionadaCerrada}
               className="flex-1 bg-primary hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center"
             >
               {loading ? (

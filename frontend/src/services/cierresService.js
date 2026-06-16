@@ -87,3 +87,23 @@ export async function getCierresPendientes(localDate) {
     return null;
   }
 }
+
+export async function reabrirCierre(reopenData) {
+  try {
+    const response = await fetch(`${API_BASE}/cierres/reabrir`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(reopenData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al reabrir el periodo');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error en reabrirCierre:', error);
+    throw error;
+  }
+}

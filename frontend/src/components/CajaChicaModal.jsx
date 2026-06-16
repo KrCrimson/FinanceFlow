@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { crearCierre, getResumenPeriodo } from '../services/cierresService';
 
 function CajaChicaModal({ isOpen, onClose, tipo, periodo, defaultFondoFijo, onSuccess }) {
-  const [fondoFijo, setFondoFijo] = useState(defaultFondoFijo || 1000);
+  const [fondoFijo, setFondoFijo] = useState(defaultFondoFijo || 0);
   const [ingresosTotales, setIngresosTotales] = useState(0);
   const [egresosTotales, setEgresosTotales] = useState(0);
   const [saldoFisico, setSaldoFisico] = useState('');
@@ -101,7 +101,7 @@ function CajaChicaModal({ isOpen, onClose, tipo, periodo, defaultFondoFijo, onSu
         <div className="flex justify-between items-start mb-6">
           <div>
             <span className="text-xs uppercase font-extrabold tracking-wider px-2.5 py-1 bg-primary/10 text-primary rounded-full">
-              🏛️ Arqueo de Caja Chica
+              🏛️ Arqueo de Caja
             </span>
             <h3 className="text-2xl font-black text-gray-800 mt-2">
               Cierre {tipo === 'diario' ? 'Diario' : 'Mensual'}
@@ -131,7 +131,7 @@ function CajaChicaModal({ isOpen, onClose, tipo, periodo, defaultFondoFijo, onSu
               <h4 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Resumen Contable (Monto Esperado)</h4>
               
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600"> Fondo Fijo Asignado:</span>
+                <span className="text-gray-600">💵 Saldo Inicial (Fondo Base):</span>
                 <div className="flex items-center space-x-1">
                   <span className="text-gray-400 font-bold">$</span>
                   <input
@@ -155,7 +155,7 @@ function CajaChicaModal({ isOpen, onClose, tipo, periodo, defaultFondoFijo, onSu
               </div>
               
               <div className="border-t border-gray-200/60 my-2 pt-2 flex justify-between items-center text-base font-bold">
-                <span className="text-gray-800">💰 (=) Saldo Esperado en Caja:</span>
+                <span className="text-gray-800">💰 (=) Saldo Esperado:</span>
                 <span className="text-gray-900">${saldoEsperado.toLocaleString()}</span>
               </div>
             </div>
@@ -180,7 +180,7 @@ function CajaChicaModal({ isOpen, onClose, tipo, periodo, defaultFondoFijo, onSu
                   className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 font-bold text-lg"
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">Suma todo el dinero físico en tu cajón o caja de efectivo.</p>
+              <p className="text-xs text-gray-400 mt-1">Suma todo el dinero físico que tienes en caja.</p>
             </div>
 
             {/* Cálculo de diferencia */}

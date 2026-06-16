@@ -4,8 +4,9 @@ import { useAnalisisGastos } from '../hooks/useAnalisisGastos';
 import { inhabilitarMovimiento, updateMovimiento } from '../services/movimientosService';
 import AlertasComponent from '../components/AlertasComponent';
 import PlanificadorCompras from '../components/PlanificadorCompras';
-import { getCierresPendientes, crearCierre } from '../services/cierresService';
+import { getCierresPendientes, crearCierre, getCierres } from '../services/cierresService';
 import CajaChicaModal from '../components/CajaChicaModal';
+import ReabrirModal from '../components/ReabrirModal';
 import { getProfile } from '../services/userService';
 
 const currentMonthStr = new Date().toISOString().slice(0, 7);
@@ -34,6 +35,8 @@ function DashboardPage() {
   const [perfil, setPerfil] = useState(null);
   const [posponerCierre, setPosponerCierre] = useState({ yesterday: false, prevMonth: false });
   const [modalCierre, setModalCierre] = useState({ isOpen: false, tipo: 'diario', periodo: '' });
+  const [cierresRealizados, setCierresRealizados] = useState([]);
+  const [modalReabrir, setModalReabrir] = useState({ isOpen: false, tipo: 'mensual', periodo: '' });
 
   const cargarPendientesYPerfil = async () => {
     try {
@@ -43,6 +46,9 @@ function DashboardPage() {
       
       const dataPerfil = await getProfile();
       setPerfil(dataPerfil);
+
+      const listCierres = await getCierres();
+      setCierresRealizados(listCierres);
     } catch (err) {
       console.error('Error al cargar pendientes o perfil:', err);
     }
@@ -58,12 +64,18 @@ function DashboardPage() {
     setTimeout(() => setFeedback(''), 4000);
   };
 
+  const handleReabrirExitoso = (tipo, periodo) => {
+    setFeedback(`🔓 El periodo ${periodo} ha sido reabierto con éxito. Ahora puedes realizar modificaciones.`);
+    cargarPendientesYPerfil();
+    setTimeout(() => setFeedback(''), 4000);
+  };
+
   const handleVerificacionRapidaAyer = async () => {
     if (!pendientes || !pendientes.yesterday) return;
     const { date, resumen } = pendientes.yesterday;
     setActualizando('verificacion-rapida');
     try {
-      const ff = perfil?.fondoFijo || 1000;
+      const ff = perfil?.fondoFijo || 0;
       const expected = ff + (resumen?.ingresosTotales || 0) - (resumen?.egresosTotales || 0);
       await crearCierre({
         tipo: 'diario',
@@ -161,6 +173,8 @@ function DashboardPage() {
   const ingresos = activosFiltrados.filter(m => m.tipo === 'ingreso').reduce((acc, m) => acc + m.monto, 0);
   const egresos = activosFiltrados.filter(m => m.tipo === 'egreso').reduce((acc, m) => acc + m.monto, 0);
   const balance = ingresos - egresos;
+
+  const esMesFiltroCerrado = mesFiltro !== 'general' && cierresRealizados.some(c => c.tipo === 'mensual' && c.periodo === mesFiltro);
 
   return (
     <div className="min-h-[80vh] bg-background py-6 px-4">
@@ -262,11 +276,32 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Banners de Cierre Pendiente (Opción 1) */}
-        {pendientes && (
+        {/* Banners de Cierre Pendiente o Periodo Cerrado */}
+        {(pendientes || esMesFiltroCerrado) && (
           <div className="space-y-3">
+            {/* Banner de Periodo Cerrado */}
+            {esMesFiltroCerrado && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-550 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-fade-in">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">🔒</span>
+                  <div>
+                    <h4 className="font-bold text-amber-800 text-sm sm:text-base">Periodo Cerrado: {formatMonthYear(mesFiltro)}</h4>
+                    <p className="text-xs sm:text-sm text-amber-700">Este periodo mensual está cerrado. No puedes añadir nuevos movimientos ni modificar los existentes.</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    onClick={() => setModalReabrir({ isOpen: true, tipo: 'mensual', periodo: mesFiltro })}
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors shadow-sm flex items-center gap-1"
+                  >
+                    🔓 Reabrir Periodo
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Banner de Cierre Mensual Pendiente */}
-            {pendientes.prevMonth && !pendientes.prevMonth.isClosed && !posponerCierre.prevMonth && (
+            {pendientes && pendientes.prevMonth && !pendientes.prevMonth.isClosed && !posponerCierre.prevMonth && (
               <div className="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-fade-in">
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">🚨</span>
@@ -293,15 +328,15 @@ function DashboardPage() {
             )}
 
             {/* Banner de Cierre Diario Pendiente */}
-            {pendientes.yesterday && !pendientes.yesterday.isClosed && !posponerCierre.yesterday && (
+            {pendientes && pendientes.yesterday && !pendientes.yesterday.isClosed && !posponerCierre.yesterday && (
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-fade-in">
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">📅</span>
                   <div>
                     <h4 className="font-bold text-blue-800 text-sm sm:text-base">Arqueo Diario: Ayer ({pendientes.yesterday.date})</h4>
                     <p className="text-xs sm:text-sm text-blue-700 font-medium">
-                      Ingresos de ayer: <span className="font-semibold text-green-700 font-bold">+${pendientes.yesterday.resumen.ingresosTotales}</span> | 
-                      Egresos: <span className="font-semibold text-red-700 font-bold">-${pendientes.yesterday.resumen.egresosTotales}</span>.
+                      Ingresos de ayer: <span className="font-semibold text-green-700 font-bold">+${pendientes.yesterday.resumen?.ingresosTotales || 0}</span> | 
+                      Egresos: <span className="font-semibold text-red-700 font-bold">-${pendientes.yesterday.resumen?.egresosTotales || 0}</span>.
                       ¿Todo estuvo en orden?
                     </p>
                   </div>
@@ -503,14 +538,20 @@ function DashboardPage() {
                               {m.estado === 'activo' && (
                                 <button 
                                   onClick={() => handleInhabilitar(m._id)} 
-                                  disabled={actualizando === m._id}
-                                  className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-medium"
+                                  disabled={actualizando === m._id || esMesFiltroCerrado}
+                                  className={`${
+                                    esMesFiltroCerrado
+                                      ? 'bg-gray-100 text-gray-405 cursor-not-allowed border border-gray-200'
+                                      : 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
+                                  } px-3 py-1 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-medium`}
                                 >
                                   {actualizando === m._id ? (
                                     <span className="flex items-center">
                                       <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-yellow-600 mr-1"></div>
                                       Desactivando...
                                     </span>
+                                  ) : esMesFiltroCerrado ? (
+                                    '🔒 Cerrado'
                                   ) : (
                                     '⏸️ Desactivar'
                                   )}
@@ -609,14 +650,23 @@ function DashboardPage() {
         )}
       </div>
 
-      {/* Modal de Caja Chica */}
+      {/* Modal de Cierre de Caja */}
       <CajaChicaModal
         isOpen={modalCierre.isOpen}
         onClose={() => setModalCierre({ ...modalCierre, isOpen: false })}
         tipo={modalCierre.tipo}
         periodo={modalCierre.periodo}
-        defaultFondoFijo={perfil?.fondoFijo || 1000}
+        defaultFondoFijo={perfil?.fondoFijo || 0}
         onSuccess={handleCierreExitoso}
+      />
+
+      {/* Modal de Reapertura de Periodo */}
+      <ReabrirModal
+        isOpen={modalReabrir.isOpen}
+        onClose={() => setModalReabrir({ ...modalReabrir, isOpen: false })}
+        tipo={modalReabrir.tipo}
+        periodo={modalReabrir.periodo}
+        onSuccess={handleReabrirExitoso}
       />
     </div>
   );

@@ -182,5 +182,38 @@ module.exports = {
         resumen: resumenMesAnterior
       }
     };
+  },
+
+  // Reabrir un periodo (eliminar el cierre)
+  reabrirCierre: async (userId, data) => {
+    const { tipo, periodo, password } = data;
+
+    if (!tipo || !['diario', 'mensual'].includes(tipo)) {
+      throw new Error('El tipo de cierre debe ser diario o mensual');
+    }
+    if (!periodo) {
+      throw new Error('El periodo es requerido');
+    }
+    if (!password) {
+      throw new Error('La contraseña es requerida para reabrir el periodo');
+    }
+
+    // 1. Validar la contraseña
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+    const isOk = await bcrypt.compare(password, usuario.passwordHash);
+    if (!isOk) {
+      throw new Error('Contraseña incorrecta');
+    }
+
+    // 2. Buscar y eliminar el cierre
+    const result = await Cierre.findOneAndDelete({ userId, tipo, periodo });
+    if (!result) {
+      throw new Error(`No se encontró ningún cierre ${tipo} para el periodo ${periodo}`);
+    }
+
+    return { message: 'Periodo reabierto exitosamente' };
   }
 };
