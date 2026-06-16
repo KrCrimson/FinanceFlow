@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
 import MovimientoFormPage from './pages/MovimientoFormPage';
 import ReportesPage from './pages/ReportesPage';
+import PlanificadorPage from './pages/PlanificadorPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
@@ -42,6 +43,11 @@ function App() {
         <Route path="/reportes" element={
           <ProtectedRoute>
             <ReportesPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/planificador" element={
+          <ProtectedRoute>
+            <PlanificadorPage />
           </ProtectedRoute>
         } />
         <Route path="*" element={<NotFoundPage />} />

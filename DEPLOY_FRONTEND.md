@@ -10,7 +10,7 @@
 Ve a tu proyecto en Vercel → Settings → Environment Variables:
 
 ```
-REACT_APP_API_URL=https://tu-backend.onrender.com
+REACT_APP_API_URL=https://financeflow-backend.onrender.com
 ```
 
 ### 3. Configuración automática
@@ -30,5 +30,5 @@ Vercel detecta automáticamente proyectos React. Configuración por defecto:
 En Vercel → Settings → Domains → Add
 
 ### URLs importantes
-- Frontend: https://tu-app.vercel.app
-- Backend API: configurado en REACT_APP_API_URL
+- Frontend: https://financeflow-frontend.vercel.app
+- Backend API: https://financeflow-backend.onrender.com

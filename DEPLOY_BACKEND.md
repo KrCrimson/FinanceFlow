@@ -16,11 +16,11 @@
 3. En "Environment Variables" añade:
 
 ```
-MONGODB_URI=tu_connection_string_de_atlas
-JWT_SECRET=tu_jwt_secret_muy_largo_y_seguro
+MONGODB_URI=mongodb+srv://user_prod:secure_password@cluster0.mongodb.net/financeflow
+JWT_SECRET=production_jwt_secret_token_financeflow_2026
 NODE_ENV=production
 PORT=5000
-CORS_ORIGIN=https://tu-frontend.vercel.app
+CORS_ORIGIN=https://financeflow-frontend.vercel.app
 ```
 
 ### 3. Configuración de Build
@@ -29,7 +29,7 @@ CORS_ORIGIN=https://tu-frontend.vercel.app
 - Node Version: 18.x
 
 ### API Endpoints
-- Base URL: https://tu-backend.onrender.com
+- Base URL: https://financeflow-backend.onrender.com
 - Auth: `/api/usuarios/login`, `/api/usuarios/register`
 - Movimientos: `/api/movimientos`
 - Logs: `/api/logs`

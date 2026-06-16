@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getProfile, updateProfile } from '../services/userService';
+import { getProfile, updateProfile, deleteProfile } from '../services/userService';
 import { logout } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,6 +50,26 @@ function ProfilePage() {
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.message || 'Error al actualizar el perfil');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setUpdating(true);
+      setError('');
+      setSuccess('');
+      await deleteProfile();
+      setSuccess('Cuenta eliminada correctamente. Redirigiendo...');
+      setShowDeleteConfirm(false);
+      setTimeout(() => {
+        localStorage.removeItem('token');
+        navigate('/login');
+      }, 2000);
+    } catch (err) {
+      setError(err.message || 'Error al eliminar la cuenta');
+      setShowDeleteConfirm(false);
     } finally {
       setUpdating(false);
     }
@@ -295,14 +315,11 @@ function ProfilePage() {
                     Cancelar
                   </button>
                   <button 
-                    onClick={() => {
-                      // Aquí iría la lógica de eliminación de cuenta
-                      alert('Funcionalidad de eliminación no implementada por seguridad');
-                      setShowDeleteConfirm(false);
-                    }}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    onClick={handleDeleteAccount}
+                    disabled={updating}
+                    className="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
                   >
-                    Eliminar
+                    {updating ? 'Eliminando...' : 'Eliminar'}
                   </button>
                 </div>
               </div>

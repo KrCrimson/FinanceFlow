@@ -42,6 +42,9 @@ module.exports = {
   login: async (email, password) => {
     const usuario = await Usuario.findOne({ email });
     if (!usuario) throw new Error('Usuario o contraseña incorrectos');
+    if (usuario.estado === 'eliminado') {
+      throw new Error('Usuario o contraseña incorrectos');
+    }
     const ok = await bcrypt.compare(password, usuario.passwordHash);
     if (!ok) throw new Error('Usuario o contraseña incorrectos');
     return {
@@ -93,6 +96,22 @@ module.exports = {
     const usuario = await Usuario.findByIdAndUpdate(
       id,
       { estado: 'inactivo', actualizadoEn: new Date() },
+      { new: true }
+    );
+    if (!usuario) throw new Error('Usuario no encontrado');
+    return {
+      id: usuario._id,
+      nombre: usuario.nombre,
+      email: usuario.email,
+      estado: usuario.estado,
+      creadoEn: usuario.creadoEn,
+    };
+  },
+
+  eliminarUsuario: async (id) => {
+    const usuario = await Usuario.findByIdAndUpdate(
+      id,
+      { estado: 'eliminado', actualizadoEn: new Date() },
       { new: true }
     );
     if (!usuario) throw new Error('Usuario no encontrado');

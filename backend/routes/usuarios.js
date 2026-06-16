@@ -13,6 +13,7 @@ router.post('/login', usuariosController.login);
 // Rutas protegidas para el perfil del usuario actual
 router.get('/me', auth, usuariosController.getProfile);
 router.put('/me', auth, usuariosController.updateProfile);
+router.delete('/me', auth, usuariosController.deleteProfile);
 
 // Rutas de recuperación de contraseña (sin autenticación)
 router.post('/forgot-password', usuariosController.forgotPassword);

@@ -87,6 +87,16 @@ module.exports = {
     }
   },
 
+  // Eliminar perfil del usuario actual (borrado lógico)
+  deleteProfile: async (req, res) => {
+    try {
+      const usuario = await usuariosService.eliminarUsuario(req.user.id);
+      res.json({ message: 'Cuenta eliminada exitosamente', usuario });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
   // Solicitar recuperación de contraseña
   forgotPassword: async (req, res) => {
     try {

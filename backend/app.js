@@ -56,9 +56,11 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Servidor backend escuchando en puerto ${PORT}`);
-  });
+  if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+      console.log(`Servidor backend escuchando en puerto ${PORT}`);
+    });
+  }
 });
 
 module.exports = app;

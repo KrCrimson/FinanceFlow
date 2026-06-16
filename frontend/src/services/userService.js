@@ -50,3 +50,22 @@ export async function updateProfile(data) {
     throw error;
   }
 }
+
+export async function deleteProfile() {
+  try {
+    const response = await fetch(`${API_BASE}/usuarios/me`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al eliminar perfil');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error en deleteProfile:', error);
+    throw error;
+  }
+}
