@@ -8,22 +8,13 @@ function ProfilePage() {
   const [perfil, setPerfil] = useState(null);
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
+  const [fondoFijo, setFondoFijo] = useState(1000);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Estados para Registro de Movimiento Histórico
-  const [histNombre, setHistNombre] = useState('');
-  const [histMonto, setHistMonto] = useState('');
-  const [histTipo, setHistTipo] = useState('ingreso');
-  const [histCategoria, setHistCategoria] = useState('');
-  const [histFecha, setHistFecha] = useState('');
-  const [histPassword, setHistPassword] = useState('');
-  const [histSuccess, setHistSuccess] = useState('');
-  const [histError, setHistError] = useState('');
-  const [histLoading, setHistLoading] = useState(false);
 
   useEffect(() => {
     const cargarPerfil = async () => {
@@ -34,6 +25,7 @@ function ProfilePage() {
         setPerfil(data);
         setNombre(data.nombre || '');
         setEmail(data.email || '');
+        setFondoFijo(data.fondoFijo || 1000);
       } catch (err) {
         setError(err.message || 'Error al cargar el perfil');
         console.error('Error al cargar perfil:', err);
@@ -55,7 +47,11 @@ function ProfilePage() {
     setSuccess('');
     setError('');
     try {
-      const updatedProfile = await updateProfile({ nombre: nombre.trim(), email: email.trim() });
+      const updatedProfile = await updateProfile({ 
+        nombre: nombre.trim(), 
+        email: email.trim(),
+        fondoFijo: Number(fondoFijo)
+      });
       setPerfil(updatedProfile);
       setSuccess('✅ Perfil actualizado exitosamente');
       setTimeout(() => setSuccess(''), 3000);
@@ -91,46 +87,12 @@ function ProfilePage() {
     navigate('/login');
   };
 
-  const handleHistSubmit = async (e) => {
-    e.preventDefault();
-    if (!histNombre.trim() || !histMonto || !histTipo || !histCategoria || !histFecha || !histPassword) {
-      setHistError('Por favor complete todos los campos requeridos');
-      return;
-    }
-
-    setHistLoading(true);
-    setHistError('');
-    setHistSuccess('');
-
-    try {
-      const { createMovimientoHistorico } = await import('../services/movimientosService');
-      await createMovimientoHistorico({
-        nombre: histNombre.trim(),
-        monto: Number(histMonto),
-        tipo: histTipo,
-        categoria: histCategoria,
-        fecha: new Date(histFecha),
-        password: histPassword
-      });
-      setHistSuccess('¡Movimiento histórico registrado correctamente!');
-      setHistNombre('');
-      setHistMonto('');
-      setHistTipo('ingreso');
-      setHistCategoria('');
-      setHistFecha('');
-      setHistPassword('');
-      setTimeout(() => setHistSuccess(''), 4000);
-    } catch (err) {
-      setHistError(err.message || 'Error al registrar el movimiento histórico. Verifique su contraseña.');
-    } finally {
-      setHistLoading(false);
-    }
-  };
 
   const resetForm = () => {
     if (perfil) {
       setNombre(perfil.nombre || '');
       setEmail(perfil.email || '');
+      setFondoFijo(perfil.fondoFijo || 1000);
       setError('');
       setSuccess('');
     }
@@ -230,6 +192,24 @@ function ProfilePage() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                💵 Fondo Fijo de Caja Chica ($)
+              </label>
+              <input 
+                type="number" 
+                value={fondoFijo} 
+                onChange={e => setFondoFijo(e.target.value)} 
+                placeholder="1000"
+                min="0"
+                required 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Este monto se utilizará como base inicial por defecto para calcular tu arqueo al realizar el cierre.
+              </p>
+            </div>
+
             {perfil?.creadoEn && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -314,132 +294,6 @@ function ProfilePage() {
           </div>
         </div>
 
-        {/* Registro de Movimiento Histórico */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-100 animate-fade-in">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
-            📅 Registrar Movimiento Histórico
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            Registra transacciones de meses pasados de forma segura verificando tu contraseña.
-          </p>
-
-          <form onSubmit={handleHistSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
-                <select
-                  value={histTipo}
-                  onChange={e => { setHistTipo(e.target.value); setHistCategoria(''); }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
-                >
-                  <option value="ingreso">💰 Ingreso</option>
-                  <option value="egreso">💸 Egreso</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Monto</label>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  value={histMonto}
-                  onChange={e => setHistMonto(e.target.value)}
-                  step="0.01"
-                  min="0"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre del Movimiento</label>
-                <input
-                  type="text"
-                  placeholder="Ej. Compra anterior"
-                  value={histNombre}
-                  onChange={e => setHistNombre(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría</label>
-                <select
-                  value={histCategoria}
-                  onChange={e => setHistCategoria(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
-                >
-                  <option value="">Seleccionar categoría</option>
-                  {(histTipo === 'ingreso' 
-                    ? ['Sueldo', 'Freelance', 'Ventas', 'Otros'] 
-                    : ['Comida', 'Transporte', 'Vivienda', 'Entretenimiento', 'Salud', 'Servicios', 'Otros']
-                  ).map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha del Movimiento</label>
-                <input
-                  type="date"
-                  value={histFecha}
-                  onChange={e => setHistFecha(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">🔒 Contraseña de Cuenta</label>
-                <input
-                  type="password"
-                  placeholder="Confirme su contraseña"
-                  value={histPassword}
-                  onChange={e => setHistPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={histLoading || !histNombre.trim() || !histMonto || !histFecha || !histPassword}
-              className="w-full bg-primary hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center mt-2"
-            >
-              {histLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Procesando registro...
-                </>
-              ) : (
-                <>💾 Guardar Movimiento Histórico</>
-              )}
-            </button>
-
-            {/* Mensajes */}
-            {histSuccess && (
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl animate-fade-in mt-3">
-                <div className="flex items-center">
-                  <span className="mr-2">✅</span>
-                  {histSuccess}
-                </div>
-              </div>
-            )}
-            {histError && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl animate-fade-in mt-3">
-                <div className="flex items-center">
-                  <span className="mr-2">❌</span>
-                  {histError}
-                </div>
-              </div>
-            )}
-          </form>
-        </div>
 
         {/* Acciones de Cuenta */}
         <div className="bg-white rounded-2xl shadow-lg p-6">

@@ -21,7 +21,18 @@ const apiCall = async (url, options = {}) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errData = await response.json();
+        if (errData && errData.error) {
+          errorMessage = errData.error;
+        } else if (errData && errData.message) {
+          errorMessage = errData.message;
+        }
+      } catch (e) {
+        // Ignorar si no hay cuerpo JSON legible
+      }
+      throw new Error(errorMessage);
     }
 
     return await response.json();

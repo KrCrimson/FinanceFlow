@@ -34,6 +34,7 @@ module.exports = {
       nombre: usuario.nombre,
       email: usuario.email,
       estado: usuario.estado,
+      fondoFijo: usuario.fondoFijo,
       creadoEn: usuario.creadoEn,
     };
   },
@@ -52,6 +53,7 @@ module.exports = {
       nombre: usuario.nombre,
       email: usuario.email,
       estado: usuario.estado,
+      fondoFijo: usuario.fondoFijo,
       creadoEn: usuario.creadoEn,
     };
   },
@@ -73,13 +75,16 @@ module.exports = {
   },
 
   editarUsuario: async (id, data) => {
+    const updatePayload = {
+      actualizadoEn: new Date()
+    };
+    if (data.nombre !== undefined) updatePayload.nombre = data.nombre;
+    if (data.email !== undefined) updatePayload.email = data.email;
+    if (data.fondoFijo !== undefined) updatePayload.fondoFijo = Number(data.fondoFijo);
+
     const usuario = await Usuario.findByIdAndUpdate(
       id,
-      {
-        nombre: data.nombre,
-        email: data.email,
-        actualizadoEn: new Date(),
-      },
+      updatePayload,
       { new: true }
     );
     if (!usuario) throw new Error('Usuario no encontrado');
@@ -88,6 +93,7 @@ module.exports = {
       nombre: usuario.nombre,
       email: usuario.email,
       estado: usuario.estado,
+      fondoFijo: usuario.fondoFijo,
       creadoEn: usuario.creadoEn,
     };
   },
@@ -132,6 +138,7 @@ module.exports = {
       nombre: usuario.nombre,
       email: usuario.email,
       estado: usuario.estado,
+      fondoFijo: usuario.fondoFijo,
       creadoEn: usuario.creadoEn,
     };
   },

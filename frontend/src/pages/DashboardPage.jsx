@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useAnalisisGastos } from '../hooks/useAnalisisGastos';
 import { inhabilitarMovimiento, updateMovimiento } from '../services/movimientosService';
 import AlertasComponent from '../components/AlertasComponent';
 import PlanificadorCompras from '../components/PlanificadorCompras';
+import { getCierresPendientes, crearCierre } from '../services/cierresService';
+import CajaChicaModal from '../components/CajaChicaModal';
+import { getProfile } from '../services/userService';
 
 const currentMonthStr = new Date().toISOString().slice(0, 7);
 
@@ -24,6 +27,60 @@ function DashboardPage() {
   const [feedback, setFeedback] = useState('');
   const [vistaActiva, setVistaActiva] = useState('dashboard'); // 'dashboard' o 'planificador'
   const [mesFiltro, setMesFiltro] = useState(currentMonthStr);
+  const [dropdownAbierto, setDropdownAbierto] = useState(false);
+
+  // Estados para Cierre de Caja Chica (Opción 1)
+  const [pendientes, setPendientes] = useState(null);
+  const [perfil, setPerfil] = useState(null);
+  const [posponerCierre, setPosponerCierre] = useState({ yesterday: false, prevMonth: false });
+  const [modalCierre, setModalCierre] = useState({ isOpen: false, tipo: 'diario', periodo: '' });
+
+  const cargarPendientesYPerfil = async () => {
+    try {
+      const localDate = new Date().toISOString().slice(0, 10);
+      const dataPendientes = await getCierresPendientes(localDate);
+      setPendientes(dataPendientes);
+      
+      const dataPerfil = await getProfile();
+      setPerfil(dataPerfil);
+    } catch (err) {
+      console.error('Error al cargar pendientes o perfil:', err);
+    }
+  };
+
+  useEffect(() => {
+    cargarPendientesYPerfil();
+  }, []);
+
+  const handleCierreExitoso = (tipo, periodo) => {
+    setFeedback(`✅ Cierre ${tipo} del periodo ${periodo} registrado exitosamente.`);
+    cargarPendientesYPerfil();
+    setTimeout(() => setFeedback(''), 4000);
+  };
+
+  const handleVerificacionRapidaAyer = async () => {
+    if (!pendientes || !pendientes.yesterday) return;
+    const { date, resumen } = pendientes.yesterday;
+    setActualizando('verificacion-rapida');
+    try {
+      const ff = perfil?.fondoFijo || 1000;
+      const expected = ff + (resumen?.ingresosTotales || 0) - (resumen?.egresosTotales || 0);
+      await crearCierre({
+        tipo: 'diario',
+        periodo: date,
+        fondoFijo: ff,
+        saldoFisico: expected,
+        comentarios: 'Verificación diaria rápida (Todo en orden)',
+        password: 'N/A' // Se ignora en el backend para cierres diarios
+      });
+      handleCierreExitoso('diario', date);
+    } catch (err) {
+      setFeedback(`❌ Error al realizar verificación rápida: ${err.message}`);
+      setTimeout(() => setFeedback(''), 5000);
+    } finally {
+      setActualizando(null);
+    }
+  };
 
   const handleCancelarConstancia = async (id) => {
     setActualizando(id);
@@ -116,21 +173,75 @@ function DashboardPage() {
               <p className="text-gray-600">Resumen de tu actividad financiera</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              {/* Selector de Mes */}
-              <div className="flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-                <span className="text-gray-600 font-semibold text-sm">📅 Filtrar:</span>
-                <select
-                  value={mesFiltro}
-                  onChange={e => setMesFiltro(e.target.value)}
-                  className="bg-transparent text-gray-800 font-bold text-sm focus:outline-none cursor-pointer"
+              {/* Selector de Mes Estilizado */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setDropdownAbierto(!dropdownAbierto)}
+                  className="flex items-center space-x-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm font-semibold text-gray-700"
                 >
-                  {mesesDisponibles.map(m => (
-                    <option key={m} value={m}>
-                      {formatMonthYear(m)}
-                    </option>
-                  ))}
-                  <option value="general">📊 Histórico General</option>
-                </select>
+                  <span>📅</span>
+                  <span>
+                    {mesFiltro === 'general' ? '📊 Histórico General' : formatMonthYear(mesFiltro)}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${dropdownAbierto ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {dropdownAbierto && (
+                  <>
+                    {/* Backdrop invisible para cerrar al hacer click fuera */}
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setDropdownAbierto(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md border border-gray-100 rounded-xl shadow-xl z-20 py-1.5 animate-fade-in divide-y divide-gray-100">
+                      <div className="py-1">
+                        {mesesDisponibles.map(m => (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => {
+                              setMesFiltro(m);
+                              setDropdownAbierto(false);
+                            }}
+                            className={`flex items-center w-full text-left px-4 py-2 text-sm transition-colors duration-150 ${
+                              mesFiltro === m 
+                                ? 'bg-primary/10 text-primary font-semibold' 
+                                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                            }`}
+                          >
+                            <span className="mr-2">📅</span>
+                            {formatMonthYear(m)}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="py-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMesFiltro('general');
+                            setDropdownAbierto(false);
+                          }}
+                          className={`flex items-center w-full text-left px-4 py-2 text-sm transition-colors duration-150 ${
+                            mesFiltro === 'general'
+                              ? 'bg-primary/10 text-primary font-semibold'
+                              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                          }`}
+                        >
+                          <span className="mr-2">📊</span>
+                          Histórico General
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <a 
@@ -150,6 +261,76 @@ function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Banners de Cierre Pendiente (Opción 1) */}
+        {pendientes && (
+          <div className="space-y-3">
+            {/* Banner de Cierre Mensual Pendiente */}
+            {pendientes.prevMonth && !pendientes.prevMonth.isClosed && !posponerCierre.prevMonth && (
+              <div className="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-fade-in">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">🚨</span>
+                  <div>
+                    <h4 className="font-bold text-red-800 text-sm sm:text-base">Cierre Mensual Requerido: {formatMonthYear(pendientes.prevMonth.periodo)}</h4>
+                    <p className="text-xs sm:text-sm text-red-700">El mes anterior está abierto. Cerrar el mes requiere contraseña y bloqueará sus transacciones de forma segura.</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    onClick={() => setModalCierre({ isOpen: true, tipo: 'mensual', periodo: pendientes.prevMonth.periodo })}
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors shadow-sm"
+                  >
+                    🔒 Cerrar Mes
+                  </button>
+                  <button
+                    onClick={() => setPosponerCierre({ ...posponerCierre, prevMonth: true })}
+                    className="bg-gray-200/80 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-lg text-xs transition-colors"
+                  >
+                    Posponer
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Banner de Cierre Diario Pendiente */}
+            {pendientes.yesterday && !pendientes.yesterday.isClosed && !posponerCierre.yesterday && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-fade-in">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">📅</span>
+                  <div>
+                    <h4 className="font-bold text-blue-800 text-sm sm:text-base">Arqueo Diario: Ayer ({pendientes.yesterday.date})</h4>
+                    <p className="text-xs sm:text-sm text-blue-700 font-medium">
+                      Ingresos de ayer: <span className="font-semibold text-green-700 font-bold">+${pendientes.yesterday.resumen.ingresosTotales}</span> | 
+                      Egresos: <span className="font-semibold text-red-700 font-bold">-${pendientes.yesterday.resumen.egresosTotales}</span>.
+                      ¿Todo estuvo en orden?
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    disabled={actualizando === 'verificacion-rapida'}
+                    onClick={handleVerificacionRapidaAyer}
+                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors shadow-sm"
+                  >
+                    {actualizando === 'verificacion-rapida' ? 'Cerrando...' : '✅ Sí, todo cuadra'}
+                  </button>
+                  <button
+                    onClick={() => setModalCierre({ isOpen: true, tipo: 'diario', periodo: pendientes.yesterday.date })}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors shadow-sm"
+                  >
+                    🔍 No, registrar arqueo
+                  </button>
+                  <button
+                    onClick={() => setPosponerCierre({ ...posponerCierre, yesterday: true })}
+                    className="bg-gray-200/80 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-lg text-xs transition-colors"
+                  >
+                    Posponer
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Cards de resumen mejoradas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -427,6 +608,16 @@ function DashboardPage() {
           />
         )}
       </div>
+
+      {/* Modal de Caja Chica */}
+      <CajaChicaModal
+        isOpen={modalCierre.isOpen}
+        onClose={() => setModalCierre({ ...modalCierre, isOpen: false })}
+        tipo={modalCierre.tipo}
+        periodo={modalCierre.periodo}
+        defaultFondoFijo={perfil?.fondoFijo || 1000}
+        onSuccess={handleCierreExitoso}
+      />
     </div>
   );
 }

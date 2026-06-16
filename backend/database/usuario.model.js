@@ -30,6 +30,10 @@ const usuarioSchema = new mongoose.Schema({
 		enum: ['activo', 'inactivo'],
 		default: 'activo',
 	},
+	fondoFijo: {
+		type: Number,
+		default: 1000,
+	},
 	resetPasswordToken: {
 		type: String,
 		default: null,

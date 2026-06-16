@@ -1,7 +1,7 @@
-// Servicio de movimientos (esqueleto)
 const Movimiento = require('../database/movimiento.model');
 const Usuario = require('../database/usuario.model');
 const bcrypt = require('bcryptjs');
+const cierresService = require('./cierres.service');
 
 module.exports = {
   crearMovimiento: async (data) => {
@@ -20,6 +20,13 @@ module.exports = {
     }
     if (!data.userId) {
       throw new Error('userId es requerido');
+    }
+
+    // Verificar si el periodo está cerrado
+    const fechaMov = data.fecha ? new Date(data.fecha) : new Date();
+    const isClosed = await cierresService.esPeriodoCerrado(data.userId, fechaMov);
+    if (isClosed) {
+      throw new Error('No se pueden registrar movimientos en un período diario o mensual cerrado');
     }
     const movimiento = new Movimiento({
       tipo: data.tipo,
@@ -40,6 +47,23 @@ module.exports = {
     return await Movimiento.find({ userId }).sort({ creadoEn: -1 });
   },
   editarMovimiento: async (id, data) => {
+    const existingMovimiento = await Movimiento.findById(id);
+    if (!existingMovimiento) throw new Error('Movimiento no encontrado');
+
+    // Verificar si el periodo original está cerrado
+    const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
+    if (isClosed) {
+      throw new Error('No se puede modificar un movimiento perteneciente a un período cerrado');
+    }
+
+    // Verificar si el nuevo periodo (si se cambia la fecha) está cerrado
+    if (data.fecha !== undefined) {
+      const isNewPeriodClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, data.fecha);
+      if (isNewPeriodClosed) {
+        throw new Error('No se puede trasladar un movimiento a un período cerrado');
+      }
+    }
+
     const updatePayload = {
       actualizadoEn: new Date(),
     };
@@ -56,16 +80,22 @@ module.exports = {
       updatePayload,
       { new: true }
     );
-    if (!movimiento) throw new Error('Movimiento no encontrado');
     return movimiento;
   },
   inhabilitarMovimiento: async (id) => {
+    const existingMovimiento = await Movimiento.findById(id);
+    if (!existingMovimiento) throw new Error('Movimiento no encontrado');
+
+    const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
+    if (isClosed) {
+      throw new Error('No se puede desactivar un movimiento perteneciente a un período cerrado');
+    }
+
     const movimiento = await Movimiento.findByIdAndUpdate(
       id,
       { estado: 'inactivo', actualizadoEn: new Date() },
       { new: true }
     );
-    if (!movimiento) throw new Error('Movimiento no encontrado');
     return movimiento;
   },
   crearMovimientoHistorico: async (userId, data) => {
