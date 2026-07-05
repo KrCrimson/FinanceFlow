@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-12 — Gestionar Información de Perfil</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      margin: 50px 60px;
+      color: #000;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 13pt;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      text-align: center;
+      font-weight: normal;
+      color: #333;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 36px;
+    }
+
+    td, th {
+      border: 1px solid #000;
+      padding: 9px 12px;
+      vertical-align: top;
+      font-size: 10.5pt;
+      line-height: 1.6;
+    }
+
+    .header-section {
+      background-color: #c6c6c6;
+      font-weight: bold;
+      font-size: 11.5pt;
+      letter-spacing: 0.3px;
+    }
+
+    .col-header {
+      background-color: #ebebeb;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .col-paso {
+      width: 11%;
+      font-weight: bold;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    .col-actor  { width: 44.5%; }
+    .col-sistema { width: 44.5%; }
+    .empty-cell  { background-color: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>CU-12 — Gestionar Información de Perfil</h1>
+<h3>Módulo de Configuración · Sistema de Balance Financiero</h3>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--                         FLUJO PRINCIPAL                           -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Flujo Principal</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <!-- Paso 1 -->
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">
+      El usuario, ya habiendo iniciado sesión de forma exitosa
+      anteriormente, decide revisar o actualizar los datos con los
+      cuales está registrado. Se dirige al menú y pulsa sobre la
+      opción correspondiente a su "Perfil".
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 2 -->
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recibe la orden de navegación. De inmediato, oculta
+      la interfaz anterior y muestra un indicador de carga central (un
+      círculo giratorio) acompañado del texto "Cargando perfil...". En
+      paralelo, emite una solicitud interna y confidencial hacia el
+      servidor para obtener la ficha actualizada de este usuario.
+    </td>
+  </tr>
+
+  <!-- Paso 3 -->
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El servidor verifica la identidad de quien solicita la
+      información, accede a la base de datos central, extrae los
+      datos personales del usuario (nombre, correo electrónico, fecha
+      de creación y estado) y se los envía de regreso a la aplicación
+      web.
+    </td>
+  </tr>
+
+  <!-- Paso 4 -->
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Al recibir la información exitosamente, la aplicación detiene
+      la animación de carga y presenta la pantalla "Mi Perfil".
+      Automáticamente rellena los campos de texto del formulario
+      "Nombre Completo" y "Correo Electrónico" con los valores reales
+      recién obtenidos. También muestra un bloque informativo indicando
+      la fecha exacta desde la cual es miembro y presenta un panel
+      adicional con estadísticas de su cuenta (estado activo,
+      seguridad protegida, etc.).
+    </td>
+  </tr>
+
+  <!-- Paso 5 -->
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor">
+      Motivado a efectuar alteraciones, el usuario hace clic dentro
+      del recuadro "Nombre Completo" y suplanta el texto existente por
+      uno distinto (por ejemplo, agrega su segundo apellido o corrige
+      la ortografía).
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 6 -->
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema registra instantáneamente cada carácter ingresado o
+      borrado en la memoria temporal de la pantalla, manteniendo el
+      botón "Guardar Cambios" habilitado y listo para ser pulsado.
+    </td>
+  </tr>
+
+  <!-- Paso 7 -->
+  <tr>
+    <td class="col-paso">Paso 7</td>
+    <td class="col-actor">
+      Una vez conforme con la edición, el usuario desplaza su cursor y
+      pulsa sobre el botón principal azul rotulado "Guardar Cambios".
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 8 -->
+  <tr>
+    <td class="col-paso">Paso 8</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema web realiza una validación local instantánea: vigila
+      que tanto el campo de nombre como el de correo contengan texto y
+      no hayan sido dejados en blanco o solo con espacios. Al verificar
+      que están completos, permite que la operación continúe.
+    </td>
+  </tr>
+
+  <!-- Paso 9 -->
+  <tr>
+    <td class="col-paso">Paso 9</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema cambia el estado del botón a modo de procesamiento.
+      El botón pasa a mostrar un círculo giratorio junto a la palabra
+      "Actualizando...", y queda temporalmente bloqueado para evitar
+      que el usuario envíe la misma solicitud por duplicado por error.
+      Acto seguido, transmite los nuevos datos empaquetados hacia el
+      servidor.
+    </td>
+  </tr>
+
+  <!-- Paso 10 -->
+  <tr>
+    <td class="col-paso">Paso 10</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema central (servidor) recibe los nuevos datos, localiza
+      el registro del usuario en la base general e inscribe los nuevos
+      valores, sobreescribiendo permanentemente los viejos de forma
+      segura. Luego, devuelve una confirmación de éxito a la
+      aplicación web.
+    </td>
+  </tr>
+
+  <!-- Paso 11 -->
+  <tr>
+    <td class="col-paso">Paso 11</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La aplicación web recoge la confirmación del servidor. Restaura
+      el botón a su estado normal ("Guardar Cambios") y lo habilita.
+      Inmediatamente, expone bajo el formulario una cinta visual de
+      color verde claro con el texto "✅ Perfil actualizado exitosamente",
+      avisando al dueño sobre el triunfo de la operación. Esta alerta
+      desaparecerá sola luego de 3 segundos para no estorbar en la
+      pantalla.
+    </td>
+  </tr>
+
+  <!-- Paso 12 -->
+  <tr>
+    <td class="col-paso">Paso 12</td>
+    <td class="col-actor">
+      El usuario observa la franja afirmativa, verifica que su nombre
+      ahora aparece actualizado de forma definitiva, y da por concluido
+      el proceso de ajuste de su identidad en la plataforma.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 1 — Omisión de datos obligatorios en perfil          -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 1: El usuario intenta guardar dejando campos obligatorios en blanco</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">
+      El usuario, con la pantalla de su perfil cargada, hace clic
+      dentro del campo "Nombre Completo" y borra por completo todo su
+      contenido, o ingresa únicamente espacios en blanco.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema, al detectar que el campo obligatorio carece de texto
+      real, reacciona instantáneamente deshabilitando el botón principal.
+      El botón "Guardar Cambios" se vuelve de color gris opaco y no
+      responde a los clics del usuario, previniendo que se envíe
+      información incompleta.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor">
+      El usuario intenta presionar el botón de guardar de todos modos,
+      o en su defecto, altera temporalmente el navegador para intentar
+      forzar el envío del formulario vacío.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El motor reactivo intercepta la operación en la validación del
+      Paso 8 del flujo principal. Anula completamente la comunicación
+      con el servidor manteniendo el fallo aislado en el dispositivo.
+      De inmediato, despliega una alerta visual roja debajo de los
+      botones con el mensaje "❌ Por favor complete todos los campos",
+      recordando la necesidad absoluta de nombrar su entidad en la
+      plataforma.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 5</td>
+    <td class="col-actor">
+      El usuario lee la advertencia, comprende que no puede guardar
+      perfiles anónimos y procede a reescribir un nombre válido, o
+      bien pulsa el botón "Restablecer" para que los campos vuelvan
+      a los valores originales que el sistema tiene registrados.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 2 — Correo electrónico tomado o error del servidor   -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 2: Conflicto en el servidor al intentar guardar (Ej: Correo ya registrado)</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 1</td>
+    <td class="col-actor">
+      Con deseo de cambio, el usuario modifica su correo en el campo
+      "Correo Electrónico" usando uno diferente (por ejemplo,
+      'otro@email.com'), pero desconoce que otra cuenta ya utiliza ese
+      mismo correo en la plataforma. Pulsa el botón de guardado.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La validación local de campos completos es superada. El sistema
+      cambia el botón a estado de "Actualizando..." y transmite el
+      petitorio hacia el servidor.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El servidor central recibe los datos, pero sus engranajes de
+      búsqueda acusan recibo de que alguien más mantiene amparo legal
+      por sobre esa misma cuenta de correo en la base general (o
+      encuentra otro tipo de conflicto de base de datos). El ciclo de
+      guardado se interrumpe abruptamente en el servidor, el cual
+      responde hacia la aplicación web con un dictamen de error.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La aplicación web capta el rechazo. Restituye el botón a su
+      estado funcional "Guardar Cambios" y materializa bajo el
+      formulario una cinta disuasiva de color rojo avisando: "❌ Error
+      al actualizar el perfil" (o el mensaje exacto proveído por el
+      servidor), notificando al usuario de la incompatibilidad. Los
+      datos en pantalla permanecen como el usuario los dejó, dándole
+      oportunidad de cambiarlos por unos válidos.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 3 — Falla al obtener los datos iniciales del perfil  -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 3: Error de conexión al cargar la pantalla por primera vez</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 1</td>
+    <td class="col-actor">
+      El usuario pulsa sobre la opción que lo traslada al apartado de
+      su "Perfil" en la navegación principal.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema muestra la animación interina de carga ("Cargando
+      perfil...") y genera la llamada confidencial al servidor para
+      exigir los datos del usuario.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La llamada fracasa (por ejemplo, debido a una pérdida repentina
+      de conexión a internet del usuario, o una saturación del
+      servidor central). No se obtiene ningún dato de retorno.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema detiene el cargador giratorio y, en lugar de mostrar
+      el formulario de edición, pinta en el centro de la pantalla un
+      gran recuadro rojo de alerta. Éste porta un ícono ⚠️, el título
+      "Error al cargar el perfil" y un par de botones: uno para
+      "Reintentar" y otro para "Volver al Dashboard". La operación
+      queda detenida hasta que se resuelva la comunicación.
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

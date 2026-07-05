@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useAnalisisGastos } from '../hooks/useAnalisisGastos';
-import { inhabilitarMovimiento, updateMovimiento } from '../services/movimientosService';
+import { inhabilitarMovimiento, updateMovimiento } from '../services/movimientos-adapter';
 import AlertasComponent from '../components/AlertasComponent';
 import PlanificadorCompras from '../components/PlanificadorCompras';
 import { getCierresPendientes, crearCierre, getCierres } from '../services/cierresService';
 import CajaChicaModal from '../components/CajaChicaModal';
 import ReabrirModal from '../components/ReabrirModal';
-import { getProfile } from '../services/userService';
+import { getProfile } from '../services/usuarios-adapter';
 
 const currentMonthStr = new Date().toISOString().slice(0, 7);
 

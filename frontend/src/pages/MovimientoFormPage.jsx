@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createMovimiento } from '../services/movimientosService';
+import { createMovimiento } from '../services/movimientos-adapter';
 import { getCierres } from '../services/cierresService';
 import { useImageToMovimiento } from '../hooks/useImageToMovimiento';
 import { useNavigate } from 'react-router-dom';

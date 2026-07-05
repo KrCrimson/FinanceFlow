@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getProfile, updateProfile, deleteProfile } from '../services/userService';
-import { logout } from '../services/authService';
+import { getProfile, updateProfile, deleteAccount as deleteProfile } from '../services/usuarios-adapter';
+import { logout } from '../services/auth-adapter';
 import { useNavigate } from 'react-router-dom';
 
 function ProfilePage() {

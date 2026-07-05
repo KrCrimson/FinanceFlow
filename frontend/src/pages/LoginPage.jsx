@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { login } from '../services/authService';
+import { login } from '../services/auth-adapter';
 import { useAuth } from '../hooks/useAuth';
 
 const schema = z.object({
@@ -41,6 +41,7 @@ function LoginPage() {
   const onSubmit = async (data) => {
     setLoading(true);
     setError('');
+    console.log("Intento de login. API URL:", process.env.REACT_APP_API_URL);
     try {
       await login(data.email, data.password);
       updateAuth(); // Actualizar el estado de autenticación

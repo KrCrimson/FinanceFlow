@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-11 — Planificar Ahorro para Compra</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      margin: 50px 60px;
+      color: #000;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 13pt;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      text-align: center;
+      font-weight: normal;
+      color: #333;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 36px;
+    }
+
+    td, th {
+      border: 1px solid #000;
+      padding: 9px 12px;
+      vertical-align: top;
+      font-size: 10.5pt;
+      line-height: 1.6;
+    }
+
+    .header-section {
+      background-color: #c6c6c6;
+      font-weight: bold;
+      font-size: 11.5pt;
+      letter-spacing: 0.3px;
+    }
+
+    .col-header {
+      background-color: #ebebeb;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .col-paso {
+      width: 11%;
+      font-weight: bold;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    .col-actor  { width: 44.5%; }
+    .col-sistema { width: 44.5%; }
+    .empty-cell  { background-color: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>CU-11 — Planificar Ahorro para Compra</h1>
+<h3>Módulo Planificador de Compras · Sistema de Balance Financiero</h3>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--                         FLUJO PRINCIPAL                           -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Flujo Principal</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <!-- Paso 1 -->
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">
+      El usuario se encuentra dentro del sistema con su sesión
+      activa y desea planificar cuánto tiempo le tomará ahorrar
+      para adquirir un bien específico. Localiza en la barra de
+      navegación superior el enlace correspondiente al módulo
+      de planificación y desplaza el cursor hacia él.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 2 -->
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema detecta el movimiento del cursor sobre el enlace
+      y aplica un efecto visual de resaltado, indicando que el
+      elemento es interactivo y que puede ser seleccionado.
+    </td>
+  </tr>
+
+  <!-- Paso 3 -->
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor">
+      El usuario hace clic sobre el enlace del módulo de
+      planificación en la barra de navegación.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 4 -->
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema redirige al usuario a la pantalla del
+      Planificador de Compras e inicia simultáneamente la
+      consulta al servidor para obtener todos los movimientos
+      financieros registrados por ese usuario. Mientras aguarda
+      la respuesta, ocupa el espacio central de la pantalla con
+      el indicador animado de carga y el texto "Cargando
+      datos...", comunicando que el proceso está en progreso.
+    </td>
+  </tr>
+
+  <!-- Paso 5 -->
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El servidor responde exitosamente con el listado de
+      movimientos del usuario. El sistema los recibe, los
+      almacena en memoria y, a partir de ellos, calcula
+      automáticamente tres indicadores financieros de base:
+      el ingreso promedio mensual del usuario, el gasto
+      promedio mensual y la capacidad de ahorro promedio
+      mensual (que resulta de la diferencia entre ambos).
+      Estos tres valores quedan disponibles para ser usados
+      en los cálculos de proyección.
+    </td>
+  </tr>
+
+  <!-- Paso 6 -->
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El indicador de carga desaparece y el sistema presenta
+      la pantalla completa del "Planificador de Compras",
+      identificada con el ícono de objetivo 🎯 y el subtítulo
+      "Calcula cuánto tiempo necesitas para comprar algo". La
+      pantalla muestra los siguientes elementos en orden
+      de arriba hacia abajo: un selector de mes, dos campos
+      de texto para ingresar el nombre del producto y su
+      precio, el botón "Calcular Plan de Ahorro" y un panel
+      de resumen financiero que ya muestra los tres
+      indicadores calculados (ingresos promedio, gastos
+      promedio y ahorro actual), todos en color verde, rojo y
+      azul respectivamente.
+    </td>
+  </tr>
+
+  <!-- Paso 7 -->
+  <tr>
+    <td class="col-paso">Paso 7</td>
+    <td class="col-actor">
+      El usuario observa el selector etiquetado "Elegir mes
+      para cálculos" y decide que prefiere que la simulación
+      se base en los datos de un mes específico de su historial,
+      en lugar del promedio general. Hace clic sobre dicho
+      selector para desplegar las opciones disponibles.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 8 -->
+  <tr>
+    <td class="col-paso">Paso 8</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema despliega la lista de opciones del selector
+      de mes. La primera opción, seleccionada por defecto, es
+      "Usar promedio general", que indica que los cálculos se
+      basarán en el historial completo. A continuación, el
+      sistema presenta los últimos doce meses calendario en
+      orden descendente desde el mes en curso hasta doce
+      meses atrás, con su nombre y año completo (por ejemplo:
+      "junio de 2025", "mayo de 2025", etc.). Solo se listan
+      los doce meses más recientes, sin importar en cuáles
+      el usuario tenga movimientos registrados.
+    </td>
+  </tr>
+
+  <!-- Paso 9 -->
+  <tr>
+    <td class="col-paso">Paso 9</td>
+    <td class="col-actor">
+      El usuario selecciona el mes de su elección de la lista
+      desplegada (por ejemplo: "mayo de 2025").
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 10 -->
+  <tr>
+    <td class="col-paso">Paso 10</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema cierra el menú desplegable y actualiza el
+      selector para mostrar el mes elegido. De inmediato,
+      recalcula los tres indicadores financieros filtrando
+      únicamente los movimientos registrados durante ese mes
+      específico: suma los ingresos de ese mes, suma los
+      gastos de ese mes y obtiene el ahorro neto de ese mes
+      (ingresos menos gastos). El panel de resumen financiero
+      en la parte inferior de la pantalla se actualiza al
+      instante mostrando las nuevas cifras bajo las etiquetas
+      "Ingresos del Mes", "Gastos del Mes" y "Ahorro del Mes",
+      y el texto debajo del selector confirma: "Usando datos
+      específicos de mayo de 2025".
+    </td>
+  </tr>
+
+  <!-- Paso 11 -->
+  <tr>
+    <td class="col-paso">Paso 11</td>
+    <td class="col-actor">
+      El usuario observa el panel de resumen financiero
+      actualizado con los datos del mes seleccionado y
+      verifica que las cifras reflejan correctamente su
+      situación de ese período. Queda conforme y procede a
+      completar el formulario de planificación.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 12 -->
+  <tr>
+    <td class="col-paso">Paso 12</td>
+    <td class="col-actor">
+      El usuario localiza el campo etiquetado "¿Qué quieres
+      comprar? (opcional)" y escribe el nombre del bien que
+      desea adquirir (por ejemplo: "Laptop nueva").
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 13 -->
+  <tr>
+    <td class="col-paso">Paso 13</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema registra el texto ingresado y lo almacena
+      en memoria. Este nombre será utilizado más adelante
+      para personalizar los mensajes del resultado. Si el
+      usuario deja este campo vacío, el sistema lo reemplazará
+      automáticamente por el texto genérico "Producto deseado"
+      al momento de presentar los resultados.
+    </td>
+  </tr>
+
+  <!-- Paso 14 -->
+  <tr>
+    <td class="col-paso">Paso 14</td>
+    <td class="col-actor">
+      El usuario localiza el campo etiquetado "Precio (S/)"
+      y escribe el precio del bien que desea comprar
+      (por ejemplo: 3500).
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 15 -->
+  <tr>
+    <td class="col-paso">Paso 15</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema registra el valor numérico ingresado. El
+      campo acepta únicamente valores de tipo número, por
+      lo que caracteres no numéricos son ignorados
+      automáticamente por el navegador.
+    </td>
+  </tr>
+
+  <!-- Paso 16 -->
+  <tr>
+    <td class="col-paso">Paso 16</td>
+    <td class="col-actor">
+      Con el nombre del producto y el precio ya ingresados,
+      el usuario hace clic sobre el botón "📊 Calcular Plan
+      de Ahorro" para solicitar la proyección.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 17 -->
+  <tr>
+    <td class="col-paso">Paso 17</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recibe la solicitud de cálculo y verifica
+      en primer lugar que el precio ingresado sea un valor
+      numérico válido y mayor a cero. La validación se
+      supera correctamente, por lo que el sistema procede
+      al cálculo sin interrupciones.
+    </td>
+  </tr>
+
+  <!-- Paso 18 -->
+  <tr>
+    <td class="col-paso">Paso 18</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recupera la capacidad de ahorro mensual
+      correspondiente al período activo (el mes seleccionado
+      o el promedio general, según lo que el usuario eligió
+      en el Paso 9). Verifica que dicha capacidad de ahorro
+      sea un valor positivo, es decir, que los ingresos
+      superen a los gastos. La verificación es exitosa y
+      el sistema continúa con los cálculos.
+    </td>
+  </tr>
+
+  <!-- Paso 19 -->
+  <tr>
+    <td class="col-paso">Paso 19</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema ejecuta la división matemática del precio
+      total ingresado entre la capacidad de ahorro mensual
+      disponible. El resultado de esa división, redondeado
+      siempre hacia arriba al entero siguiente, determina
+      la cantidad de meses necesarios para reunir el dinero
+      suficiente. Por ejemplo, si el precio es S/3.500 y el
+      ahorro mensual disponible es S/700, el resultado
+      sería 5 meses.
+    </td>
+  </tr>
+
+  <!-- Paso 20 -->
+  <tr>
+    <td class="col-paso">Paso 20</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      A partir de la cantidad de meses calculada, el sistema
+      determina la fecha calendario estimada de compra
+      sumando ese número de meses a la fecha actual del día.
+      También calcula el monto de ahorro mensual necesario
+      dividiendo el precio total entre la cantidad de meses
+      resultante, lo que da al usuario una meta concreta
+      por período.
+    </td>
+  </tr>
+
+  <!-- Paso 21 -->
+  <tr>
+    <td class="col-paso">Paso 21</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema presenta el resultado de la proyección
+      debajo del panel financiero, en una tarjeta de color
+      verde con el ícono ✅. La tarjeta muestra en orden:
+      el nombre del producto y su precio en el encabezado,
+      el mensaje central "Podrías comprarlo en X meses"
+      en texto verde destacado, la fecha exacta estimada
+      de compra con día, mes y año completos (por ejemplo:
+      "5 de noviembre de 2025"), el monto de ahorro mensual
+      necesario expresado en soles, y un mensaje de consejo
+      personalizado que varía según la cantidad de meses:
+      si son más de doce meses dice "Considera buscar
+      alternativas más económicas", si son entre seis y doce
+      dice "Planifica bien tu compra", y si son seis o menos
+      dice "¡Meta alcanzable!".
+    </td>
+  </tr>
+
+  <!-- Paso 22 -->
+  <tr>
+    <td class="col-paso">Paso 22</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Simultáneamente con la presentación del resultado,
+      el sistema activa la sección de sugerencias de ahorro.
+      Esta sección solo aparece si el usuario tiene
+      categorías de gasto que en el mes actual superaron
+      su promedio histórico, es decir, rubros donde está
+      gastando más de lo habitual. El sistema identifica
+      esas categorías, las ordena de mayor a menor impacto
+      económico y selecciona las tres más relevantes para
+      mostrarlas.
+    </td>
+  </tr>
+
+  <!-- Paso 23 -->
+  <tr>
+    <td class="col-paso">Paso 23</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema presenta la sección "💡 Sugerencias para
+      ahorrar más rápido" debajo del resultado principal.
+      Muestra hasta tres tarjetas de sugerencia, cada una
+      con fondo azul claro, que indican: el nombre de la
+      categoría donde el gasto está elevado, el mensaje
+      "Reduciendo [categoría] al promedio ahorrarías
+      S/[monto] este mes" y el monto de ahorro estimado
+      expresado con el prefijo "+S/" en texto destacado
+      azul oscuro, representando el ahorro mensual extra
+      que el usuario podría obtener si ajusta ese rubro.
+    </td>
+  </tr>
+
+  <!-- Paso 24 -->
+  <tr>
+    <td class="col-paso">Paso 24</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Al pie de la sección de sugerencias, el sistema
+      muestra un recuadro amarillo con el mensaje de
+      motivación: "💰 ¡Con estas mejoras podrías comprar
+      tu [nombre del producto] en menos tiempo!", vinculando
+      directamente las sugerencias de ahorro con la meta
+      de compra que el usuario definió.
+    </td>
+  </tr>
+
+  <!-- Paso 25 -->
+  <tr>
+    <td class="col-paso">Paso 25</td>
+    <td class="col-actor">
+      El usuario revisa detenidamente los resultados
+      presentados: la fecha estimada de compra, el monto
+      de ahorro mensual necesario, el consejo personalizado
+      y las sugerencias de reducción de gasto por categoría.
+      Toma nota de la información relevante para su
+      planificación personal.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 26 -->
+  <tr>
+    <td class="col-paso">Paso 26</td>
+    <td class="col-actor">
+      El usuario puede, si lo desea, modificar el nombre
+      del producto, el precio o cambiar el mes de referencia
+      y volver a hacer clic en "Calcular Plan de Ahorro"
+      para obtener una nueva proyección con los datos
+      actualizados. Cada nuevo cálculo reemplaza el
+      resultado anterior en pantalla.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 27 -->
+  <tr>
+    <td class="col-paso">Paso 27</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema procesa el nuevo cálculo con los valores
+      actualizados y reemplaza la tarjeta de resultado y
+      las sugerencias por la información recalculada,
+      dando por completado el caso de uso de forma
+      satisfactoria.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 1 — Capacidad de ahorro nula o negativa              -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 1: La capacidad de ahorro del período elegido es cero o negativa</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">
+      El usuario completa el formulario con el nombre del
+      producto y el precio, y hace clic en "Calcular Plan
+      de Ahorro". Sin embargo, ya sea porque eligió un mes
+      específico en el que sus gastos superaron a sus
+      ingresos, o porque en su promedio general ha venido
+      gastando más de lo que percibe, la capacidad de ahorro
+      disponible para el período activo es cero o un número
+      negativo.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recibe la solicitud de cálculo y verifica
+      que el precio es válido (mayor a cero), por lo que
+      pasa a la verificación de la capacidad de ahorro.
+      Al consultarla, determina que el valor es igual a
+      cero o negativo. Reconoce que es matemáticamente
+      imposible proyectar una fecha de compra cuando no
+      existe un excedente real de dinero disponible para
+      acumular. Descarta el cálculo de proyección sin
+      producir una fecha ficticia.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema presenta el resultado en una tarjeta de
+      color rojo con el ícono ❌. En el encabezado muestra
+      el nombre del producto y su precio. A continuación,
+      en texto rojo destacado, comunica el mensaje: "No es
+      posible con el ahorro actual". Debajo, en un recuadro
+      blanco etiquetado como "Sugerencia", muestra el
+      consejo: "Necesitas reducir gastos o aumentar
+      ingresos", orientando al usuario sobre las acciones
+      concretas que debe tomar antes de poder planificar
+      la compra.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La sección de sugerencias de ahorro por categoría no
+      se activa en esta situación: el sistema omite su
+      despliegue porque el resultado de la proyección fue
+      inviable. El panel de resumen financiero permanece
+      visible mostrando las cifras que evidencian el
+      déficit, de modo que el usuario puede ver claramente
+      cuánto es lo que gasta en exceso respecto a sus
+      ingresos.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 5</td>
+    <td class="col-actor">
+      El usuario lee el mensaje de resultado negativo y
+      comprende que su situación financiera actual no
+      permite planificar la compra. Puede optar por cambiar
+      el mes de referencia en el selector para probar con
+      un período donde haya tenido mejor desempeño
+      financiero, o puede cerrar el planificador y trabajar
+      primero en reducir sus gastos.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 2 — Precio inválido o vacío                          -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 2: El usuario no ingresó un precio válido</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 1</td>
+    <td class="col-actor">
+      El usuario hace clic en el botón "Calcular Plan de
+      Ahorro" dejando el campo "Precio (S/)" completamente
+      vacío, o habiendo escrito el valor cero (S/0.00),
+      sin darse cuenta de que el sistema requiere un monto
+      real para poder realizar la proyección.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recibe la solicitud e inmediatamente
+      verifica el valor del campo de precio. Determina que
+      el campo está vacío o que su valor es cero o menor.
+      Un precio vacío o de cero soles no representa una
+      compra real, por lo que el sistema interrumpe el
+      proceso de cálculo antes de intentar ninguna
+      operación matemática.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema presenta un recuadro de error de color
+      rojo con el ícono ❌ y el mensaje: "Por favor ingresa
+      un precio válido". Este mensaje aparece en el área
+      de resultados, debajo del botón, sin alterar ni
+      borrar lo que el usuario ya tenía escrito en los
+      campos del formulario. El usuario puede corregir el
+      precio directamente y volver a intentarlo.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 4</td>
+    <td class="col-actor">
+      El usuario lee el mensaje de error, regresa al campo
+      "Precio (S/)" y escribe un valor numérico positivo
+      válido. A continuación vuelve a hacer clic en
+      "Calcular Plan de Ahorro", retomando el flujo
+      principal desde el Paso 17.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 3 — El usuario no tiene movimientos registrados      -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 3: El usuario no tiene movimientos financieros registrados</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 1</td>
+    <td class="col-actor">
+      El usuario accede al Planificador de Compras pero
+      nunca ha registrado ningún movimiento financiero en
+      el sistema, por lo que no existe historial alguno
+      sobre el cual calcular sus promedios de ingreso,
+      gasto o ahorro.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El servidor responde con una lista de movimientos
+      vacía. El sistema la recibe y, al intentar calcular
+      los indicadores financieros (ingreso promedio, gasto
+      promedio y ahorro promedio), obtiene el valor cero
+      en los tres casos, ya que no hay datos sobre los
+      cuales operar. El panel de resumen financiero muestra
+      S/0.00 en los tres campos. El formulario permanece
+      visible y el usuario puede intentar ingresar datos
+      de todas formas.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Si el usuario intenta calcular un plan de ahorro en
+      este estado, el sistema ejecutará el cálculo con una
+      capacidad de ahorro de S/0.00, lo que llevará
+      directamente a la Excepción 1 (capacidad de ahorro
+      nula), presentando el mensaje de resultado negativo
+      con el consejo de reducir gastos o aumentar ingresos.
+      La sección de sugerencias de ahorro no se desplegará
+      porque tampoco existe historial de categorías con
+      el cual generar recomendaciones.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 4 — No hay sugerencias de ahorro disponibles         -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 4: El cálculo es exitoso pero el sistema no tiene sugerencias de ahorro que ofrecer</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 1</td>
+    <td class="col-actor">
+      El usuario completa el formulario correctamente, su
+      capacidad de ahorro es positiva y el cálculo de
+      proyección resulta viable. Sin embargo, al comparar
+      su gasto actual del mes con sus promedios históricos
+      por categoría, resulta que en todos los rubros el
+      usuario está gastando igual o menos que su promedio
+      habitual, es decir, no existe ninguna categoría con
+      gasto elevado sobre la cual hacer recomendaciones
+      de reducción.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema presenta la tarjeta de resultado exitoso
+      en color verde con toda la información de la
+      proyección: nombre del producto, precio, número de
+      meses estimados, fecha calendario de compra, monto
+      de ahorro mensual necesario y consejo personalizado.
+      Toda esta información se muestra correctamente.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La sección "💡 Sugerencias para ahorrar más rápido"
+      no aparece en pantalla. El sistema la omite por
+      completo ya que la lista de sugerencias está vacía:
+      no detectó ninguna categoría de gasto que supere
+      el promedio histórico del usuario. La pantalla no
+      muestra ningún mensaje de error ni aviso por esta
+      ausencia; simplemente el área de sugerencias no se
+      renderiza. El caso de uso concluye de forma exitosa
+      mostrando únicamente los resultados de la proyección.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 5 — Error de conexión al cargar el Planificador      -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 5: El sistema no puede conectarse al servidor al abrir el Planificador</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E5 - Paso 1</td>
+    <td class="col-actor">
+      El usuario hace clic en el enlace del Planificador
+      desde la barra de navegación, tal como se describe
+      en el Paso 3 del flujo principal.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E5 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema intenta comunicarse con el servidor para
+      obtener los movimientos del usuario. Durante ese
+      intento, muestra el indicador de carga "Cargando
+      datos..." en el centro de la pantalla, tal como
+      ocurre en el flujo normal.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E5 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El intento de comunicación con el servidor fracasa.
+      El sistema detecta el error y detiene el indicador
+      de carga. No puede calcular ninguno de los
+      indicadores financieros porque no dispone de
+      movimientos con los cuales operar.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E5 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      En lugar del formulario del planificador, el sistema
+      presenta en pantalla un mensaje de error en texto
+      rojo que describe el problema técnico ocurrido,
+      con el prefijo "Error:" seguido del detalle. El
+      formulario de planificación y el panel de resumen
+      financiero no llegan a mostrarse en ningún momento.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E5 - Paso 5</td>
+    <td class="col-actor">
+      El usuario lee el mensaje de error. Para intentar
+      acceder nuevamente, puede hacer clic en el enlace
+      del Planificador en la barra de navegación o
+      recargar la página desde el navegador. Si la
+      conexión con el servidor se restablece, el sistema
+      retoma el flujo principal desde el Paso 4. Si el
+      error persiste, vuelve a presentar el mensaje de
+      error.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+</table>
+
+</body>
+</html>

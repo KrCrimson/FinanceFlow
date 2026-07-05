@@ -15,14 +15,16 @@ import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import DevLogger from './components/DevLogger';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
     <Router>
       <Navbar />
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      <ErrorBoundary debug={process.env.NODE_ENV === 'development'}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/perfil" element={
@@ -52,6 +54,7 @@ function App() {
         } />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </ErrorBoundary>
       
       {/* Dev Logger - Solo visible en desarrollo */}
       <DevLogger />

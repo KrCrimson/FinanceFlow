@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
@@ -14,6 +14,9 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline
+
+# Configurar ruta de Tesseract en Windows
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 app = FastAPI(title="Bank Sync & ML Classifier API")
 
@@ -68,9 +71,17 @@ def predict_category(description: str) -> str:
     if any(word in desc for word in ['kfc', 'rappi', 'restaurante']): return "Comida"
     return "Otros"
 
+
+API_KEY_SECRET = os.environ.get("ML_API_KEY")
+
+def verify_api_key(x_api_key: str = Header(None)):
+    if x_api_key != API_KEY_SECRET:
+        raise HTTPException(status_code=401, detail="Unauthorized API Key")
+    return True
+
 # --- NUEVO: OCR MACHINE LEARNING (Procesador de Imagen) ---
 @app.post("/analyze-receipt")
-async def analyze_receipt(file: UploadFile = File(...)):
+async def analyze_receipt(file: UploadFile = File(...), authorized: bool = Depends(verify_api_key)):
     try:
         # 1. Leer imagen a Memoria
         contents = await file.read()
@@ -85,7 +96,12 @@ async def analyze_receipt(file: UploadFile = File(...)):
 
         # 3. Extraer Texto con Tesseract
         custom_config = r'--oem 3 --psm 6'
-        text_raw = pytesseract.image_to_string(thresh, config=custom_config)
+        try:
+            text_raw = pytesseract.image_to_string(thresh, config=custom_config)
+        except Exception as tesseract_err:
+            print(f"⚠️ Error de Tesseract: {tesseract_err}")
+            raise HTTPException(status_code=500, detail="Error procesando la imagen con OCR.")
+            
         text_clean = text_raw.lower()
 
         # 4. Extracción de Información (NLP / Regex)
@@ -209,7 +225,7 @@ async def sync_bank_transactions(bank: str, limit: int = 5):
     return {"bank": bank, "status": "success", "data": transactions}
 
 @app.post("/categorize")
-async def categorize_transaction(request: CategorizeRequest):
+async def categorize_transaction(request: CategorizeRequest, authorized: bool = Depends(verify_api_key)):
     category = predict_category(request.description)
     return {"category": category, "confidence": round(random.uniform(0.85, 0.99), 2)}
 

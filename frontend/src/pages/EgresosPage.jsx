@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useNavigate } from 'react-router-dom';
-import { inhabilitarMovimiento } from '../services/movimientosService';
+import { inhabilitarMovimiento } from '../services/movimientos-adapter';
 
 function EgresosPage() {
   const navigate = useNavigate();

@@ -11,7 +11,7 @@ class AdapterConfig {
       // Configuración principal del SDK
       sdk: {
         enabled: false,  // Por defecto deshabilitado para seguridad
-        baseURL: 'http://localhost:3000/api',
+        baseURL: process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL + '/api' : 'http://localhost:5000/api',
         timeout: 10000,
         retries: 3,
         debug: false

@@ -8,7 +8,7 @@
  * const BalanceSDK = require('@sistema-balance/sdk');
  * 
  * const sdk = new BalanceSDK({
- *   baseURL: 'http://localhost:3000/api',
+ *   baseURL: process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL + '/api' : 'http://localhost:5000/api',
  *   token: 'your-jwt-token'
  * });
  * 

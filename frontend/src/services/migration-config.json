@@ -2,7 +2,7 @@
   "mode": "safe",
   "sdk": {
     "enabled": false,
-    "baseURL": "http://localhost:3000/api"
+    "baseURL": "http://localhost:5000/api"
   },
   "migration": {
     "phase": "disabled",

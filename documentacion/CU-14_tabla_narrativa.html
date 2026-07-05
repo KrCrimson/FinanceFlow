@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-14 — Realizar Arqueo Diario</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      margin: 50px 60px;
+      color: #000;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 13pt;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      text-align: center;
+      font-weight: normal;
+      color: #333;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 36px;
+    }
+
+    td, th {
+      border: 1px solid #000;
+      padding: 9px 12px;
+      vertical-align: top;
+      font-size: 10.5pt;
+      line-height: 1.6;
+    }
+
+    .header-section {
+      background-color: #c6c6c6;
+      font-weight: bold;
+      font-size: 11.5pt;
+      letter-spacing: 0.3px;
+    }
+
+    .col-header {
+      background-color: #ebebeb;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .col-paso {
+      width: 11%;
+      font-weight: bold;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    .col-actor  { width: 44.5%; }
+    .col-sistema { width: 44.5%; }
+    .empty-cell  { background-color: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>CU-14 — Realizar Arqueo Diario</h1>
+<h3>Módulo de Cierres de Caja · Sistema de Balance Financiero</h3>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--                         FLUJO PRINCIPAL                           -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Flujo Principal</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <!-- Paso 1 -->
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">
+      El usuario ingresa a la plataforma web e inicia sesión
+      correctamente con sus credenciales válidas, aterrizando
+      directamente en la vista del Panel de Control (Dashboard).
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 2 -->
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema carga la interfaz inicial, consulta los registros
+      históricos del usuario en la base de datos y detecta que el
+      cierre de caja del día anterior (o un día previo) se encuentra
+      catalogado como "Pendiente" de conciliación.
+    </td>
+  </tr>
+
+  <!-- Paso 3 -->
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema genera y renderiza de inmediato un aviso o botón
+      destacado en el tablero principal, indicándole al usuario
+      que existe un arqueo pendiente que requiere su atención.
+    </td>
+  </tr>
+
+  <!-- Paso 4 -->
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor">
+      El usuario lee la notificación y hace clic en la acción
+      "Realizar Arqueo" (o equivalente) para proceder al cierre.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 5 -->
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema despliega una ventana modal (pantalla superpuesta)
+      con el título "Arqueo de Caja - Cierre Diario" y la fecha
+      exacta del período. Simultáneamente, oscurece el fondo para
+      bloquear interacciones con el resto de la página. Al abrirse,
+      muestra temporalmente un indicador giratorio con el texto
+      "Calculando balance del periodo..." mientras el sistema envía
+      una petición confidencial al servidor para extraer los ingresos
+      y egresos exactos de ese día específico.
+    </td>
+  </tr>
+
+  <!-- Paso 6 -->
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Al recibir la información, el sistema detiene el indicador
+      de carga y dibuja el formulario completo. En el área superior,
+      crea un recuadro de "Resumen Contable" donde expone
+      matemáticamente la situación teórica: el Saldo Inicial (fondo
+      base) en un campo editable, seguido de la suma total de
+      Ingresos (en verde) restada por la suma total de Egresos
+      (en rojo). Como resultado final de la ecuación, muestra en
+      letras destacadas el "Saldo Esperado": la cantidad de dinero
+      exacta que el usuario debería tener si todo cuadra
+      perfectamente.
+    </td>
+  </tr>
+
+  <!-- Paso 7 -->
+  <tr>
+    <td class="col-paso">Paso 7</td>
+    <td class="col-actor">
+      El usuario revisa su Saldo Inicial, ajustándolo de ser
+      necesario. Luego, procede a contar físicamente el dinero real
+      (billetes, monedas o saldos bancarios) que posee en ese
+      momento y se dirige al campo etiquetado "Dinero Físico Real
+      en Caja".
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 8 -->
+  <tr>
+    <td class="col-paso">Paso 8</td>
+    <td class="col-actor">
+      Digita la cantidad numérica decimal exacta de su recuento
+      físico en dicho campo.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 9 -->
+  <tr>
+    <td class="col-paso">Paso 9</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema captura cada dígito introducido de forma
+      instantánea y ejecuta una resta matemática contra el "Saldo
+      Esperado". Acto seguido, hace aparecer debajo un panel de
+      "Resultado del Arqueo" reaccionando en tiempo real:
+      <br><br>
+      • Se tiñe de <strong>Verde</strong> si la diferencia es cero ("✅ Caja cuadra").<br>
+      • Se tiñe de <strong>Rojo</strong> si es negativa ("⚠️ Faltante de dinero").<br>
+      • Se tiñe de <strong>Amarillo</strong> si es positiva ("💡 Sobrante de dinero").<br>
+      Acompañado en tamaño grande del monto exacto de la
+      discrepancia.
+    </td>
+  </tr>
+
+  <!-- Paso 10 -->
+  <tr>
+    <td class="col-paso">Paso 10</td>
+    <td class="col-actor">
+      Si existe un faltante o sobrante, o si simplemente el usuario
+      lo desea, se dirige al área de "Notas / Comentarios del
+      Arqueo" y redacta una explicación textual detallando el motivo
+      del desajuste (por ejemplo: "Gasté S/20 en un pasaje que no
+      registré").
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 11 -->
+  <tr>
+    <td class="col-paso">Paso 11</td>
+    <td class="col-actor">
+      El usuario verifica que la información en pantalla coincide
+      con la realidad y presiona el botón principal azul oscuro
+      rotulado "💾 Confirmar Cierre".
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 12 -->
+  <tr>
+    <td class="col-paso">Paso 12</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema realiza una validación local final confirmando
+      que el campo de dinero físico contiene un valor válido, y de
+      inmediato cambia el estado del botón a modo de carga
+      mostrando un círculo giratorio junto a la frase
+      "Cerrando Periodo...". El botón queda bloqueado para evitar
+      envíos duplicados.
+    </td>
+  </tr>
+
+  <!-- Paso 13 -->
+  <tr>
+    <td class="col-paso">Paso 13</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema empaqueta los datos: el fondo fijo, el dinero
+      físico real ingresado, la diferencia matemática y el
+      comentario redactado, transmitiéndolos hacia el servidor
+      central de manera segura.
+    </td>
+  </tr>
+
+  <!-- Paso 14 -->
+  <tr>
+    <td class="col-paso">Paso 14</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El servidor inscribe la información en el registro histórico
+      de la base de datos, marcando oficial y permanentemente ese
+      día como conciliado/cerrado, y devuelve un mensaje de éxito
+      a la aplicación web.
+    </td>
+  </tr>
+
+  <!-- Paso 15 -->
+  <tr>
+    <td class="col-paso">Paso 15</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Al recibir la afirmación del servidor, el sistema web cierra
+      completamente la ventana modal devolviendo al usuario a su
+      Panel de Control principal. Las alertas o notificaciones que
+      exigían el arqueo son removidas visualmente en el acto.
+    </td>
+  </tr>
+
+  <!-- Paso 16 -->
+  <tr>
+    <td class="col-paso">Paso 16</td>
+    <td class="col-actor">
+      El usuario observa que su tablero está libre de la alerta
+      de arqueo pendiente y da por finalizado exitosamente el
+      proceso de cierre diario de caja.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 1 — Omisión del ingreso del dinero físico             -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 1: El usuario omite ingresar el dinero físico real</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">
+      El usuario, teniendo la ventana de arqueo abierta, revisa el
+      resumen contable y decide presionar directamente el botón
+      "Confirmar Cierre" sin haber digitado ningún valor en el
+      campo "Dinero Físico Real en Caja" (el campo permanece en
+      blanco).
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema detecta proactivamente la falta de información
+      incluso antes de que el usuario haga clic. Mantiene el botón
+      "Confirmar Cierre" en un estado visualmente inactivo
+      (atenuado y grisáceo) que impide que sea presionado
+      exitosamente.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor">
+      Si el usuario intenta vulnerar esta restricción visual
+      manipulando la interfaz web y forza el evento de clic sobre
+      el botón, el motor reactivo lo intercepta en la validación
+      interna.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema cancela cualquier petición al servidor de
+      inmediato. Despliega un aviso rojo en la parte inferior de
+      la ventana modal que dicta con firmeza: "❌ Por favor digite
+      el dinero físico en caja". La modal se mantiene abierta,
+      bloqueando el avance hasta que el requerimiento se solucione.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--    EXCEPCIÓN 2 — Error de Red o Falla del Servidor al Guardar    -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 2: Falla de conexión con el servidor al confirmar el cierre</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 1</td>
+    <td class="col-actor">
+      El usuario completa correctamente el formulario, incluyendo
+      el monto físico y cualquier comentario pertinente, y presiona
+      "Confirmar Cierre" con normalidad.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recibe la solicitud, verifica el formulario
+      localmente, pasa el botón al estado de carga ("Cerrando
+      Periodo...") y emite el paquete de datos hacia el servidor
+      central.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Debido a una caída repentina de la conexión a internet por
+      parte del usuario, o un error inesperado en el servidor
+      interno de la base de datos, el envío fracasa y la
+      aplicación web recibe un error (o un "timeout").
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema intercepta la interrupción del guardado. Detiene
+      inmediatamente la animación de carga, restituyendo el botón
+      a su forma original y habilitándolo de nuevo para evitar que
+      el usuario quede congelado. Acto seguido, hace aparecer una
+      alerta en formato de caja roja brillante en la base del
+      formulario, indicando: "❌ Error al guardar el cierre"
+      (acompañado del detalle técnico de la falla).
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      La ventana modal no se cierra y preserva intactos todos los
+      datos y comentarios que el usuario ya había digitado
+      minutos atrás. El proceso queda en espera de que el usuario
+      intente pulsar el botón nuevamente una vez que se restablezca
+      su señal de internet.
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

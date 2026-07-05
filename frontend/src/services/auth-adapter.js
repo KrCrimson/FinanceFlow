@@ -43,7 +43,7 @@ class AuthAdapter {
       this.log('Error cargando configuración, usando defaults', 'warning');
       return {
         enableSDK: false,
-        sdkConfig: { baseURL: 'http://localhost:3000/api' },
+        sdkConfig: { baseURL: process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL + '/api' : 'http://localhost:5000/api' },
         debug: false
       };
     }

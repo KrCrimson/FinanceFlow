@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMovimientos } from '../services/movimientosService';
+import { getMovimientos } from '../services/movimientos-adapter';
 
 export function useMovimientos() {
   const [movimientos, setMovimientos] = useState([]);

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-15 — Realizar Cierre Mensual</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 50px 60px; color: #000; background: #fff; }
+    h1 { font-size: 13pt; text-align: center; margin-bottom: 4px; }
+    h3 { font-size: 11pt; text-align: center; font-weight: normal; color: #333; margin-top: 0; margin-bottom: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 36px; }
+    td, th { border: 1px solid #000; padding: 9px 12px; vertical-align: top; font-size: 10.5pt; line-height: 1.6; }
+    .header-section { background-color: #c6c6c6; font-weight: bold; font-size: 11.5pt; letter-spacing: 0.3px; }
+    .col-header { background-color: #ebebeb; font-weight: bold; text-align: left; }
+    .col-paso { width: 11%; font-weight: bold; white-space: nowrap; vertical-align: top; }
+    .col-actor  { width: 44.5%; }
+    .col-sistema { width: 44.5%; }
+    .empty-cell  { background-color: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>CU-15 — Realizar Cierre Mensual</h1>
+<h3>Módulo de Cierres de Caja · Sistema de Balance Financiero</h3>
+
+<table>
+  <tr><td colspan="3" class="header-section">Flujo Principal</td></tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">El usuario ingresa a la aplicación y navega hacia su Panel de Control a principios de un nuevo mes, tras haber finalizado el mes anterior.</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema consulta los períodos contables, detecta que el mes anterior ha finalizado en su totalidad y no posee cierre definitivo. En consecuencia, genera una advertencia destacada informando de un Cierre Mensual pendiente.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor">El usuario visualiza la advertencia y hace clic en el botón para ejecutar el cierre del mes (o selecciona "Cierre Mensual" desde el modal de cierres).</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema despliega una ventana modal rotulada "Cierre Mensual". Inicia un estado de carga mientras consulta al servidor la sumatoria consolidada del mes. Una vez cargado, muestra el Resumen Contable: Ingresos Totales, Egresos Totales y Saldo Esperado del periodo mensual.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Adicionalmente, y al tratarse de un cierre de mes, el sistema renderiza un bloque de "Confirmación de Seguridad" en color rojo suave, advirtiendo claramente: "Esta acción es irreversible. Una vez cerrada la caja, no podrás añadir ni modificar ningún movimiento de este periodo". Debajo de la alerta, habilita un campo para ingresar la contraseña de cuenta.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor">El usuario ingresa el saldo físico contabilizado (o deja que el sistema autocomplete el saldo esperado) y, a continuación, digita su contraseña de acceso personal en el campo de seguridad.</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 7</td>
+    <td class="col-actor">Verifica los datos y presiona el botón "💾 Confirmar Cierre".</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 8</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema cambia el estado del botón a "Cerrando Periodo...", bloquea temporalmente la interfaz y transmite de forma segura la petición (con la contraseña) hacia el servidor.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 9</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El backend compara la contraseña recibida con la original. Al ser correcta, genera un documento de Cierre Oficial que funciona como un "candado" lógico sobre todos los días de dicho mes.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 10</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">A partir de este instante, el sistema a nivel central rechazará cualquier intento futuro de creación, edición o desactivación de movimientos que pertenezcan a ese mes.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 11</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">La aplicación web recibe el éxito de la operación, cierra la ventana modal y actualiza el Dashboard, ocultando la advertencia inicial y notificando al usuario que el cierre mensual ha sido procesado exitosamente.</td>
+  </tr>
+</table>
+
+<table>
+  <tr><td colspan="3" class="header-section">Excepción 1: Contraseña Inválida</td></tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">El usuario intenta apresurar el proceso de cierre, escribe una contraseña equivocada y presiona "Confirmar Cierre".</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema realiza el envío. El servidor captura la contraseña y al compararla determina que no coincide con las credenciales legítimas del dueño.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El servidor rechaza de inmediato la creación del candado y devuelve un mensaje de acceso denegado.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">La aplicación web detiene la carga, rehabilita el botón de guardado y despliega un mensaje rojo en la parte inferior de la ventana indicando: "❌ Error al guardar el cierre. Verifique su contraseña." El usuario debe corregir la clave para continuar.</td>
+  </tr>
+</table>
+
+</body>
+</html>

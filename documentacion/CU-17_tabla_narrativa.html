@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-17 — Destacar Ingreso Fijo</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 50px 60px; color: #000; background: #fff; }
+    h1 { font-size: 13pt; text-align: center; margin-bottom: 4px; }
+    h3 { font-size: 11pt; text-align: center; font-weight: normal; color: #333; margin-top: 0; margin-bottom: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 36px; }
+    td, th { border: 1px solid #000; padding: 9px 12px; vertical-align: top; font-size: 10.5pt; line-height: 1.6; }
+    .header-section { background-color: #c6c6c6; font-weight: bold; font-size: 11.5pt; letter-spacing: 0.3px; }
+    .col-header { background-color: #ebebeb; font-weight: bold; text-align: left; }
+    .col-paso { width: 11%; font-weight: bold; white-space: nowrap; vertical-align: top; }
+    .col-actor  { width: 44.5%; }
+    .col-sistema { width: 44.5%; }
+    .empty-cell  { background-color: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>CU-17 — Destacar Ingreso Fijo</h1>
+<h3>Módulo de Gestión de Movimientos · Sistema de Balance Financiero</h3>
+
+<table>
+  <tr><td colspan="3" class="header-section">Flujo Principal</td></tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">Durante la creación de un nuevo movimiento de tipo "Ingreso" (por ejemplo, registrar su salario), el usuario localiza la casilla de verificación opcional "🔁 Registrar como Ingreso Constante (Mensual)".</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor">El usuario marca la casilla y procede a guardar el movimiento de manera normal.</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema procesa la creación en la base de datos inyectando internamente la propiedad de constancia (<i>esRecurrente: true</i>) a este registro particular.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor">El usuario retorna a la pantalla de Panel de Control (Dashboard) para observar su tablero.</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Al cargar el Dashboard, el sistema ejecuta una evaluación filtrando todo el historial en búsqueda exclusiva de los ingresos que cuenten con la etiqueta de "Recurrente".</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema despliega un bloque visual lateral titulado "🔁 Ingresos Constantes". Dentro de este widget, el sistema lista de forma resumida, elegante y persistente el movimiento recién marcado (mostrando su nombre, fecha y monto) para que el usuario pueda tener un monitoreo fijo de sus ganancias garantizadas.</td>
+  </tr>
+</table>
+
+<table>
+  <tr><td colspan="3" class="header-section">Excepción 1: Revocación de Constancia (Retirar Ingreso Fijo)</td></tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">Tiempo después, el ingreso en cuestión deja de ser regular. El usuario, desde su Dashboard, se dirige al panel lateral de "Ingresos Constantes", ubica el registro y hace clic en el botón rojo de remover (✕).</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema captura la acción y lanza de manera transparente una actualización directa (un PATCH) hacia el servidor.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">La base de datos actualiza dicho movimiento y modifica su propiedad "esRecurrente" de verdadera a falsa (falso).</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Al completarse la transacción, el sistema remueve visualmente el ítem del widget lateral. El movimiento original permanece intacto en los listados generales del historial sin borrarse, habiendo perdido únicamente su atributo de "destacado".</td>
+  </tr>
+</table>
+
+</body>
+</html>

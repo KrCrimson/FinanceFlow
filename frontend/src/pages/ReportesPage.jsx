@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMovimientos } from '../services/movimientosService';
+import { getMovimientos } from '../services/movimientos-adapter';
 import { useNavigate } from 'react-router-dom';
 import { GraficoBarras, GraficoLinea, GraficoCircular } from '../components/Graficos';
 import logger from '../utils/logger';

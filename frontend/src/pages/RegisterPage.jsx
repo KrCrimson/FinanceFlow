@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { register as registerUser } from '../services/authService';
+import { register as registerUser } from '../services/auth-adapter';
 
 const schema = z.object({
   nombre: z.string().min(2, { message: 'Nombre muy corto' }),

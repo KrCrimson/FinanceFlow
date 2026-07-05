@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getToken, logout as logoutService, onAuthChange, isTokenValid } from '../services/authService';
+import { getToken, logout as logoutService, onAuthChange, isTokenValid } from '../services/auth-adapter';
 
 export function useAuth() {
   const [user, setUser] = useState(null);

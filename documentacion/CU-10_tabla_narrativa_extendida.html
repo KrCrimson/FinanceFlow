@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-10 — Filtrar Historial Completo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      margin: 50px 60px;
+      color: #000;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 13pt;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      text-align: center;
+      font-weight: normal;
+      color: #333;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 36px;
+    }
+
+    td, th {
+      border: 1px solid #000;
+      padding: 9px 12px;
+      vertical-align: top;
+      font-size: 10.5pt;
+      line-height: 1.6;
+    }
+
+    .header-section {
+      background-color: #c6c6c6;
+      font-weight: bold;
+      font-size: 11.5pt;
+      letter-spacing: 0.3px;
+    }
+
+    .col-header {
+      background-color: #ebebeb;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .col-paso {
+      width: 11%;
+      font-weight: bold;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    .col-actor {
+      width: 44.5%;
+    }
+
+    .col-sistema {
+      width: 44.5%;
+    }
+
+    .empty-cell {
+      background-color: #fafafa;
+    }
+
+    .nota {
+      font-size: 9pt;
+      color: #444;
+      font-style: italic;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>CU-10 — Filtrar Historial Completo</h1>
+<h3>Módulo de Reportes · Pestaña "Movimientos" · Sistema de Balance Financiero</h3>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--                         FLUJO PRINCIPAL                           -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Flujo Principal</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <!-- Paso 1 -->
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">
+      El usuario se encuentra dentro del sistema con su sesión ya
+      iniciada, ubicado en cualquier sección (por ejemplo, el
+      Dashboard principal). Localiza en la barra de navegación
+      superior el enlace "Reportes", identificado con el ícono 📊,
+      y desplaza el cursor hacia él.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 2 -->
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema detecta que el cursor se posiciona sobre el enlace
+      "Reportes" y aplica un efecto visual de resaltado sobre dicho
+      elemento, indicándole al usuario que se trata de un elemento
+      interactivo y que puede hacer clic en él.
+    </td>
+  </tr>
+
+  <!-- Paso 3 -->
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor">
+      El usuario confirma su intención y hace clic sobre el enlace
+      "Reportes" en la barra de navegación.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 4 -->
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema registra la solicitud de navegación y redirige al
+      usuario a la sección de Reportes. Simultáneamente, la barra de
+      navegación actualiza el estado visual del enlace "Reportes"
+      para mostrarlo como la sección activa en ese momento, con un
+      fondo levemente diferenciado que confirma la ubicación actual
+      del usuario dentro del sistema.
+    </td>
+  </tr>
+
+  <!-- Paso 5 -->
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema inicia automáticamente la consulta al servidor para
+      traer la totalidad de los movimientos financieros registrados
+      por ese usuario. Mientras aguarda la respuesta del servidor,
+      ocupa el espacio central de la pantalla con un indicador
+      giratorio animado acompañado del texto "Generando reportes…",
+      para comunicarle al usuario que el proceso está en marcha y
+      que debe aguardar unos instantes.
+    </td>
+  </tr>
+
+  <!-- Paso 6 -->
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El servidor responde exitosamente con el listado completo de
+      movimientos del usuario. El sistema recibe esos datos, los
+      valida para asegurarse de que llegaron en el formato correcto
+      y los guarda en la memoria de la pantalla. Esta información
+      queda disponible de forma local para todas las operaciones de
+      filtrado que el usuario realice a continuación, sin necesidad
+      de volver a consultar al servidor en cada interacción.
+    </td>
+  </tr>
+
+  <!-- Paso 7 -->
+  <tr>
+    <td class="col-paso">Paso 7</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El indicador de carga desaparece y el sistema presenta la
+      pantalla completa de "Reportes y Análisis". En la parte
+      superior se muestra el título de la sección junto con una
+      breve descripción. Debajo del encabezado, se despliegan tres
+      pestañas horizontales claramente diferenciadas entre sí:
+      "Resumen General", "Gráficos" y "Movimientos". La pestaña
+      activa por defecto al ingresar es "Resumen General", que
+      aparece visualmente resaltada con un subrayado de color
+      primario y un fondo diferenciado, indicando que es la sección
+      que se está visualizando en ese momento.
+    </td>
+  </tr>
+
+  <!-- Paso 8 -->
+  <tr>
+    <td class="col-paso">Paso 8</td>
+    <td class="col-actor">
+      El usuario observa las tres pestañas disponibles y decide
+      acceder a su historial de operaciones individuales. Identifica
+      la pestaña "Movimientos" e indica su intención moviéndole el
+      cursor encima.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 9 -->
+  <tr>
+    <td class="col-paso">Paso 9</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema responde al movimiento del cursor resaltando la
+      pestaña "Movimientos" con un efecto visual de hover, indicando
+      que es seleccionable.
+    </td>
+  </tr>
+
+  <!-- Paso 10 -->
+  <tr>
+    <td class="col-paso">Paso 10</td>
+    <td class="col-actor">
+      El usuario hace clic sobre la pestaña "Movimientos".
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 11 -->
+  <tr>
+    <td class="col-paso">Paso 11</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema registra la selección y activa la pestaña
+      "Movimientos", que adopta el estilo visual de pestaña activa:
+      subrayado de color primario y fondo levemente diferenciado.
+      La pestaña "Resumen General" pierde ese estilo y pasa a
+      verse como las demás pestañas inactivas. El área de contenido
+      principal debajo de las pestañas se actualiza para mostrar
+      el contenido correspondiente a la pestaña "Movimientos".
+    </td>
+  </tr>
+
+  <!-- Paso 12 -->
+  <tr>
+    <td class="col-paso">Paso 12</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema presenta el área de filtros en la parte superior del
+      contenido de la pestaña. Dicha área tiene un fondo gris suave
+      y contiene tres elementos dispuestos en fila horizontal: a la
+      izquierda el selector etiquetado "Filtrar por mes", en el
+      centro el selector etiquetado "Filtrar por categoría", y a la
+      derecha el botón "Limpiar Filtros". Los dos selectores muestran
+      sus opciones predeterminadas: "Todos los meses" y "Todas las
+      categorías" respectivamente, lo que indica que en este momento
+      no hay ningún filtro activo.
+    </td>
+  </tr>
+
+  <!-- Paso 13 -->
+  <tr>
+    <td class="col-paso">Paso 13</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Inmediatamente debajo del área de filtros, el sistema despliega
+      la tabla completa de movimientos activos del usuario. La tabla
+      presenta cinco columnas con encabezados en gris claro: "Tipo",
+      "Nombre", "Monto", "Categoría" y "Estado". Cada fila de la
+      tabla corresponde a un movimiento individual. El tipo de cada
+      movimiento se distingue visualmente: los ingresos se presentan
+      con una etiqueta de fondo verde con texto verde oscuro y el
+      ícono 💰, mientras que los egresos se presentan con una
+      etiqueta de fondo rojo con texto rojo oscuro y el ícono 💸.
+      Los montos de los ingresos aparecen en color verde y los de
+      los egresos en color rojo. Dado que no hay ningún filtro
+      activo, la tabla muestra la totalidad de los movimientos
+      activos que el usuario ha registrado en el sistema a lo largo
+      de toda su historia.
+    </td>
+  </tr>
+
+  <!-- Paso 14 -->
+  <tr>
+    <td class="col-paso">Paso 14</td>
+    <td class="col-actor">
+      El usuario examina el contenido completo de la tabla y decide
+      que desea acotar la vista para analizar únicamente los
+      movimientos de un mes específico. Desplaza el cursor hacia el
+      selector "Filtrar por mes" y hace clic sobre él para
+      desplegar sus opciones.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 15 -->
+  <tr>
+    <td class="col-paso">Paso 15</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema despliega el menú del selector de mes, presentando
+      la lista completa de los doce meses del año calendario en
+      orden cronológico: Todos los meses, Enero, Febrero, Marzo,
+      Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre,
+      Noviembre y Diciembre. Esta lista es siempre idéntica y
+      completa, con independencia de si el usuario tiene o no
+      movimientos registrados en alguno de esos meses. La opción
+      actualmente seleccionada, "Todos los meses", aparece
+      resaltada.
+    </td>
+  </tr>
+
+  <!-- Paso 16 -->
+  <tr>
+    <td class="col-paso">Paso 16</td>
+    <td class="col-actor">
+      El usuario recorre la lista desplegada y selecciona el mes de
+      su interés haciendo clic sobre él (por ejemplo: "Mayo").
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 17 -->
+  <tr>
+    <td class="col-paso">Paso 17</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema cierra el menú desplegable y actualiza el selector
+      para mostrar "Mayo" como la opción actualmente seleccionada.
+      Acto seguido, aplica el filtro de forma completamente
+      instantánea y sin realizar ninguna consulta adicional al
+      servidor: recorre internamente la totalidad de los movimientos
+      ya almacenados en la memoria de la pantalla e identifica
+      aquellos cuya fecha de creación corresponde al mes de Mayo,
+      sin importar el año en que fueron generados. La tabla de
+      movimientos se refresca de inmediato y muestra únicamente
+      esos registros coincidentes. Si hay filas que no pertenecen
+      al mes de Mayo, desaparecen de la vista sin ser eliminadas
+      del sistema.
+    </td>
+  </tr>
+
+  <!-- Paso 18 -->
+  <tr>
+    <td class="col-paso">Paso 18</td>
+    <td class="col-actor">
+      El usuario observa los resultados filtrados por mes y decide
+      agregar un segundo nivel de búsqueda. Desplaza el cursor hacia
+      el selector "Filtrar por categoría" y hace clic sobre él para
+      desplegar sus opciones.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 19 -->
+  <tr>
+    <td class="col-paso">Paso 19</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema despliega el menú del selector de categoría. A
+      diferencia del selector de mes, cuya lista es siempre fija,
+      este selector muestra únicamente las categorías que el propio
+      usuario ha utilizado al registrar sus movimientos a lo largo
+      del tiempo. Las opciones se generan automáticamente y en
+      tiempo real a partir de los datos del usuario (por ejemplo:
+      "Alimentación", "Salud", "Transporte"). No existen categorías
+      predefinidas visibles que el usuario nunca haya empleado. La
+      primera opción de la lista es siempre "Todas las categorías",
+      que figura como la selección activa en ese momento.
+    </td>
+  </tr>
+
+  <!-- Paso 20 -->
+  <tr>
+    <td class="col-paso">Paso 20</td>
+    <td class="col-actor">
+      El usuario localiza la categoría que desea analizar en la lista
+      desplegada y hace clic sobre ella (por ejemplo: "Transporte").
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 21 -->
+  <tr>
+    <td class="col-paso">Paso 21</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema cierra el menú desplegable y actualiza el selector
+      de categoría para mostrar "Transporte" como la opción activa.
+      De inmediato, combina ambos criterios vigentes en simultáneo:
+      exige que cada movimiento cumpla las dos condiciones a la vez,
+      es decir, que haya sido generado en el mes de Mayo Y que
+      pertenezca a la categoría "Transporte". Los movimientos que
+      cumplan solo una de las dos condiciones quedan excluidos del
+      resultado. La tabla se actualiza en ese mismo instante
+      mostrando únicamente los registros que satisfacen ambos
+      requisitos al mismo tiempo. Ambos filtros permanecen activos
+      y visibles en sus respectivos selectores.
+    </td>
+  </tr>
+
+  <!-- Paso 22 -->
+  <tr>
+    <td class="col-paso">Paso 22</td>
+    <td class="col-actor">
+      El usuario revisa detenidamente los resultados que el sistema
+      le presentó en la tabla. Examina el tipo de cada movimiento
+      (ingreso o egreso), su nombre descriptivo, el monto en pesos,
+      la categoría asignada y el estado activo de cada registro.
+      Toma nota de la información que necesitaba.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 23 -->
+  <tr>
+    <td class="col-paso">Paso 23</td>
+    <td class="col-actor">
+      Una vez satisfecho con la consulta, el usuario decide volver a
+      ver el historial completo sin restricciones. Localiza el botón
+      "Limpiar Filtros" en el área de filtros y hace clic sobre él.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <!-- Paso 24 -->
+  <tr>
+    <td class="col-paso">Paso 24</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema restablece ambos selectores en el mismo instante:
+      el selector de mes vuelve a mostrar "Todos los meses" y el
+      selector de categoría vuelve a mostrar "Todas las categorías".
+      La tabla se actualiza de inmediato y presenta nuevamente la
+      totalidad de los movimientos activos del usuario, exactamente
+      como estaba al ingresar por primera vez a la pestaña
+      "Movimientos". El caso de uso concluye de manera exitosa y
+      el usuario queda en condición de iniciar una nueva consulta
+      si lo desea.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--          EXCEPCIÓN 1 — Combinación de filtros sin resultados       -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 1: La combinación de filtros no arroja ningún resultado</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">
+      En cualquier punto del flujo principal a partir del Paso 14,
+      el usuario configura una combinación de filtros que en ese
+      momento no tiene ningún movimiento asociado en su historial.
+      Por ejemplo: selecciona el mes de "Octubre" en el primer
+      selector y la categoría "Restaurantes" en el segundo selector,
+      sin saber de antemano que nunca registró un movimiento de esa
+      categoría en ese mes en particular.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema aplica de inmediato los dos criterios de forma
+      simultánea sobre todos los movimientos almacenados en memoria.
+      Tras recorrer el listado completo, determina que ningún
+      movimiento cumple al mismo tiempo la condición de pertenecer
+      al mes de Octubre Y a la categoría "Restaurantes". El
+      resultado de la operación es un conjunto vacío: cero
+      movimientos coincidentes.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema oculta por completo la tabla de movimientos, dado
+      que no hay filas que mostrar. En su lugar, presenta en el
+      área central un mensaje de estado vacío compuesto por tres
+      elementos: en primer lugar, un ícono grande de bloc de notas
+      📝 que sirve como referente visual; a continuación, el aviso
+      principal en texto destacado "No hay movimientos"; y debajo,
+      en texto normal, la aclaración "Con los filtros aplicados no
+      se encontraron resultados". Este mensaje comunica con claridad
+      que el sistema funcionó correctamente, pero que simplemente
+      no existen datos para esa combinación específica.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El área de filtros permanece completamente visible e
+      interactiva por encima del mensaje. Ambos selectores siguen
+      mostrando las opciones que el usuario eligió ("Octubre" y
+      "Restaurantes") y el botón "Limpiar Filtros" sigue disponible.
+      El usuario no queda bloqueado: puede modificar cualquiera de
+      los dos filtros o limpiarlos por completo para retomar la
+      consulta con criterios distintos, sin necesidad de recargar
+      la página ni de realizar ninguna acción especial.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--       EXCEPCIÓN 2 — El usuario no tiene categorías registradas     -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 2: El usuario no tiene categorías registradas en el sistema</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 1</td>
+    <td class="col-actor">
+      El usuario accede a la sección de Reportes y hace clic en la
+      pestaña "Movimientos". Sin embargo, es un usuario que nunca
+      ha registrado movimientos en el sistema, o que registró todos
+      sus movimientos sin asignarles ninguna categoría.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema detecta que no existen categorías que pueda ofrecer
+      como opciones en el selector "Filtrar por categoría", porque
+      ningún movimiento del usuario tiene una categoría asignada.
+      A pesar de esto, el selector se muestra en pantalla de forma
+      normal, pero su menú desplegable contendrá únicamente la
+      opción predeterminada "Todas las categorías", sin ninguna
+      categoría adicional debajo de ella. El sistema no genera
+      ningún error ni mensaje de advertencia por esta situación:
+      simplemente adapta el contenido del selector a lo que hay
+      disponible.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E2 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Además, como tampoco existen movimientos activos que mostrar
+      en la tabla, el sistema no presenta ninguna fila de datos.
+      En cambio, muestra el mensaje de estado vacío con el ícono
+      📝, el texto "No hay movimientos" y la aclaración "Con los
+      filtros aplicados no se encontraron resultados". La pantalla
+      se mantiene estable y funcional: el usuario puede interactuar
+      con los selectores y el botón "Limpiar Filtros" sin que se
+      produzca ningún error o comportamiento inesperado.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--       EXCEPCIÓN 3 — Error de conexión al cargar la pantalla       -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 3: El sistema no puede conectarse al servidor al abrir Reportes</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 1</td>
+    <td class="col-actor">
+      El usuario hace clic en "Reportes" desde la barra de
+      navegación, tal como se describe en el Paso 3 del flujo
+      principal.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema intenta comunicarse con el servidor para obtener
+      los movimientos del usuario. Durante ese intento, muestra en
+      pantalla el indicador giratorio de carga con el mensaje
+      "Generando reportes…", tal como ocurre en el flujo normal.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El intento de comunicación con el servidor fracasa. El sistema
+      detecta el error, detiene el indicador de carga y abandona
+      el proceso de obtención de datos. No carga ningún movimiento
+      en memoria.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      En lugar de la pantalla normal de Reportes, el sistema
+      presenta una pantalla de error centrada en la pantalla,
+      compuesta por: el ícono de advertencia ⚠️ en rojo, el
+      mensaje principal "Error al cargar reportes" en texto
+      destacado, el detalle técnico del problema ocurrido, y un
+      botón "Reintentar". La pestaña "Movimientos", los filtros
+      y la tabla no llegan a mostrarse en ningún momento.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 5</td>
+    <td class="col-actor">
+      El usuario lee el mensaje de error, comprende que hubo un
+      problema al cargar la información y hace clic en el botón
+      "Reintentar" para intentar acceder nuevamente.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E3 - Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema recarga la página de Reportes desde el principio.
+      Si la conexión con el servidor se ha restablecido, el proceso
+      continúa desde el Paso 5 del flujo principal (consulta al
+      servidor, indicador de carga y presentación normal de la
+      pantalla). Si el problema de conexión persiste, el sistema
+      vuelve a mostrar la pantalla de error con el botón
+      "Reintentar" disponible para que el usuario pueda intentarlo
+      cuantas veces sea necesario.
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- EXCEPCIÓN 4 — Cambio de mes con una categoría activa incompatible  -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<table>
+  <tr>
+    <td colspan="3" class="header-section">Excepción 4: El usuario cambia el mes mientras ya tiene una categoría seleccionada, y esa combinación no produce resultados</td>
+  </tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 1</td>
+    <td class="col-actor">
+      El usuario ya tiene activo un filtro de categoría (por
+      ejemplo: "Alimentación") y la tabla muestra correctamente
+      todos sus movimientos de esa categoría sin restricción de
+      mes. En ese estado, decide también filtrar por mes y
+      selecciona un mes del selector "Filtrar por mes" (por
+      ejemplo: "Marzo").
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema aplica el nuevo criterio de mes sobre los datos
+      en memoria, manteniéndolo en combinación simultánea con el
+      filtro de categoría "Alimentación" que ya estaba activo. El
+      selector de categoría no se reinicia ni se modifica: conserva
+      "Alimentación" como selección activa. No hay ningún
+      mecanismo automático que ajuste o limpie el filtro de
+      categoría al cambiar el mes.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      Si en el mes de "Marzo" el usuario no registró ningún
+      movimiento de la categoría "Alimentación", la combinación
+      resultante devuelve cero registros. El sistema oculta la
+      tabla y presenta el mensaje de estado vacío con el ícono
+      📝, "No hay movimientos" y "Con los filtros aplicados no
+      se encontraron resultados", exactamente igual que en la
+      Excepción 1. Ambos selectores permanecen visibles mostrando
+      sus selecciones activas ("Marzo" y "Alimentación") y el
+      botón "Limpiar Filtros" continúa disponible para que el
+      usuario pueda ajustar los criterios.
+    </td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 4</td>
+    <td class="col-actor">
+      El usuario comprende que esa combinación no tiene datos,
+      ajusta uno o ambos filtros a criterios que sí tengan
+      registros asociados, o bien hace clic en "Limpiar Filtros"
+      para volver al historial completo y retomar la búsqueda
+      desde cero.
+    </td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+
+  <tr>
+    <td class="col-paso">E4 - Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">
+      El sistema responde al cambio de criterios de inmediato,
+      actualizando la tabla con los nuevos resultados, o
+      restableciendo ambos filtros a sus valores iniciales si el
+      usuario utilizó el botón "Limpiar Filtros", retomando así
+      el flujo principal desde el Paso 13.
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

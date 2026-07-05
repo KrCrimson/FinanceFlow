@@ -19,6 +19,9 @@ export function useImageToMovimiento() {
       
       const response = await fetch(`${API_URL}/analyze-receipt`, {
         method: 'POST',
+        headers: {
+          'x-api-key': process.env.REACT_APP_ML_API_KEY
+        },
         body: formData,
       });
       

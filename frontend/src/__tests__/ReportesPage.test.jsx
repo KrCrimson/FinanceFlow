@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import ReportesPage from '../pages/ReportesPage';
-import * as movimientosService from '../services/movimientosService';
+import * as movimientosService from '../services/movimientos-adapter';
 
 jest.mock('../services/movimientosService');
 

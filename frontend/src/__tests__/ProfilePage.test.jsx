@@ -2,7 +2,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import ProfilePage from '../pages/ProfilePage';
-import * as userService from '../services/userService';
+import * as userService from '../services/usuarios-adapter';
 
 jest.mock('../services/userService');
 jest.mock('../services/authService');

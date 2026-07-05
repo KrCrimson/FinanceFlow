@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CU-18 — Eliminar Cuenta</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 50px 60px; color: #000; background: #fff; }
+    h1 { font-size: 13pt; text-align: center; margin-bottom: 4px; }
+    h3 { font-size: 11pt; text-align: center; font-weight: normal; color: #333; margin-top: 0; margin-bottom: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 36px; }
+    td, th { border: 1px solid #000; padding: 9px 12px; vertical-align: top; font-size: 10.5pt; line-height: 1.6; }
+    .header-section { background-color: #c6c6c6; font-weight: bold; font-size: 11.5pt; letter-spacing: 0.3px; }
+    .col-header { background-color: #ebebeb; font-weight: bold; text-align: left; }
+    .col-paso { width: 11%; font-weight: bold; white-space: nowrap; vertical-align: top; }
+    .col-actor  { width: 44.5%; }
+    .col-sistema { width: 44.5%; }
+    .empty-cell  { background-color: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>CU-18 — Eliminar Cuenta</h1>
+<h3>Módulo de Configuración de Perfil · Sistema de Balance Financiero</h3>
+
+<table>
+  <tr><td colspan="3" class="header-section">Flujo Principal</td></tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 1</td>
+    <td class="col-actor">El usuario accede al menú principal, selecciona la opción "Mi Perfil" y se desplaza hacia la parte inferior, donde se aloja el bloque de "Configuración de Cuenta".</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 2</td>
+    <td class="col-actor">El usuario ubica el recuadro rojo de peligro y hace clic en el botón "Eliminar".</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Para prevenir toques accidentales con consecuencias irreversibles, el sistema detiene el avance de manera automática y levanta un gran modal superpuesto de advertencia. El modal muestra un ícono de precaución gigante (⚠️) y el texto: "Esta acción no se puede deshacer. Se eliminarán todos tus datos permanentemente". Obliga al usuario a decidir entre un botón gris para cancelar o un botón rojo agresivo para confirmar.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 4</td>
+    <td class="col-actor">El usuario, plenamente consciente, presiona el botón rojo "Eliminar" en el modal.</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 5</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema bloquea temporalmente los botones mostrando el texto "Eliminando..." y lanza una petición prioritaria al servicio de servidor para procesar la baja.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 6</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El servidor central ejecuta un proceso técnico de "Borrado Lógico", donde en lugar de triturar los registros numéricos (lo que rompería historiales cruzados de auditoría), cambia el atributo de "estado" de la cuenta del usuario a "eliminado" o inactivo de forma permanente. Devuelve un indicador de éxito a la pantalla.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 7</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Al recibir la confirmación, el sistema en el navegador lanza un mensaje de éxito ("Cuenta eliminada correctamente. Redirigiendo...") y esconde el modal.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 8</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Inmediatamente después, el sistema destruye el identificador criptográfico almacenado (Token JWT) purgando la memoria local (`localStorage`), aniquilando la sesión activa y cortando la conexión segura.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">Paso 9</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema expulsa al usuario forzando una redirección automática hacia la pantalla pública de "Iniciar Sesión", completando la desvinculación a perpetuidad.</td>
+  </tr>
+</table>
+
+<table>
+  <tr><td colspan="3" class="header-section">Excepción 1: Intento de Logeo Zombi (Posterior a la Eliminación)</td></tr>
+  <tr>
+    <td class="col-paso col-header">Paso</td>
+    <td class="col-actor col-header">ACTOR</td>
+    <td class="col-sistema col-header">SISTEMA</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 1</td>
+    <td class="col-actor">Días o semanas después, el usuario intenta acceder al sistema llenando la pantalla de Login con su correo original y su contraseña válida, y pulsa "Ingresar".</td>
+    <td class="col-sistema empty-cell"></td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 2</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El sistema web transmite los datos. El servidor verifica que el correo existe y que la contraseña, en efecto, era la correcta.</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 3</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">Como capa final de seguridad, el servidor inspecciona el atributo "estado" del registro y detecta que se encuentra marcado como "eliminado" o "inactivo".</td>
+  </tr>
+  <tr>
+    <td class="col-paso">E1 - Paso 4</td>
+    <td class="col-actor empty-cell"></td>
+    <td class="col-sistema">El servidor aborta de inmediato la generación del token de ingreso. Por política de seguridad frente a posibles hackers, se rehúsa a explicar que la cuenta fue borrada; en su lugar, devuelve la misma alerta que utiliza para contraseñas falsas, denegando el paso eternamente. La pantalla del usuario mostrará un banner genérico: "Credenciales incorrectas" u "Operación denegada".</td>
+  </tr>
+</table>
+
+</body>
+</html>
