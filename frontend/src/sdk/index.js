@@ -5,7 +5,7 @@
  * Proporciona una interfaz limpia y consistente para todas las operaciones.
  * 
  * @example
- * const BalanceSDK = require('@sistema-balance/sdk');
+ * import BalanceSDK from '@sistema-balance/sdk';
  * 
  * const sdk = new BalanceSDK({
  *   baseURL: process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL + '/api' : 'http://localhost:5000/api',
@@ -17,11 +17,11 @@
  * const usuario = await sdk.auth.login('email', 'password');
  */
 
-const HttpClient = require('./utils/httpClient.js');
-const AuthModule = require('./modules/auth.js');
-const MovimientosModule = require('./modules/movimientos.js');
-const UsuariosModule = require('./modules/usuarios.js');
-const ReportesModule = require('./modules/reportes.js');
+import HttpClient from './utils/httpClient.js';
+import AuthModule from './modules/auth.js';
+import MovimientosModule from './modules/movimientos.js';
+import UsuariosModule from './modules/usuarios.js';
+import ReportesModule from './modules/reportes.js';
 
 class BalanceSDK {
   /**
@@ -135,4 +135,4 @@ class BalanceSDK {
   }
 }
 
-module.exports = BalanceSDK;
+export default BalanceSDK;

@@ -259,4 +259,4 @@ class MovimientosModule {
   }
 }
 
-module.exports = MovimientosModule;
+export default MovimientosModule;

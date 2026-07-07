@@ -301,4 +301,4 @@ class UsuariosModule {
   }
 }
 
-module.exports = UsuariosModule;
+export default UsuariosModule;

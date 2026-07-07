@@ -350,4 +350,4 @@ class ReportesModule {
   }
 }
 
-module.exports = ReportesModule;
+export default ReportesModule;
