@@ -1,6 +1,6 @@
-# 💰 Sistema de Balance - Sistema de Gestión Financiera Personal
+# 💰 Valt - Ecosistema de Gestión Financiera Personal
 
-Un sistema completo de gestión financiera personal desarrollado con React y Node.js que permite llevar un control detallado de ingresos, egresos y generar reportes financieros.
+**Valt** es un ecosistema completo de gestión financiera personal. Compuesto por una plataforma Web (React) y una aplicación Móvil (React Native/Expo), conectadas a un backend robusto en Node.js, permite llevar un control detallado de ingresos, egresos y generar reportes financieros en tiempo real desde cualquier dispositivo.
 
 ## 🌟 Características Principales
 
