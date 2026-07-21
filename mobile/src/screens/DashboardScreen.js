@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Modal, TextInput, Alert, Platform, StatusBar } from 'react-native';
-import { fetchMovimientos, crearCierre } from '../services/api';
+import { fetchMovimientos, createMovimiento, crearCierre } from '../services/api';
 
 const MONTH_OPTIONS = [
   { label: 'Julio 2026', month: 6, year: 2026 },
@@ -87,6 +87,43 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
     setNuevaCompraMonto('');
     setShowAddCompraModal(false);
     Alert.alert('¡Meta Agregada!', 'Tu meta de compra ha sido añadida al planificador.');
+  };
+
+  // Botón "Comprado" -> Convierte la meta en Egreso y refresca el Dashboard
+  const handleMarcarComprado = (compra) => {
+    Alert.alert(
+      '🛒 Confirmar Compra',
+      `¿Deseas cerrar "${compra.item}" y registrar el egreso por S/ ${compra.montoObjetivo}?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sí, Comprado',
+          onPress: async () => {
+            try {
+              // 1. Crear el movimiento de egreso en el backend
+              await createMovimiento({
+                nombre: compra.item,
+                tipo: 'egreso',
+                monto: compra.montoObjetivo,
+                categoria: 'Otros',
+                descripcion: 'Compra finalizada desde el Planificador de Compras',
+                fecha: new Date().toISOString()
+              });
+
+              // 2. Eliminar de la lista de metas planificadas
+              setComprasPlanificadas((prev) => prev.filter((c) => c.id !== compra.id));
+
+              // 3. Recargar el dashboard
+              await loadData();
+
+              Alert.alert('🎉 ¡Felicidades!', `Se registró el egreso de S/ ${compra.montoObjetivo} en tus movimientos.`);
+            } catch (err) {
+              Alert.alert('Error', 'No se pudo guardar el egreso de la compra.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const theme = isDarkMode ? darkStyles : lightStyles;
@@ -196,21 +233,37 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           </TouchableOpacity>
         </View>
 
-        {comprasPlanificadas.map((compra) => {
-          const percent = Math.min(100, (compra.montoAhorrado / compra.montoObjetivo) * 100);
-          return (
-            <View key={compra.id} style={theme.goalCard}>
-              <View style={theme.goalHeader}>
-                <Text style={theme.goalTitle}>{compra.item}</Text>
-                <Text style={theme.goalAmount}>S/ {compra.montoAhorrado} / S/ {compra.montoObjetivo}</Text>
+        {comprasPlanificadas.length === 0 ? (
+          <Text style={theme.emptyText}>No tienes compras planificadas en este momento.</Text>
+        ) : (
+          comprasPlanificadas.map((compra) => {
+            const percent = Math.min(100, (compra.montoAhorrado / compra.montoObjetivo) * 100);
+            return (
+              <View key={compra.id} style={theme.goalCard}>
+                <View style={theme.goalHeader}>
+                  <View style={{ flex: 1, paddingRight: 8 }}>
+                    <Text style={theme.goalTitle}>{compra.item}</Text>
+                    <Text style={theme.goalAmount}>S/ {compra.montoAhorrado} / S/ {compra.montoObjetivo}</Text>
+                  </View>
+
+                  {/* Botón Comprado */}
+                  <TouchableOpacity
+                    style={theme.compradoBtn}
+                    onPress={() => handleMarcarComprado(compra)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={theme.compradoBtnText}>🛒 Comprado</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={theme.goalTrack}>
+                  <View style={[theme.goalFill, { width: `${percent}%` }]} />
+                </View>
+                <Text style={theme.goalPercent}>{percent.toFixed(0)}% Completado</Text>
               </View>
-              <View style={theme.goalTrack}>
-                <View style={[theme.goalFill, { width: `${percent}%` }]} />
-              </View>
-              <Text style={theme.goalPercent}>{percent.toFixed(0)}% Completado</Text>
-            </View>
-          );
-        })}
+            );
+          })
+        )}
 
         {/* Sección de Movimientos Recientes */}
         <Text style={theme.sectionHeader}>📂 Movimientos Recientes</Text>
@@ -342,9 +395,11 @@ const baseStyles = {
   addGoalBtn: { backgroundColor: '#34D399', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
   addGoalBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' },
   goalCard: { borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1 },
-  goalHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+  goalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   goalTitle: { fontSize: 13, fontWeight: 'bold' },
   goalAmount: { fontSize: 12, color: '#10B981', fontWeight: 'bold' },
+  compradoBtn: { backgroundColor: '#10B981', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 },
+  compradoBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' },
   goalTrack: { height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden' },
   goalFill: { height: '100%', backgroundColor: '#34D399', borderRadius: 4 },
   goalPercent: { fontSize: 11, alignSelf: 'flex-end', marginTop: 4 },

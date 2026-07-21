@@ -10,6 +10,17 @@ const MONTH_FILTERS = [
   'Abril 2026'
 ];
 
+const CATEGORY_COLORS = [
+  '#3B82F6', // Azul
+  '#10B981', // Verde Esmeralda
+  '#8B5CF6', // Púrpura
+  '#EF4444', // Rojo
+  '#F59E0B', // Ámbar / Dorado
+  '#06B6D4', // Cían
+  '#EC4899', // Rosa
+  '#84CC16'  // Lima
+];
+
 export default function ReportsScreen({ isDarkMode }) {
   const [activeTab, setActiveTab] = useState('resumen'); // 'resumen' | 'graficos' | 'movimientos'
   const [movimientos, setMovimientos] = useState([]);
@@ -66,6 +77,9 @@ export default function ReportsScreen({ isDarkMode }) {
     tipo: categoryStats[cat].tipo
   })).sort((a, b) => b.amount - a.amount);
 
+  const egresosCategories = categoriesList.filter((c) => c.tipo === 'egreso');
+  const ingresosCategories = categoriesList.filter((c) => c.tipo === 'ingreso');
+
   const allCategories = ['Todas las categorías', ...Array.from(new Set(activos.map((m) => m.categoria)))];
 
   // Aplicar filtros en pestaña Movimientos
@@ -78,6 +92,16 @@ export default function ReportsScreen({ isDarkMode }) {
     setSelectedMonth('Todos los meses');
     setSelectedCategory('Todas las categorías');
   };
+
+  // Datos simulados de tendencia de 6 meses
+  const trendMonths = [
+    { label: 'Feb 26', egreso: 0, ingreso: 0 },
+    { label: 'Mar 26', egreso: 0, ingreso: 0 },
+    { label: 'Abr 26', egreso: 120, ingreso: 0 },
+    { label: 'May 26', egreso: 1800, ingreso: 3000 },
+    { label: 'Jun 26', egreso: 950, ingreso: 3000 },
+    { label: 'Jul 26', egreso: 107.5, ingreso: 1560 }
+  ];
 
   return (
     <SafeAreaView style={theme.container}>
@@ -182,7 +206,7 @@ export default function ReportsScreen({ isDarkMode }) {
           </View>
         )}
 
-        {/* PESTAÑA 2: GRÁFICOS (Idéntica a las Capturas 3, 4 y 5) */}
+        {/* PESTAÑA 2: GRÁFICOS (Vibrante y Completa) */}
         {activeTab === 'graficos' && (
           <View>
             {/* Header del Análisis */}
@@ -191,62 +215,101 @@ export default function ReportsScreen({ isDarkMode }) {
               <Text style={theme.cardSub}>Visualiza tus patrones de gastos e ingresos con gráficos interactivos para tomar mejores decisiones financieras.</Text>
             </View>
 
-            {/* Distribución de Gastos por Categoría */}
+            {/* Distribución de Gastos por Categoría (Multi-color Multi-Segment Bar) */}
             <View style={theme.card}>
               <Text style={theme.cardTitle}>💸 Distribución de Gastos por Categoría</Text>
-              <View style={theme.pieSimBox}>
-                <View style={theme.pieSimCircle}>
-                  <Text style={theme.pieSimSub}>Total</Text>
-                  <Text style={theme.pieSimTotal}>S/ {totalEgresos.toFixed(2)}</Text>
-                </View>
+              <Text style={theme.cardSub}>Monto Total Egresos: S/ {totalEgresos.toFixed(2)}</Text>
+              
+              {/* Barra segmentada multi-color */}
+              <View style={theme.multiSegmentTrack}>
+                {egresosCategories.map((cat, idx) => {
+                  const percent = totalEgresos > 0 ? (cat.amount / totalEgresos) * 100 : 0;
+                  const color = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+                  return (
+                    <View
+                      key={cat.name}
+                      style={[theme.multiSegmentFill, { width: `${percent}%`, backgroundColor: color }]}
+                    />
+                  );
+                })}
               </View>
 
+              {/* Leyenda con Puntos de Colores */}
               <View style={theme.legendGrid}>
-                {categoriesList.filter(c => c.tipo === 'egreso').map((cat, idx) => {
-                  const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#F59E0B', '#84CC16', '#EC4899', '#06B6D4'];
-                  const color = colors[idx % colors.length];
+                {egresosCategories.map((cat, idx) => {
+                  const color = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+                  const percent = totalEgresos > 0 ? ((cat.amount / totalEgresos) * 100).toFixed(1) : '0';
                   return (
-                    <View key={cat.name} style={theme.legendItem}>
+                    <View key={cat.name} style={theme.legendBadge}>
                       <View style={[theme.legendDot, { backgroundColor: color }]} />
-                      <Text style={theme.legendText}>{cat.name}</Text>
+                      <Text style={theme.legendText}>{cat.name} ({percent}%)</Text>
                     </View>
                   );
                 })}
               </View>
             </View>
 
-            {/* Ingresos por Categoría (Barras Visuales) */}
+            {/* Ingresos por Categoría (Barras Multicolor por Categoría) */}
             <View style={theme.card}>
               <Text style={theme.cardTitle}>💰 Ingresos por Categoría</Text>
               <View style={theme.barChartContainer}>
-                {categoriesList.filter(c => c.tipo === 'ingreso').map((cat) => (
-                  <View key={cat.name} style={theme.barGroup}>
-                    <Text style={theme.barLabel}>S/ {cat.amount.toFixed(0)}</Text>
-                    <View style={theme.barTrack}>
-                      <View style={[theme.barFillGreen, { height: `${Math.min(100, (cat.amount / (totalIngresos || 1)) * 100)}%` }]} />
-                    </View>
-                    <Text style={theme.barCatName} numberOfLines={1}>{cat.name}</Text>
-                  </View>
-                ))}
+                {ingresosCategories.length === 0 ? (
+                  <Text style={theme.emptyText}>No hay ingresos registrados.</Text>
+                ) : (
+                  ingresosCategories.map((cat, idx) => {
+                    const color = CATEGORY_COLORS[(idx + 1) % CATEGORY_COLORS.length];
+                    const maxIngreso = Math.max(...ingresosCategories.map((c) => c.amount), 1);
+                    const barHeightPercent = Math.min(100, Math.max(15, (cat.amount / maxIngreso) * 100));
+
+                    return (
+                      <View key={cat.name} style={theme.barGroup}>
+                        <Text style={theme.barLabel}>S/ {cat.amount.toFixed(0)}</Text>
+                        <View style={theme.barTrack}>
+                          <View style={[theme.barFillColor, { height: `${barHeightPercent}%`, backgroundColor: color }]} />
+                        </View>
+                        <Text style={theme.barCatName} numberOfLines={1}>{cat.name}</Text>
+                      </View>
+                    );
+                  })
+                )}
               </View>
             </View>
 
-            {/* Tendencias de 6 Meses */}
+            {/* Tendencia de Gastos (6 meses) - Gráfico de Barras Mensuales */}
             <View style={theme.card}>
               <Text style={theme.cardTitle}>📉 Tendencia de Gastos (6 meses)</Text>
-              <View style={theme.trendLineBoxRed}>
-                <Text style={{ color: '#EF4444', fontWeight: 'bold', fontSize: 13, textAlign: 'center' }}>
-                  📉 Pico en Mayo: S/ 1800.00 | Promedio: S/ { (totalEgresos / 6).toFixed(2) }/mes
-                </Text>
+              <View style={theme.monthChartContainer}>
+                {trendMonths.map((m) => {
+                  const barPercent = Math.min(100, Math.max(10, (m.egreso / 1800) * 100));
+                  return (
+                    <View key={m.label} style={theme.monthBarGroup}>
+                      <Text style={theme.monthBarVal}>S/ {m.egreso}</Text>
+                      <View style={theme.monthBarTrack}>
+                        <View style={[theme.monthBarFillRed, { height: `${barPercent}%` }]} />
+                      </View>
+                      <Text style={theme.monthBarLabel}>{m.label}</Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
 
+            {/* Tendencia de Ingresos (6 meses) - Gráfico de Barras Mensuales */}
             <View style={theme.card}>
               <Text style={theme.cardTitle}>📈 Tendencia de Ingresos (6 meses)</Text>
-              <View style={theme.trendLineBoxGreen}>
-                <Text style={{ color: '#10B981', fontWeight: 'bold', fontSize: 13, textAlign: 'center' }}>
-                  📈 Pico en Mayo/Junio: S/ 3000.00 | Promedio: S/ { (totalIngresos / 6).toFixed(2) }/mes
-                </Text>
+              <View style={theme.monthChartContainer}>
+                {trendMonths.map((m) => {
+                  const barPercent = Math.min(100, Math.max(10, (m.ingreso / 3000) * 100));
+                  return (
+                    <View key={m.label} style={theme.monthBarGroup}>
+                      <Text style={theme.monthBarVal}>S/ {m.ingreso}</Text>
+                      <View style={theme.monthBarTrack}>
+                        <View style={[theme.monthBarFillGreen, { height: `${barPercent}%` }]} />
+                      </View>
+                      <Text style={theme.monthBarLabel}>{m.label}</Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
 
@@ -391,22 +454,31 @@ const baseStyles = {
   catCardName: { fontSize: 11, fontWeight: 'bold', flex: 1 },
   catCardCount: { fontSize: 10, opacity: 0.7 },
   catCardAmount: { fontSize: 13, fontWeight: 'bold' },
-  pieSimBox: { height: 120, justifyContent: 'center', alignItems: 'center', marginVertical: 10 },
-  pieSimCircle: { width: 110, height: 110, borderRadius: 55, borderWidth: 6, borderColor: '#34D399', justifyContent: 'center', alignItems: 'center' },
-  pieSimSub: { fontSize: 10, opacity: 0.7 },
-  pieSimTotal: { fontSize: 14, fontWeight: 'bold' },
-  legendGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+
+  // Grafico Segmentado Multi-color
+  multiSegmentTrack: { height: 14, borderRadius: 7, flexDirection: 'row', overflow: 'hidden', backgroundColor: '#E5E7EB', marginVertical: 12 },
+  multiSegmentFill: { height: '100%' },
+
+  legendGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+  legendBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendText: { fontSize: 11 },
-  barChartContainer: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', height: 120, marginTop: 14 },
+  legendText: { fontSize: 11, fontWeight: '500' },
+
+  barChartContainer: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', height: 130, marginTop: 14 },
   barGroup: { alignItems: 'center', flex: 1 },
   barLabel: { fontSize: 9, fontWeight: 'bold', marginBottom: 4 },
-  barTrack: { width: 24, height: 70, backgroundColor: '#E5E7EB', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
-  barFillGreen: { backgroundColor: '#10B981', width: '100%', borderRadius: 4 },
+  barTrack: { width: 22, height: 80, backgroundColor: '#E5E7EB', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
+  barFillColor: { width: '100%', borderRadius: 4 },
   barCatName: { fontSize: 10, marginTop: 4 },
-  trendLineBoxRed: { backgroundColor: '#FEF2F2', padding: 14, borderRadius: 10, borderWidth: 1, borderColor: '#FECACA' },
-  trendLineBoxGreen: { backgroundColor: '#ECFDF5', padding: 14, borderRadius: 10, borderWidth: 1, borderColor: '#A7F3D0' },
+
+  monthChartContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 110, marginTop: 10 },
+  monthBarGroup: { alignItems: 'center', flex: 1 },
+  monthBarVal: { fontSize: 8, fontWeight: 'bold', marginBottom: 2 },
+  monthBarTrack: { width: 14, height: 70, backgroundColor: '#E5E7EB', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
+  monthBarFillRed: { backgroundColor: '#EF4444', width: '100%', borderRadius: 4 },
+  monthBarFillGreen: { backgroundColor: '#10B981', width: '100%', borderRadius: 4 },
+  monthBarLabel: { fontSize: 9, marginTop: 4 },
+
   statsRowGrid: { gap: 8, marginTop: 10 },
   statMetricCard: { padding: 12, borderRadius: 10, borderWidth: 1 },
   statMetricLabel: { fontSize: 11, fontWeight: '600' },
@@ -453,10 +525,12 @@ const lightStyles = StyleSheet.create({
   catCardName: { ...baseStyles.catCardName, color: '#1F2937' },
   catCardCount: { ...baseStyles.catCardCount, color: '#6B7280' },
   catCardAmount: { ...baseStyles.catCardAmount, color: '#10B981' },
-  pieSimTotal: { ...baseStyles.pieSimTotal, color: '#1F2937' },
+  legendBadge: { ...baseStyles.legendBadge, backgroundColor: '#F9FAFB', borderColor: '#E5E7EB' },
   legendText: { ...baseStyles.legendText, color: '#4B5563' },
   barLabel: { ...baseStyles.barLabel, color: '#4B5563' },
   barCatName: { ...baseStyles.barCatName, color: '#4B5563' },
+  monthBarVal: { ...baseStyles.monthBarVal, color: '#4B5563' },
+  monthBarLabel: { ...baseStyles.monthBarLabel, color: '#4B5563' },
   statMetricCard: { ...baseStyles.statMetricCard, backgroundColor: '#F9FAFB', borderColor: '#E5E7EB' },
   statMetricLabel: { ...baseStyles.statMetricLabel, color: '#4B5563' },
   filterCard: { ...baseStyles.filterCard, backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' },
@@ -492,10 +566,12 @@ const darkStyles = StyleSheet.create({
   catCardName: { ...baseStyles.catCardName, color: '#F9FAFB' },
   catCardCount: { ...baseStyles.catCardCount, color: '#9CA3AF' },
   catCardAmount: { ...baseStyles.catCardAmount, color: '#34D399' },
-  pieSimTotal: { ...baseStyles.pieSimTotal, color: '#F9FAFB' },
+  legendBadge: { ...baseStyles.legendBadge, backgroundColor: '#111827', borderColor: '#374151' },
   legendText: { ...baseStyles.legendText, color: '#D1D5DB' },
   barLabel: { ...baseStyles.barLabel, color: '#D1D5DB' },
   barCatName: { ...baseStyles.barCatName, color: '#D1D5DB' },
+  monthBarVal: { ...baseStyles.monthBarVal, color: '#D1D5DB' },
+  monthBarLabel: { ...baseStyles.monthBarLabel, color: '#D1D5DB' },
   statMetricCard: { ...baseStyles.statMetricCard, backgroundColor: '#111827', borderColor: '#374151' },
   statMetricLabel: { ...baseStyles.statMetricLabel, color: '#9CA3AF' },
   filterCard: { ...baseStyles.filterCard, backgroundColor: '#1F2937', borderColor: '#374151' },
