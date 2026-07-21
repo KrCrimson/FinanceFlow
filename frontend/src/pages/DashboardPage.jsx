@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useAnalisisGastos } from '../hooks/useAnalisisGastos';
-import { inhabilitarMovimiento, updateMovimiento } from '../services/movimientos-adapter';
+import { inhabilitarMovimiento, updateMovimiento, createMovimiento } from '../services/movimientos-adapter';
 import AlertasComponent from '../components/AlertasComponent';
 import PlanificadorCompras from '../components/PlanificadorCompras';
 import { getCierresPendientes, crearCierre, getCierres } from '../services/cierresService';
@@ -664,6 +664,11 @@ function DashboardPage() {
             calcularTiempoParaCompra={calcularTiempoParaCompra}
             obtenerSugerenciasAhorro={obtenerSugerenciasAhorro}
             movimientos={movimientos}
+            balanceTotal={balance}
+            onCrearEgreso={async (data) => {
+              await createMovimiento(data);
+              window.location.reload();
+            }}
           />
         )}
       </div>
