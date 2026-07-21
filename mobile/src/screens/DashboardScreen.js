@@ -29,10 +29,71 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
   const [nuevaCompraItem, setNuevaCompraItem] = useState('');
   const [nuevaCompraMonto, setNuevaCompraMonto] = useState('');
 
+  const autoCheckRecurrentIncomes = async (data) => {
+    try {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth();
+      const currentDay = today.getDate();
+
+      const recurrentes = data.filter(
+        (m) => m.estado === 'activo' && m.tipo === 'ingreso' && m.esRecurrente
+      );
+
+      let createdAny = false;
+
+      for (const rec of recurrentes) {
+        const recDate = new Date(rec.fecha);
+        const dayOfMonth = recDate.getDate();
+
+        // Si la fecha actual ya superó o es el día de cobro del mes
+        if (currentDay >= dayOfMonth) {
+          const yaExiste = data.some((m) => {
+            const d = new Date(m.fecha);
+            return (
+              m.estado === 'activo' &&
+              m.nombre === rec.nombre &&
+              m.monto === rec.monto &&
+              d.getFullYear() === currentYear &&
+              d.getMonth() === currentMonth &&
+              !m.esRecurrente // no comparar contra el propio template
+            );
+          });
+
+          if (!yaExiste) {
+            const fechaCobro = new Date(currentYear, currentMonth, dayOfMonth);
+            await createMovimiento({
+              nombre: rec.nombre,
+              tipo: 'ingreso',
+              monto: rec.monto,
+              categoria: rec.categoria,
+              descripcion: 'Ingreso constante mensual autogenerado',
+              fecha: fechaCobro.toISOString(),
+              esRecurrente: false
+            });
+            createdAny = true;
+          }
+        }
+      }
+
+      return createdAny;
+    } catch (err) {
+      console.error('Error autogenerando ingresos constantes:', err);
+      return false;
+    }
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await fetchMovimientos();
+      let data = await fetchMovimientos();
+      
+      // Verificar si hay ingresos constantes pendientes por autogenerar este mes
+      const created = await autoCheckRecurrentIncomes(data || []);
+      if (created) {
+        data = await fetchMovimientos(); // Recargar datos si se inyectó el ingreso
+      }
+
       setMovimientos(data || []);
     } catch (err) {
       console.error(err);
