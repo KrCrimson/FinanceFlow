@@ -217,16 +217,19 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
   const balanceTotal = totalIngresos - totalEgresos;
   const recurrentes = filteredActivos.filter((m) => m.esRecurrente);
 
-  // CÁLCULO DINÁMICO DE METAS BASADO EN EL BALANCE REAL
-  let saldoDisponible = Math.max(0, balanceTotal);
+  // CARRERA DE METAS: CADA META EVALÚA SU ALCANCE CONTRA EL BALANCE DISPONIBLE REAL
+  const balanceDisponible = Math.max(0, balanceTotal);
   const comprasConAvance = comprasPlanificadas.map((compra) => {
-    const asignado = Math.min(saldoDisponible, compra.montoObjetivo);
-    saldoDisponible = Math.max(0, saldoDisponible - asignado);
-    const porcentaje = compra.montoObjetivo > 0 ? (asignado / compra.montoObjetivo) * 100 : 0;
+    const asignado = Math.min(balanceDisponible, compra.montoObjetivo);
+    const porcentaje = compra.montoObjetivo > 0 
+      ? Math.min(100, (balanceDisponible / compra.montoObjetivo) * 100) 
+      : 0;
+    
     return {
       ...compra,
       montoAhorrado: asignado,
-      porcentaje
+      porcentaje,
+      alcanzado: balanceDisponible >= compra.montoObjetivo
     };
   });
 
@@ -312,7 +315,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
 
         {/* Sección: Planificador de Compras */}
         <View style={theme.sectionHeaderRow}>
-          <Text style={theme.sectionHeader}>🛍️ Planificador de Compras</Text>
+          <Text style={theme.sectionHeader}>🏁 Carrera de Compras Planificadas</Text>
           <TouchableOpacity style={theme.addGoalBtn} onPress={() => setShowAddCompraModal(true)} activeOpacity={0.8}>
             <Text style={theme.addGoalBtnText}>+ Nueva Meta</Text>
           </TouchableOpacity>
@@ -322,17 +325,21 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           <Text style={theme.emptyText}>No tienes compras planificadas en este momento.</Text>
         ) : (
           comprasConAvance.map((compra) => (
-            <View key={compra.id} style={theme.goalCard}>
+            <View key={compra.id} style={[theme.goalCard, compra.alcanzado && { borderColor: '#10B981', borderWidth: 2 }]}>
               <View style={theme.goalHeader}>
                 <View style={{ flex: 1, paddingRight: 8 }}>
-                  <Text style={theme.goalTitle}>{compra.item}</Text>
-                  <Text style={theme.goalAmount}>S/ {compra.montoAhorrado.toFixed(2)} / S/ {compra.montoObjetivo.toFixed(2)}</Text>
+                  <Text style={theme.goalTitle}>
+                    {compra.item} {compra.alcanzado ? '🎉 (¡Listo para comprar!)' : ''}
+                  </Text>
+                  <Text style={theme.goalAmount}>
+                    S/ {compra.montoAhorrado.toFixed(2)} / S/ {compra.montoObjetivo.toFixed(2)}
+                  </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 6 }}>
                   {/* Botón Comprado */}
                   <TouchableOpacity
-                    style={theme.compradoBtn}
+                    style={[theme.compradoBtn, compra.alcanzado && { backgroundColor: '#059669' }]}
                     onPress={() => handleMarcarComprado(compra)}
                     activeOpacity={0.8}
                   >
@@ -351,9 +358,11 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
               </View>
 
               <View style={theme.goalTrack}>
-                <View style={[theme.goalFill, { width: `${compra.porcentaje}%` }]} />
+                <View style={[theme.goalFill, { width: `${compra.porcentaje}%`, backgroundColor: compra.alcanzado ? '#10B981' : '#34D399' }]} />
               </View>
-              <Text style={theme.goalPercent}>{compra.porcentaje.toFixed(0)}% Completado</Text>
+              <Text style={[theme.goalPercent, compra.alcanzado && { color: '#10B981', fontWeight: 'bold' }]}>
+                {compra.porcentaje.toFixed(0)}% Completado {compra.alcanzado ? '• ¡Dinero suficiente!' : ''}
+              </Text>
             </View>
           ))
         )}

@@ -47,16 +47,19 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
     }
   };
 
-  // CÁLCULO DINÁMICO DE METAS BASADO EN EL BALANCE REAL EN LA WEB
-  let saldoDisponible = Math.max(0, balanceTotal || 0);
+  // CARRERA DE METAS: CADA META EVALÚA SU ALCANCE SIMULTÁNEO CONTRA EL BALANCE TOTAL DISPONIBLE
+  const balanceDisponible = Math.max(0, balanceTotal || 0);
   const comprasConAvance = comprasPlanificadas.map((compra) => {
-    const asignado = Math.min(saldoDisponible, compra.montoObjetivo);
-    saldoDisponible = Math.max(0, saldoDisponible - asignado);
-    const porcentaje = compra.montoObjetivo > 0 ? (asignado / compra.montoObjetivo) * 100 : 0;
+    const asignado = Math.min(balanceDisponible, compra.montoObjetivo);
+    const porcentaje = compra.montoObjetivo > 0 
+      ? Math.min(100, (balanceDisponible / compra.montoObjetivo) * 100) 
+      : 0;
+    
     return {
       ...compra,
       montoAhorrado: asignado,
-      porcentaje
+      porcentaje,
+      alcanzado: balanceDisponible >= compra.montoObjetivo
     };
   });
 
@@ -64,10 +67,10 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex items-center space-x-3">
-          <span className="text-3xl">🛍️</span>
+          <span className="text-3xl">🏁</span>
           <div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Planificador de Compras</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Gestiona y monitorea tus metas vinculadas a tu balance real</p>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Carrera de Compras Planificadas</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Monitorea en tiempo real cuáles metas puedes comprar primero con tu dinero real</p>
           </div>
         </div>
         <button
@@ -88,10 +91,12 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
           </div>
         ) : (
           comprasConAvance.map((compra) => (
-            <div key={compra.id} className="p-4 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-xl">
+            <div key={compra.id} className={`p-4 bg-gray-50 dark:bg-gray-900/60 border rounded-xl transition-all ${compra.alcanzado ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-gray-200 dark:border-gray-700'}`}>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
                 <div>
-                  <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">{compra.item}</h3>
+                  <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">
+                    {compra.item} {compra.alcanzado && <span className="ml-2 text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">🎉 ¡Listo para comprar!</span>}
+                  </h3>
                   <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                     S/ {compra.montoAhorrado.toLocaleString('es-PE', { minimumFractionDigits: 2 })} / S/ {compra.montoObjetivo.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                   </p>
@@ -100,7 +105,7 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleMarcarComprado(compra)}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-colors shadow-sm flex items-center gap-1"
+                    className={`${compra.alcanzado ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-400 animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'} text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-colors shadow-sm flex items-center gap-1`}
                   >
                     <span>🛒</span> Comprado
                   </button>
@@ -117,13 +122,17 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
               {/* Barra de Progreso */}
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-emerald-500 h-3 rounded-full transition-all duration-500"
+                  className={`h-3 rounded-full transition-all duration-500 ${compra.alcanzado ? 'bg-emerald-500' : 'bg-emerald-400'}`}
                   style={{ width: `${compra.porcentaje}%` }}
                 />
               </div>
               <div className="flex justify-between items-center mt-1.5">
-                <span className="text-xs text-gray-400">Avance según balance actual</span>
-                <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{compra.porcentaje.toFixed(0)}% Completado</span>
+                <span className="text-xs text-gray-400">
+                  {compra.alcanzado ? '✅ Tu saldo cubre totalmente esta compra' : 'Avance contra tu saldo actual'}
+                </span>
+                <span className={`text-xs font-bold ${compra.alcanzado ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                  {compra.porcentaje.toFixed(0)}% Completado
+                </span>
               </div>
             </div>
           ))
