@@ -28,7 +28,7 @@ export const apiFetch = async (endpoint, options = {}) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || 'Algo salió mal');
+    throw new Error(data.error || data.message || 'Algo salió mal');
   }
 
   return data;
@@ -72,9 +72,24 @@ export const createMovimiento = async (movimientoData) => {
   });
 };
 
-export const toggleMovimientoEstado = async (id, inactivo = false) => {
-  const action = inactivo ? 'inhabilitar' : 'inhabilitar'; // toggle endpoint
+export const toggleMovimientoEstado = async (id) => {
   return await apiFetch(`/movimientos/${id}/inhabilitar`, {
     method: 'PATCH'
+  });
+};
+
+// Endpoints de Arqueos / Cierres
+export const fetchCierresPendientes = async () => {
+  try {
+    return await apiFetch('/cierres/pendientes');
+  } catch (err) {
+    return [];
+  }
+};
+
+export const crearCierre = async (cierreData) => {
+  return await apiFetch('/cierres', {
+    method: 'POST',
+    body: JSON.stringify(cierreData)
   });
 };

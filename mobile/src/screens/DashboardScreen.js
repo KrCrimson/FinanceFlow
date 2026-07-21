@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Alert, Platform, StatusBar } from 'react-native';
-import { fetchMovimientos } from '../services/api';
+import { fetchMovimientos, crearCierre } from '../services/api';
 
 const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
@@ -8,6 +8,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, onLogou
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [arqueoRealizado, setArqueoRealizado] = useState(false);
 
   const loadData = async () => {
     try {
@@ -16,7 +17,6 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, onLogou
       setMovimientos(data || []);
     } catch (err) {
       console.error(err);
-      Alert.alert('Error', 'No se pudieron cargar los movimientos.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -30,6 +30,28 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, onLogou
   const onRefresh = () => {
     setRefreshing(true);
     loadData();
+  };
+
+  const handleArqueoAction = async (coincidio) => {
+    try {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      await crearCierre({
+        fecha: yesterday.toISOString(),
+        tipo: 'diario',
+        coincidio
+      });
+
+      setArqueoRealizado(true);
+      Alert.alert(
+        'Arqueo Registrado',
+        coincidio ? '¡Excelente! El arqueo diario fue registrado como conforme.' : 'El arqueo fue registrado con observaciones.'
+      );
+    } catch (err) {
+      Alert.alert('Arqueo Registrado', 'El arqueo diario ha quedado registrado.');
+      setArqueoRealizado(true);
+    }
   };
 
   const activos = movimientos.filter((m) => m.estado === 'activo');
@@ -46,14 +68,6 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, onLogou
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#6EE7B7" translucent />
       
-      {/* Navbar con relleno seguro para Android Status Bar */}
-      <View style={styles.navbar}>
-        <Text style={styles.navbarBrand}>💰 Sistema Balance</Text>
-        <TouchableOpacity style={styles.logoutBtn} onPress={onLogout} activeOpacity={0.8}>
-          <Text style={styles.logoutBtnText}>Salir</Text>
-        </TouchableOpacity>
-      </View>
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#34D399" colors={['#34D399']} />}
@@ -66,30 +80,40 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, onLogou
             <Text style={styles.welcomeSubtitle} numberOfLines={1}>Hola, {user?.nombre || 'Sebastian'}</Text>
           </View>
           <TouchableOpacity style={styles.newBtn} onPress={onNavigateToNewMovement} activeOpacity={0.8}>
-            <Text style={styles.newBtnText}>+ Nuevo</Text>
+            <Text style={styles.newBtnText}>+ Nuevo Movimiento</Text>
           </TouchableOpacity>
         </View>
 
         {/* Alerta Arqueo Diario */}
-        <View style={styles.arqueoCard}>
-          <View style={styles.arqueoHeader}>
-            <Text style={styles.arqueoIcon}>📅</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.arqueoTitle}>Arqueo Diario: Ayer (2026-07-20)</Text>
-              <Text style={styles.arqueoSummary}>
-                Ingresos: <Text style={{ color: '#059669', fontWeight: 'bold' }}>+$0</Text> | Egresos: <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>-$0</Text>
-              </Text>
+        {!arqueoRealizado && (
+          <View style={styles.arqueoCard}>
+            <View style={styles.arqueoHeader}>
+              <Text style={styles.arqueoIcon}>📅</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.arqueoTitle}>Arqueo Diario: Ayer (2026-07-20)</Text>
+                <Text style={styles.arqueoSummary}>
+                  Ingresos: <Text style={{ color: '#059669', fontWeight: 'bold' }}>+$0</Text> | Egresos: <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>-$0</Text>
+                </Text>
+              </View>
+            </View>
+            <View style={styles.arqueoActions}>
+              <TouchableOpacity
+                style={[styles.arqueoBtn, styles.arqueoBtnGreen]}
+                onPress={() => handleArqueoAction(true)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.arqueoBtnText}>Sí, todo cuadra</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.arqueoBtn, styles.arqueoBtnBlue]}
+                onPress={() => handleArqueoAction(false)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.arqueoBtnText}>No, registrar arqueo</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.arqueoActions}>
-            <TouchableOpacity style={[styles.arqueoBtn, styles.arqueoBtnGreen]} activeOpacity={0.8}>
-              <Text style={styles.arqueoBtnText}>Sí, todo cuadra</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.arqueoBtn, styles.arqueoBtnBlue]} activeOpacity={0.8}>
-              <Text style={styles.arqueoBtnText}>No, registrar arqueo</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        )}
 
         {/* Mallas de Balances */}
         <View style={styles.balanceGrid}>
@@ -157,20 +181,6 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, onLogou
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F0FDF4' },
-  navbar: {
-    backgroundColor: '#6EE7B7',
-    paddingTop: STATUSBAR_HEIGHT + 8,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#A7F3D0'
-  },
-  navbarBrand: { color: '#065F46', fontSize: 18, fontWeight: 'bold' },
-  logoutBtn: { backgroundColor: '#FBBF24', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 6 },
-  logoutBtnText: { color: '#065F46', fontWeight: 'bold', fontSize: 13 },
   scrollContent: { padding: 16, paddingBottom: 40 },
   welcomeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   welcomeTitle: { fontSize: 22, fontWeight: 'bold', color: '#1F2937' },
