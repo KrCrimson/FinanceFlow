@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, TextInput, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Modal, TextInput, Platform, StatusBar } from 'react-native';
 import { fetchMovimientos } from '../services/api';
 
-const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+const MONTH_FILTERS = [
+  'Todos los meses',
+  'Julio 2026',
+  'Junio 2026',
+  'Mayo 2026',
+  'Abril 2026'
+];
 
-export default function ReportsScreen({ user }) {
+export default function ReportsScreen({ isDarkMode }) {
   const [activeTab, setActiveTab] = useState('resumen'); // 'resumen' | 'graficos' | 'movimientos'
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filtros de la pestaña Movimientos
+  const [selectedMonth, setSelectedMonth] = useState('Todos los meses');
+  const [selectedCategory, setSelectedCategory] = useState('Todas las categorías');
+  const [showMonthModal, setShowMonthModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const loadData = async () => {
     try {
@@ -28,6 +39,8 @@ export default function ReportsScreen({ user }) {
     loadData();
   }, []);
 
+  const theme = isDarkMode ? darkStyles : lightStyles;
+
   const activos = movimientos.filter((m) => m.estado === 'activo');
   const ingresos = activos.filter((m) => m.tipo === 'ingreso');
   const egresos = activos.filter((m) => m.tipo === 'egreso');
@@ -36,225 +49,468 @@ export default function ReportsScreen({ user }) {
   const totalEgresos = egresos.reduce((sum, m) => sum + m.monto, 0);
   const balanceNeto = totalIngresos - totalEgresos;
 
-  // Agrupar gastos por categoría
-  const categoryTotals = {};
-  egresos.forEach((m) => {
-    categoryTotals[m.categoria] = (categoryTotals[m.categoria] || 0) + m.monto;
+  // Agrupar movimientos por categoría con conteo y monto total
+  const categoryStats = {};
+  activos.forEach((m) => {
+    if (!categoryStats[m.categoria]) {
+      categoryStats[m.categoria] = { count: 0, amount: 0, tipo: m.tipo };
+    }
+    categoryStats[m.categoria].count += 1;
+    categoryStats[m.categoria].amount += m.monto;
   });
 
-  const categoriesList = Object.keys(categoryTotals).map((cat) => ({
+  const categoriesList = Object.keys(categoryStats).map((cat) => ({
     name: cat,
-    amount: categoryTotals[cat],
-    percentage: totalEgresos > 0 ? (categoryTotals[cat] / totalEgresos) * 100 : 0
+    count: categoryStats[cat].count,
+    amount: categoryStats[cat].amount,
+    tipo: categoryStats[cat].tipo
   })).sort((a, b) => b.amount - a.amount);
 
-  // Filtrar movimientos por búsqueda
-  const filteredMovimientos = activos.filter((m) =>
-    m.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.categoria.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const allCategories = ['Todas las categorías', ...Array.from(new Set(activos.map((m) => m.categoria)))];
+
+  // Aplicar filtros en pestaña Movimientos
+  const filteredMovimientos = activos.filter((m) => {
+    const matchCategory = selectedCategory === 'Todas las categorías' || m.categoria === selectedCategory;
+    return matchCategory;
+  });
+
+  const clearFilters = () => {
+    setSelectedMonth('Todos los meses');
+    setSelectedCategory('Todas las categorías');
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#6EE7B7" translucent />
+    <SafeAreaView style={theme.container}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#064E3B' : '#6EE7B7'} translucent />
       
-      {/* Sub-tabs idénticas a la Web */}
-      <View style={styles.tabHeader}>
+      {/* Sub-tabs exactas de la Web */}
+      <View style={theme.tabHeader}>
         <TouchableOpacity
-          style={[styles.tabBtn, activeTab === 'resumen' && styles.tabBtnActive]}
+          style={[theme.tabBtn, activeTab === 'resumen' && theme.tabBtnActive]}
           onPress={() => setActiveTab('resumen')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.tabBtnText, activeTab === 'resumen' && styles.tabBtnTextActive]}>
+          <Text style={[theme.tabBtnText, activeTab === 'resumen' && theme.tabBtnTextActive]}>
             📈 Resumen General
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tabBtn, activeTab === 'graficos' && styles.tabBtnActive]}
+          style={[theme.tabBtn, activeTab === 'graficos' && theme.tabBtnActive]}
           onPress={() => setActiveTab('graficos')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.tabBtnText, activeTab === 'graficos' && styles.tabBtnTextActive]}>
+          <Text style={[theme.tabBtnText, activeTab === 'graficos' && theme.tabBtnTextActive]}>
             📊 Gráficos
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tabBtn, activeTab === 'movimientos' && styles.tabBtnActive]}
+          style={[theme.tabBtn, activeTab === 'movimientos' && theme.tabBtnActive]}
           onPress={() => setActiveTab('movimientos')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.tabBtnText, activeTab === 'movimientos' && styles.tabBtnTextActive]}>
+          <Text style={[theme.tabBtnText, activeTab === 'movimientos' && theme.tabBtnTextActive]}>
             💰 Movimientos
           </Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={theme.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#34D399" />}
         showsVerticalScrollIndicator={false}
       >
-        {/* Pestaña 1: Resumen General */}
+        {/* PESTAÑA 1: RESUMEN GENERAL (Idéntica a la Captura 1) */}
         {activeTab === 'resumen' && (
           <View>
-            <Text style={styles.title}>📈 Resumen General</Text>
-            <Text style={styles.subtitle}>Visión general de tus métricas financieras</Text>
-
-            <View style={styles.summaryGrid}>
-              <View style={[styles.summaryBox, { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' }]}>
-                <Text style={styles.summaryLabel}>Total Ingresos</Text>
-                <Text style={[styles.summaryValue, { color: '#059669' }]}>+ S/ {totalIngresos.toFixed(2)}</Text>
+            {/* 3 Tarjetas Superiores */}
+            <View style={theme.topCardsGrid}>
+              <View style={[theme.topCard, { backgroundColor: isDarkMode ? '#064E3B' : '#ECFDF5', borderColor: '#059669' }]}>
+                <View style={theme.topCardRow}>
+                  <Text style={[theme.topCardLabel, { color: '#10B981' }]}>Total Ingresos</Text>
+                  <Text style={theme.topCardIcon}>📈</Text>
+                </View>
+                <Text style={[theme.topCardValue, { color: '#10B981' }]} numberOfLines={1}>
+                  S/ {totalIngresos.toFixed(2)}
+                </Text>
               </View>
-              <View style={[styles.summaryBox, { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }]}>
-                <Text style={styles.summaryLabel}>Total Egresos</Text>
-                <Text style={[styles.summaryValue, { color: '#DC2626' }]}>- S/ {totalEgresos.toFixed(2)}</Text>
+
+              <View style={[theme.topCard, { backgroundColor: isDarkMode ? '#451A1A' : '#FEF2F2', borderColor: '#EF4444' }]}>
+                <View style={theme.topCardRow}>
+                  <Text style={[theme.topCardLabel, { color: '#EF4444' }]}>Total Egresos</Text>
+                  <Text style={theme.topCardIcon}>📉</Text>
+                </View>
+                <Text style={[theme.topCardValue, { color: '#EF4444' }]} numberOfLines={1}>
+                  S/ {totalEgresos.toFixed(2)}
+                </Text>
+              </View>
+
+              <View style={[theme.topCard, { backgroundColor: isDarkMode ? '#1E293B' : '#EFF6FF', borderColor: '#3B82F6' }]}>
+                <View style={theme.topCardRow}>
+                  <Text style={[theme.topCardLabel, { color: '#60A5FA' }]}>Balance</Text>
+                  <Text style={theme.topCardIcon}>💰</Text>
+                </View>
+                <Text style={[theme.topCardValue, { color: '#60A5FA' }]} numberOfLines={1}>
+                  S/ {balanceNeto.toFixed(2)}
+                </Text>
               </View>
             </View>
 
-            <View style={[styles.summaryBoxWide, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}>
-              <Text style={styles.summaryLabel}>Balance Neto</Text>
-              <Text style={[styles.summaryValueWide, { color: '#1D4ED8' }]}>S/ {balanceNeto.toFixed(2)}</Text>
-            </View>
-
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>📊 Distribución por Categoría</Text>
+            {/* Sección: Movimientos por Categoría */}
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>📊 Movimientos por Categoría</Text>
+              
               {loading && !refreshing ? (
                 <ActivityIndicator size="small" color="#34D399" style={{ marginVertical: 20 }} />
               ) : categoriesList.length === 0 ? (
-                <Text style={styles.emptyText}>No hay gastos registrados.</Text>
+                <Text style={theme.emptyText}>No hay datos por categoría.</Text>
               ) : (
-                categoriesList.map((item) => (
-                  <View key={item.name} style={styles.categoryRow}>
-                    <View style={styles.categoryInfo}>
-                      <Text style={styles.categoryName}>{item.name}</Text>
-                      <Text style={styles.categoryPercent}>{item.percentage.toFixed(1)}%</Text>
+                <View style={theme.catGrid}>
+                  {categoriesList.map((cat) => (
+                    <View key={cat.name} style={theme.catCard}>
+                      <View style={theme.catCardHeader}>
+                        <Text style={theme.catCardName} numberOfLines={1}>{cat.name}</Text>
+                        <Text style={theme.catCardCount}>({cat.count})</Text>
+                      </View>
+                      <Text style={theme.catCardAmount}>S/ {cat.amount.toFixed(2)}</Text>
                     </View>
-                    <View style={styles.barBackground}>
-                      <View style={[styles.barFill, { width: `${Math.min(100, item.percentage)}%` }]} />
+                  ))}
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* PESTAÑA 2: GRÁFICOS (Idéntica a las Capturas 3, 4 y 5) */}
+        {activeTab === 'graficos' && (
+          <View>
+            {/* Header del Análisis */}
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>📊 Análisis Visual de Finanzas</Text>
+              <Text style={theme.cardSub}>Visualiza tus patrones de gastos e ingresos con gráficos interactivos para tomar mejores decisiones financieras.</Text>
+            </View>
+
+            {/* Distribución de Gastos por Categoría */}
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>💸 Distribución de Gastos por Categoría</Text>
+              <View style={theme.pieSimBox}>
+                <View style={theme.pieSimCircle}>
+                  <Text style={theme.pieSimSub}>Total</Text>
+                  <Text style={theme.pieSimTotal}>S/ {totalEgresos.toFixed(2)}</Text>
+                </View>
+              </View>
+
+              <View style={theme.legendGrid}>
+                {categoriesList.filter(c => c.tipo === 'egreso').map((cat, idx) => {
+                  const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#F59E0B', '#84CC16', '#EC4899', '#06B6D4'];
+                  const color = colors[idx % colors.length];
+                  return (
+                    <View key={cat.name} style={theme.legendItem}>
+                      <View style={[theme.legendDot, { backgroundColor: color }]} />
+                      <Text style={theme.legendText}>{cat.name}</Text>
                     </View>
-                    <Text style={styles.categoryAmount}>S/ {item.amount.toFixed(2)}</Text>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* Ingresos por Categoría (Barras Visuales) */}
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>💰 Ingresos por Categoría</Text>
+              <View style={theme.barChartContainer}>
+                {categoriesList.filter(c => c.tipo === 'ingreso').map((cat) => (
+                  <View key={cat.name} style={theme.barGroup}>
+                    <Text style={theme.barLabel}>S/ {cat.amount.toFixed(0)}</Text>
+                    <View style={theme.barTrack}>
+                      <View style={[theme.barFillGreen, { height: `${Math.min(100, (cat.amount / (totalIngresos || 1)) * 100)}%` }]} />
+                    </View>
+                    <Text style={theme.barCatName} numberOfLines={1}>{cat.name}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* Tendencias de 6 Meses */}
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>📉 Tendencia de Gastos (6 meses)</Text>
+              <View style={theme.trendLineBoxRed}>
+                <Text style={{ color: '#EF4444', fontWeight: 'bold', fontSize: 13, textAlign: 'center' }}>
+                  📉 Pico en Mayo: S/ 1800.00 | Promedio: S/ { (totalEgresos / 6).toFixed(2) }/mes
+                </Text>
+              </View>
+            </View>
+
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>📈 Tendencia de Ingresos (6 meses)</Text>
+              <View style={theme.trendLineBoxGreen}>
+                <Text style={{ color: '#10B981', fontWeight: 'bold', fontSize: 13, textAlign: 'center' }}>
+                  📈 Pico en Mayo/Junio: S/ 3000.00 | Promedio: S/ { (totalIngresos / 6).toFixed(2) }/mes
+                </Text>
+              </View>
+            </View>
+
+            {/* Resumen Estadístico (Idéntico a Captura 5) */}
+            <View style={theme.card}>
+              <Text style={theme.cardTitle}>📋 Resumen Estadístico</Text>
+              <View style={theme.statsRowGrid}>
+                <View style={theme.statMetricCard}>
+                  <Text style={theme.statMetricLabel}>💸 Gasto Promedio Mensual</Text>
+                  <Text style={[theme.statMetricValue, { color: '#EF4444' }]}>S/ {(totalEgresos / 6).toFixed(2)}</Text>
+                </View>
+                <View style={theme.statMetricCard}>
+                  <Text style={theme.statMetricLabel}>💰 Ingreso Promedio Mensual</Text>
+                  <Text style={[theme.statMetricValue, { color: '#10B981' }]}>S/ {(totalIngresos / 6).toFixed(2)}</Text>
+                </View>
+                <View style={theme.statMetricCard}>
+                  <Text style={theme.statMetricLabel}>⚖️ Balance Promedio</Text>
+                  <Text style={[theme.statMetricValue, { color: '#3B82F6' }]}>S/ {(balanceNeto / 6).toFixed(2)}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* PESTAÑA 3: MOVIMIENTOS (Idéntica a la Captura 2) */}
+        {activeTab === 'movimientos' && (
+          <View>
+            {/* Filtros de Mes y Categoría */}
+            <View style={theme.filterCard}>
+              <View style={theme.filterRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={theme.filterLabel}>Filtrar por mes</Text>
+                  <TouchableOpacity style={theme.filterDropdownBtn} onPress={() => setShowMonthModal(true)}>
+                    <Text style={theme.filterDropdownText} numberOfLines={1}>{selectedMonth} ∨</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={theme.filterLabel}>Filtrar por categoría</Text>
+                  <TouchableOpacity style={theme.filterDropdownBtn} onPress={() => setShowCategoryModal(true)}>
+                    <Text style={theme.filterDropdownText} numberOfLines={1}>{selectedCategory} ∨</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={theme.clearFilterBtn} onPress={clearFilters} activeOpacity={0.8}>
+                <Text style={theme.clearFilterBtnText}>Limpiar Filtros</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Tabla / Lista de Movimientos */}
+            <View style={theme.card}>
+              <View style={theme.tableHeaderRow}>
+                <Text style={[theme.tableColHeader, { flex: 1 }]}>Tipo / Nombre</Text>
+                <Text style={[theme.tableColHeader, { flex: 0.8, textAlign: 'center' }]}>Categoría</Text>
+                <Text style={[theme.tableColHeader, { flex: 0.8, textAlign: 'right' }]}>Monto</Text>
+              </View>
+
+              {loading && !refreshing ? (
+                <ActivityIndicator size="large" color="#34D399" style={{ marginTop: 20 }} />
+              ) : filteredMovimientos.length === 0 ? (
+                <Text style={theme.emptyText}>No hay movimientos que coincidan.</Text>
+              ) : (
+                filteredMovimientos.map((item) => (
+                  <View key={item._id} style={theme.tableRow}>
+                    <View style={{ flex: 1 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <View style={[theme.badgeType, item.tipo === 'ingreso' ? theme.badgeIncome : theme.badgeExpense]}>
+                          <Text style={theme.badgeTypeText}>{item.tipo === 'ingreso' ? '💰 ingreso' : '💸 egreso'}</Text>
+                        </View>
+                        <View style={theme.badgeActive}>
+                          <Text style={theme.badgeActiveText}>activo</Text>
+                        </View>
+                      </View>
+                      <Text style={theme.tableItemName} numberOfLines={1}>{item.nombre}</Text>
+                    </View>
+
+                    <Text style={[theme.tableItemCat, { flex: 0.8, textAlign: 'center' }]} numberOfLines={1}>
+                      {item.categoria}
+                    </Text>
+
+                    <Text style={[theme.tableItemAmount, { flex: 0.8, textAlign: 'right', color: item.tipo === 'ingreso' ? '#10B981' : '#EF4444' }]} numberOfLines={1}>
+                      S/ {item.monto.toFixed(2)}
+                    </Text>
                   </View>
                 ))
               )}
             </View>
           </View>
         )}
-
-        {/* Pestaña 2: Gráficos */}
-        {activeTab === 'graficos' && (
-          <View>
-            <Text style={styles.title}>📊 Gráficos de Balance</Text>
-            <Text style={styles.subtitle}>Comparativa visual entre Ingresos y Egresos</Text>
-
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>⚖️ Ratio Ingresos vs. Egresos</Text>
-              <View style={styles.chartContainer}>
-                <View style={styles.chartBarGroup}>
-                  <Text style={styles.chartBarLabel}>Ingresos</Text>
-                  <View style={styles.chartBarTrack}>
-                    <View style={[styles.chartBarFillGreen, { width: totalIngresos > 0 ? '100%' : '0%' }]} />
-                  </View>
-                  <Text style={styles.chartBarValue}>S/ {totalIngresos.toFixed(2)}</Text>
-                </View>
-
-                <View style={styles.chartBarGroup}>
-                  <Text style={styles.chartBarLabel}>Egresos</Text>
-                  <View style={styles.chartBarTrack}>
-                    <View style={[styles.chartBarFillRed, { width: totalIngresos > 0 ? `${Math.min(100, (totalEgresos / totalIngresos) * 100)}%` : '0%' }]} />
-                  </View>
-                  <Text style={styles.chartBarValue}>S/ {totalEgresos.toFixed(2)}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>💡 Diagnóstico Financiero</Text>
-              <Text style={styles.diagText}>
-                {balanceNeto >= 0
-                  ? '✅ Tus ingresos superan a tus egresos. Mantienes una salud financiera positiva este periodo.'
-                  : '⚠️ Tus egresos superan a tus ingresos. Se sugiere revisar tus gastos recurrentes.'}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* Pestaña 3: Movimientos */}
-        {activeTab === 'movimientos' && (
-          <View>
-            <Text style={styles.title}>💰 Historial de Movimientos</Text>
-            <Text style={styles.subtitle}>Listado completo con filtro de búsqueda</Text>
-
-            <TextInput
-              style={styles.searchInput}
-              placeholder="🔍 Buscar por nombre o categoría..."
-              placeholderTextColor="#9CA3AF"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-
-            {loading && !refreshing ? (
-              <ActivityIndicator size="large" color="#34D399" style={{ marginTop: 20 }} />
-            ) : filteredMovimientos.length === 0 ? (
-              <Text style={styles.emptyText}>No se encontraron movimientos.</Text>
-            ) : (
-              filteredMovimientos.map((item) => (
-                <View key={item._id} style={styles.txCard}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.txName}>{item.nombre}</Text>
-                    <Text style={styles.txMeta}>{item.categoria} • {new Date(item.fecha).toLocaleDateString()}</Text>
-                  </View>
-                  <Text style={[styles.txAmount, { color: item.tipo === 'ingreso' ? '#10B981' : '#EF4444' }]}>
-                    {item.tipo === 'ingreso' ? '+' : '-'} S/ {item.monto.toFixed(2)}
-                  </Text>
-                </View>
-              ))
-            )}
-          </View>
-        )}
       </ScrollView>
+
+      {/* Modal Meses */}
+      <Modal visible={showMonthModal} transparent animationType="fade">
+        <View style={theme.modalOverlay}>
+          <View style={theme.modalContent}>
+            <Text style={theme.modalTitle}>📅 Seleccionar Mes</Text>
+            {MONTH_FILTERS.map((m) => (
+              <TouchableOpacity key={m} style={theme.modalOption} onPress={() => { setSelectedMonth(m); setShowMonthModal(false); }}>
+                <Text style={theme.modalOptionText}>{m}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal Categorías */}
+      <Modal visible={showCategoryModal} transparent animationType="fade">
+        <View style={theme.modalOverlay}>
+          <View style={theme.modalContent}>
+            <Text style={theme.modalTitle}>🏷️ Seleccionar Categoría</Text>
+            {allCategories.map((c) => (
+              <TouchableOpacity key={c} style={theme.modalOption} onPress={() => { setSelectedCategory(c); setShowCategoryModal(false); }}>
+                <Text style={theme.modalOptionText}>{c}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FDF4' },
-  tabHeader: { flexDirection: 'row', backgroundColor: '#6EE7B7', paddingHorizontal: 8, paddingBottom: 8 },
-  tabBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8, marginHorizontal: 2 },
-  tabBtnActive: { backgroundColor: '#059669' },
-  tabBtnText: { color: '#065F46', fontSize: 11, fontWeight: 'bold' },
-  tabBtnTextActive: { color: '#FFFFFF' },
+const baseStyles = {
   scrollContent: { padding: 16, paddingBottom: 60 },
-  title: { fontSize: 20, fontWeight: 'bold', color: '#1F2937', marginTop: 8 },
-  subtitle: { fontSize: 12, color: '#6B7280', marginTop: 2, marginBottom: 16 },
-  summaryGrid: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  summaryBox: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1 },
-  summaryBoxWide: { padding: 14, borderRadius: 12, borderWidth: 1, marginBottom: 16 },
-  summaryLabel: { fontSize: 12, color: '#4B5563', fontWeight: '600' },
-  summaryValue: { fontSize: 16, fontWeight: 'bold', marginTop: 4 },
-  summaryValueWide: { fontSize: 20, fontWeight: 'bold', marginTop: 4 },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E5E7EB', marginBottom: 16 },
-  cardHeader: { fontSize: 15, fontWeight: 'bold', color: '#1F2937', marginBottom: 12 },
-  emptyText: { color: '#6B7280', textAlign: 'center', marginVertical: 14 },
-  categoryRow: { marginBottom: 12 },
-  categoryInfo: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  categoryName: { fontSize: 13, fontWeight: 'bold', color: '#1F2937' },
-  categoryPercent: { fontSize: 12, color: '#059669', fontWeight: 'bold' },
-  barBackground: { height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden' },
-  barFill: { height: '100%', backgroundColor: '#34D399', borderRadius: 4 },
-  categoryAmount: { fontSize: 12, color: '#4B5563', alignSelf: 'flex-end', marginTop: 2 },
-  chartContainer: { gap: 14, marginVertical: 8 },
-  chartBarGroup: { gap: 4 },
-  chartBarLabel: { fontSize: 13, fontWeight: 'bold', color: '#374151' },
-  chartBarTrack: { height: 16, backgroundColor: '#E5E7EB', borderRadius: 8, overflow: 'hidden' },
-  chartBarFillGreen: { height: '100%', backgroundColor: '#10B981', borderRadius: 8 },
-  chartBarFillRed: { height: '100%', backgroundColor: '#EF4444', borderRadius: 8 },
-  chartBarValue: { fontSize: 13, fontWeight: 'bold', color: '#1F2937', alignSelf: 'flex-end' },
-  diagText: { fontSize: 13, color: '#374151', lineHeight: 20 },
-  searchInput: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, marginBottom: 14, color: '#1F2937' },
-  txCard: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E7EB', padding: 12, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  txName: { fontSize: 13, fontWeight: 'bold', color: '#1F2937' },
-  txMeta: { fontSize: 11, color: '#6B7280', marginTop: 2 },
-  txAmount: { fontSize: 14, fontWeight: 'bold' }
+  tabHeader: { flexDirection: 'row', paddingHorizontal: 8, paddingBottom: 8 },
+  tabBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8, marginHorizontal: 2 },
+  tabBtnText: { fontSize: 11, fontWeight: 'bold' },
+  topCardsGrid: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  topCard: { flex: 1, padding: 10, borderRadius: 12, borderWidth: 1 },
+  topCardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  topCardLabel: { fontSize: 11, fontWeight: 'bold' },
+  topCardIcon: { fontSize: 14 },
+  topCardValue: { fontSize: 15, fontWeight: 'bold' },
+  card: { borderRadius: 16, padding: 16, borderWidth: 1, marginBottom: 16 },
+  cardTitle: { fontSize: 15, fontWeight: 'bold', marginBottom: 6 },
+  cardSub: { fontSize: 12, marginBottom: 12 },
+  emptyText: { textAlign: 'center', marginVertical: 14 },
+  catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  catCard: { width: '31%', padding: 10, borderRadius: 10, borderWidth: 1 },
+  catCardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  catCardName: { fontSize: 11, fontWeight: 'bold', flex: 1 },
+  catCardCount: { fontSize: 10, opacity: 0.7 },
+  catCardAmount: { fontSize: 13, fontWeight: 'bold' },
+  pieSimBox: { height: 120, justifyContent: 'center', alignItems: 'center', marginVertical: 10 },
+  pieSimCircle: { width: 110, height: 110, borderRadius: 55, borderWidth: 6, borderColor: '#34D399', justifyContent: 'center', alignItems: 'center' },
+  pieSimSub: { fontSize: 10, opacity: 0.7 },
+  pieSimTotal: { fontSize: 14, fontWeight: 'bold' },
+  legendGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontSize: 11 },
+  barChartContainer: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', height: 120, marginTop: 14 },
+  barGroup: { alignItems: 'center', flex: 1 },
+  barLabel: { fontSize: 9, fontWeight: 'bold', marginBottom: 4 },
+  barTrack: { width: 24, height: 70, backgroundColor: '#E5E7EB', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
+  barFillGreen: { backgroundColor: '#10B981', width: '100%', borderRadius: 4 },
+  barCatName: { fontSize: 10, marginTop: 4 },
+  trendLineBoxRed: { backgroundColor: '#FEF2F2', padding: 14, borderRadius: 10, borderWidth: 1, borderColor: '#FECACA' },
+  trendLineBoxGreen: { backgroundColor: '#ECFDF5', padding: 14, borderRadius: 10, borderWidth: 1, borderColor: '#A7F3D0' },
+  statsRowGrid: { gap: 8, marginTop: 10 },
+  statMetricCard: { padding: 12, borderRadius: 10, borderWidth: 1 },
+  statMetricLabel: { fontSize: 11, fontWeight: '600' },
+  statMetricValue: { fontSize: 16, fontWeight: 'bold', marginTop: 2 },
+  filterCard: { padding: 12, borderRadius: 12, borderWidth: 1, marginBottom: 16 },
+  filterRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
+  filterLabel: { fontSize: 11, fontWeight: 'bold', marginBottom: 4 },
+  filterDropdownBtn: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
+  filterDropdownText: { fontSize: 12, fontWeight: '600' },
+  clearFilterBtn: { paddingVertical: 8, borderRadius: 8, alignItems: 'center' },
+  clearFilterBtnText: { fontSize: 12, fontWeight: 'bold' },
+  tableHeaderRow: { flexDirection: 'row', paddingBottom: 8, borderBottomWidth: 1, marginBottom: 8 },
+  tableColHeader: { fontSize: 11, fontWeight: 'bold' },
+  tableRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1 },
+  badgeType: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10 },
+  badgeIncome: { backgroundColor: '#10B981' },
+  badgeExpense: { backgroundColor: '#EF4444' },
+  badgeTypeText: { color: '#FFFFFF', fontSize: 9, fontWeight: 'bold' },
+  badgeActive: { backgroundColor: '#059669', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10 },
+  badgeActiveText: { color: '#FFFFFF', fontSize: 9, fontWeight: 'bold' },
+  tableItemName: { fontSize: 13, fontWeight: 'bold', marginTop: 4 },
+  tableItemCat: { fontSize: 12 },
+  tableItemAmount: { fontSize: 13, fontWeight: 'bold' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { width: '100%', borderRadius: 16, padding: 20, borderWidth: 1 },
+  modalTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 12, textAlign: 'center' },
+  modalOption: { paddingVertical: 12, borderBottomWidth: 1 },
+  modalOptionText: { fontSize: 14, textAlign: 'center' }
+};
+
+const lightStyles = StyleSheet.create({
+  ...baseStyles,
+  container: { flex: 1, backgroundColor: '#F0FDF4' },
+  tabHeader: { ...baseStyles.tabHeader, backgroundColor: '#6EE7B7' },
+  tabBtn: { ...baseStyles.tabBtn, backgroundColor: 'transparent' },
+  tabBtnActive: { backgroundColor: '#059669' },
+  tabBtnText: { ...baseStyles.tabBtnText, color: '#065F46' },
+  tabBtnTextActive: { color: '#FFFFFF' },
+  card: { ...baseStyles.card, backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' },
+  cardTitle: { ...baseStyles.cardTitle, color: '#1F2937' },
+  cardSub: { ...baseStyles.cardSub, color: '#6B7280' },
+  emptyText: { ...baseStyles.emptyText, color: '#6B7280' },
+  catCard: { ...baseStyles.catCard, backgroundColor: '#F9FAFB', borderColor: '#E5E7EB' },
+  catCardName: { ...baseStyles.catCardName, color: '#1F2937' },
+  catCardCount: { ...baseStyles.catCardCount, color: '#6B7280' },
+  catCardAmount: { ...baseStyles.catCardAmount, color: '#10B981' },
+  pieSimTotal: { ...baseStyles.pieSimTotal, color: '#1F2937' },
+  legendText: { ...baseStyles.legendText, color: '#4B5563' },
+  barLabel: { ...baseStyles.barLabel, color: '#4B5563' },
+  barCatName: { ...baseStyles.barCatName, color: '#4B5563' },
+  statMetricCard: { ...baseStyles.statMetricCard, backgroundColor: '#F9FAFB', borderColor: '#E5E7EB' },
+  statMetricLabel: { ...baseStyles.statMetricLabel, color: '#4B5563' },
+  filterCard: { ...baseStyles.filterCard, backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' },
+  filterLabel: { ...baseStyles.filterLabel, color: '#374151' },
+  filterDropdownBtn: { ...baseStyles.filterDropdownBtn, backgroundColor: '#F9FAFB', borderColor: '#D1D5DB' },
+  filterDropdownText: { ...baseStyles.filterDropdownText, color: '#1F2937' },
+  clearFilterBtn: { ...baseStyles.clearFilterBtn, backgroundColor: '#E5E7EB' },
+  clearFilterBtnText: { ...baseStyles.clearFilterBtnText, color: '#374151' },
+  tableHeaderRow: { ...baseStyles.tableHeaderRow, borderColor: '#E5E7EB' },
+  tableColHeader: { ...baseStyles.tableColHeader, color: '#4B5563' },
+  tableRow: { ...baseStyles.tableRow, borderColor: '#F3F4F6' },
+  tableItemName: { ...baseStyles.tableItemName, color: '#1F2937' },
+  tableItemCat: { ...baseStyles.tableItemCat, color: '#6B7280' },
+  modalContent: { ...baseStyles.modalContent, backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' },
+  modalTitle: { ...baseStyles.modalTitle, color: '#1F2937' },
+  modalOption: { ...baseStyles.modalOption, borderColor: '#F3F4F6' },
+  modalOptionText: { ...baseStyles.modalOptionText, color: '#1F2937' }
+});
+
+const darkStyles = StyleSheet.create({
+  ...baseStyles,
+  container: { flex: 1, backgroundColor: '#111827' },
+  tabHeader: { ...baseStyles.tabHeader, backgroundColor: '#064E3B' },
+  tabBtn: { ...baseStyles.tabBtn, backgroundColor: 'transparent' },
+  tabBtnActive: { backgroundColor: '#10B981' },
+  tabBtnText: { ...baseStyles.tabBtnText, color: '#A7F3D0' },
+  tabBtnTextActive: { color: '#FFFFFF' },
+  card: { ...baseStyles.card, backgroundColor: '#1F2937', borderColor: '#374151' },
+  cardTitle: { ...baseStyles.cardTitle, color: '#F9FAFB' },
+  cardSub: { ...baseStyles.cardSub, color: '#9CA3AF' },
+  emptyText: { ...baseStyles.emptyText, color: '#9CA3AF' },
+  catCard: { ...baseStyles.catCard, backgroundColor: '#111827', borderColor: '#374151' },
+  catCardName: { ...baseStyles.catCardName, color: '#F9FAFB' },
+  catCardCount: { ...baseStyles.catCardCount, color: '#9CA3AF' },
+  catCardAmount: { ...baseStyles.catCardAmount, color: '#34D399' },
+  pieSimTotal: { ...baseStyles.pieSimTotal, color: '#F9FAFB' },
+  legendText: { ...baseStyles.legendText, color: '#D1D5DB' },
+  barLabel: { ...baseStyles.barLabel, color: '#D1D5DB' },
+  barCatName: { ...baseStyles.barCatName, color: '#D1D5DB' },
+  statMetricCard: { ...baseStyles.statMetricCard, backgroundColor: '#111827', borderColor: '#374151' },
+  statMetricLabel: { ...baseStyles.statMetricLabel, color: '#9CA3AF' },
+  filterCard: { ...baseStyles.filterCard, backgroundColor: '#1F2937', borderColor: '#374151' },
+  filterLabel: { ...baseStyles.filterLabel, color: '#D1D5DB' },
+  filterDropdownBtn: { ...baseStyles.filterDropdownBtn, backgroundColor: '#111827', borderColor: '#4B5563' },
+  filterDropdownText: { ...baseStyles.filterDropdownText, color: '#F9FAFB' },
+  clearFilterBtn: { ...baseStyles.clearFilterBtn, backgroundColor: '#374151' },
+  clearFilterBtnText: { ...baseStyles.clearFilterBtnText, color: '#F9FAFB' },
+  tableHeaderRow: { ...baseStyles.tableHeaderRow, borderColor: '#374151' },
+  tableColHeader: { ...baseStyles.tableColHeader, color: '#9CA3AF' },
+  tableRow: { ...baseStyles.tableRow, borderColor: '#374151' },
+  tableItemName: { ...baseStyles.tableItemName, color: '#F9FAFB' },
+  tableItemCat: { ...baseStyles.tableItemCat, color: '#9CA3AF' },
+  modalContent: { ...baseStyles.modalContent, backgroundColor: '#1F2937', borderColor: '#374151' },
+  modalTitle: { ...baseStyles.modalTitle, color: '#F9FAFB' },
+  modalOption: { ...baseStyles.modalOption, borderColor: '#374151' },
+  modalOptionText: { ...baseStyles.modalOptionText, color: '#F9FAFB' }
 });

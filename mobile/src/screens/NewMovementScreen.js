@@ -15,7 +15,7 @@ const CATEGORIES = [
   'Otros'
 ];
 
-export default function NewMovementScreen({ onSaveSuccess, onNavigateBack }) {
+export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDarkMode }) {
   const [nombre, setNombre] = useState('');
   const [tipo, setTipo] = useState('ingreso');
   const [monto, setMonto] = useState('');
@@ -53,56 +53,58 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack }) {
     }
   };
 
+  const theme = isDarkMode ? darkStyles : lightStyles;
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#6EE7B7" translucent />
+    <SafeAreaView style={theme.container}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#064E3B' : '#6EE7B7'} translucent />
       
-      {/* Navbar con relleno seguro para Android Status Bar */}
-      <View style={styles.navbar}>
-        <TouchableOpacity onPress={onNavigateBack} activeOpacity={0.7} style={styles.navActionBtn}>
-          <Text style={styles.backBtnText}>← Volver</Text>
+      {/* Navbar secundario */}
+      <View style={theme.navbar}>
+        <TouchableOpacity onPress={onNavigateBack} activeOpacity={0.7} style={theme.navActionBtn}>
+          <Text style={theme.backBtnText}>← Volver</Text>
         </TouchableOpacity>
-        <Text style={styles.navbarTitle} numberOfLines={1}>Registrar Movimiento</Text>
-        <TouchableOpacity style={styles.navActionBtn} onPress={() => { setNombre(''); setMonto(''); setDescripcion(''); }} activeOpacity={0.7}>
-          <Text style={styles.clearBtnText}>Limpiar</Text>
+        <Text style={theme.navbarTitle} numberOfLines={1}>Registrar Movimiento</Text>
+        <TouchableOpacity style={theme.navActionBtn} onPress={() => { setNombre(''); setMonto(''); setDescripcion(''); }} activeOpacity={0.7}>
+          <Text style={theme.clearBtnText}>Limpiar</Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={theme.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         {/* Placeholder OCR */}
-        <View style={styles.ocrCard}>
-          <Text style={styles.ocrText}>📷 Extraer datos de comprobante (OCR)</Text>
-          <TouchableOpacity style={styles.ocrBtn} activeOpacity={0.8}>
-            <Text style={styles.ocrBtnText}>Seleccionar archivo</Text>
+        <View style={theme.ocrCard}>
+          <Text style={theme.ocrText}>📷 Extraer datos de comprobante (OCR)</Text>
+          <TouchableOpacity style={theme.ocrBtn} activeOpacity={0.8}>
+            <Text style={theme.ocrBtnText}>Seleccionar archivo</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Tipo de Movimiento</Text>
-          <View style={styles.typeSelector}>
+        <View style={theme.card}>
+          <Text style={theme.label}>Tipo de Movimiento</Text>
+          <View style={theme.typeSelector}>
             <TouchableOpacity
-              style={[styles.typeBtn, tipo === 'ingreso' && styles.typeBtnActiveIncome]}
+              style={[theme.typeBtn, tipo === 'ingreso' && theme.typeBtnActiveIncome]}
               onPress={() => setTipo('ingreso')}
               activeOpacity={0.8}
             >
-              <Text style={[styles.typeBtnText, tipo === 'ingreso' && { color: '#FFFFFF' }]}>Ingreso</Text>
+              <Text style={[theme.typeBtnText, tipo === 'ingreso' && { color: '#FFFFFF' }]}>Ingreso</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.typeBtn, tipo === 'egreso' && styles.typeBtnActiveExpense]}
+              style={[theme.typeBtn, tipo === 'egreso' && theme.typeBtnActiveExpense]}
               onPress={() => setTipo('egreso')}
               activeOpacity={0.8}
             >
-              <Text style={[styles.typeBtnText, tipo === 'egreso' && { color: '#FFFFFF' }]}>Egreso</Text>
+              <Text style={[theme.typeBtnText, tipo === 'egreso' && { color: '#FFFFFF' }]}>Egreso</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>Monto (S/)</Text>
+          <Text style={theme.label}>Monto (S/)</Text>
           <TextInput
-            style={styles.input}
+            style={theme.input}
             placeholder="0.00"
             placeholderTextColor="#9CA3AF"
             keyboardType="numeric"
@@ -110,33 +112,33 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack }) {
             onChangeText={setMonto}
           />
 
-          <Text style={styles.label}>Nombre del Movimiento</Text>
+          <Text style={theme.label}>Nombre del Movimiento</Text>
           <TextInput
-            style={styles.input}
+            style={theme.input}
             placeholder="Ej: Pago de alquiler"
             placeholderTextColor="#9CA3AF"
             value={nombre}
             onChangeText={setNombre}
           />
 
-          <Text style={styles.label}>Categoría</Text>
-          <View style={styles.catGrid}>
+          <Text style={theme.label}>Categoría</Text>
+          <View style={theme.catGrid}>
             {CATEGORIES.map((cat) => (
               <TouchableOpacity
                 key={cat}
-                style={[styles.catBadge, categoria === cat && styles.catBadgeActive]}
+                style={[theme.catBadge, categoria === cat && theme.catBadgeActive]}
                 onPress={() => setCategoria(cat)}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.catBadgeText, categoria === cat && styles.catBadgeTextActive]}>
+                <Text style={[theme.catBadgeText, categoria === cat && theme.catBadgeTextActive]}>
                   {cat}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <View style={styles.switchRow}>
-            <Text style={styles.switchLabel}>Ingreso Constante (Mensual)</Text>
+          <View style={theme.switchRow}>
+            <Text style={theme.switchLabel}>Ingreso Constante (Mensual)</Text>
             <Switch
               value={esRecurrente}
               onValueChange={setEsRecurrente}
@@ -145,9 +147,9 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack }) {
             />
           </View>
 
-          <Text style={styles.label}>Descripción (Opcional)</Text>
+          <Text style={theme.label}>Descripción (Opcional)</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[theme.input, theme.textArea]}
             placeholder="Detalles adicionales del movimiento..."
             placeholderTextColor="#9CA3AF"
             multiline
@@ -156,8 +158,8 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack }) {
             onChangeText={setDescripcion}
           />
 
-          <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting} activeOpacity={0.8}>
-            <Text style={styles.saveBtnText}>{submitting ? 'Guardando...' : 'Guardar Movimiento'}</Text>
+          <TouchableOpacity style={theme.saveBtn} onPress={handleSave} disabled={submitting} activeOpacity={0.8}>
+            <Text style={theme.saveBtnText}>{submitting ? 'Guardando...' : 'Guardar Movimiento'}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -165,44 +167,67 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FDF4' },
-  navbar: {
-    backgroundColor: '#6EE7B7',
-    paddingTop: STATUSBAR_HEIGHT + 8,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#A7F3D0'
-  },
-  navActionBtn: { paddingVertical: 4 },
-  backBtnText: { color: '#065F46', fontSize: 14, fontWeight: 'bold' },
-  navbarTitle: { color: '#065F46', fontSize: 16, fontWeight: 'bold', flex: 1, textAlign: 'center', marginHorizontal: 8 },
-  clearBtnText: { color: '#059669', fontSize: 13, fontWeight: '600' },
+const baseStyles = {
   scrollContent: { padding: 16, paddingBottom: 60 },
-  ocrCard: { backgroundColor: '#EFF6FF', borderWidth: 1, borderColor: '#BFDBFE', borderRadius: 12, padding: 14, alignItems: 'center', marginBottom: 16 },
-  ocrText: { color: '#1E3A8A', fontWeight: '600', fontSize: 13, marginBottom: 8 },
-  ocrBtn: { backgroundColor: '#6EE7B7', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+  navActionBtn: { paddingVertical: 4 },
+  ocrCard: { borderRadius: 12, padding: 14, alignItems: 'center', marginBottom: 16, borderWidth: 1 },
+  ocrText: { fontWeight: '600', fontSize: 13, marginBottom: 8 },
+  ocrBtn: { backgroundColor: '#34D399', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
   ocrBtnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 12 },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E5E7EB', shadowColor: '#000', shadowOpacity: 0.02, elevation: 1 },
-  label: { fontSize: 13, fontWeight: 'bold', color: '#374151', marginBottom: 6, marginTop: 10 },
-  input: { backgroundColor: '#F9FAFB', color: '#1F2937', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, fontSize: 15, borderWidth: 1, borderColor: '#E5E7EB' },
+  card: { borderRadius: 16, padding: 16, borderWidth: 1 },
+  label: { fontSize: 13, fontWeight: 'bold', marginBottom: 6, marginTop: 10 },
+  input: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, fontSize: 15, borderWidth: 1 },
   textArea: { height: 70, textAlignVertical: 'top' },
   typeSelector: { flexDirection: 'row', gap: 10, marginVertical: 4 },
-  typeBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, backgroundColor: '#F3F4F6', alignItems: 'center', borderWidth: 1, borderColor: '#E5E7EB' },
+  typeBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', borderWidth: 1 },
   typeBtnActiveIncome: { backgroundColor: '#10B981', borderColor: '#10B981' },
   typeBtnActiveExpense: { backgroundColor: '#EF4444', borderColor: '#EF4444' },
-  typeBtnText: { color: '#1F2937', fontWeight: 'bold', fontSize: 14 },
+  typeBtnText: { fontWeight: 'bold', fontSize: 14 },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginVertical: 4 },
-  catBadge: { backgroundColor: '#F3F4F6', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: '#E5E7EB' },
+  catBadge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
   catBadgeActive: { backgroundColor: '#34D399', borderColor: '#34D399' },
-  catBadgeText: { color: '#4B5563', fontSize: 12, fontWeight: '500' },
+  catBadgeText: { fontSize: 12, fontWeight: '500' },
   catBadgeTextActive: { color: '#FFFFFF', fontWeight: 'bold' },
   switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 },
-  switchLabel: { fontSize: 13, fontWeight: 'bold', color: '#374151', flex: 1, marginRight: 8 },
+  switchLabel: { fontSize: 13, fontWeight: 'bold', flex: 1, marginRight: 8 },
   saveBtn: { backgroundColor: '#34D399', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginTop: 16 },
   saveBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: 'bold' }
+};
+
+const lightStyles = StyleSheet.create({
+  ...baseStyles,
+  container: { flex: 1, backgroundColor: '#F0FDF4' },
+  navbar: { backgroundColor: '#6EE7B7', paddingHorizontal: 16, paddingVertical: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: '#A7F3D0' },
+  backBtnText: { color: '#065F46', fontSize: 14, fontWeight: 'bold' },
+  navbarTitle: { color: '#065F46', fontSize: 16, fontWeight: 'bold', flex: 1, textAlign: 'center' },
+  clearBtnText: { color: '#059669', fontSize: 13, fontWeight: '600' },
+  ocrCard: { ...baseStyles.ocrCard, backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' },
+  ocrText: { ...baseStyles.ocrText, color: '#1E3A8A' },
+  card: { ...baseStyles.card, backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' },
+  label: { ...baseStyles.label, color: '#374151' },
+  input: { ...baseStyles.input, backgroundColor: '#F9FAFB', borderColor: '#E5E7EB', color: '#1F2937' },
+  typeBtn: { ...baseStyles.typeBtn, backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' },
+  typeBtnText: { ...baseStyles.typeBtnText, color: '#1F2937' },
+  catBadge: { ...baseStyles.catBadge, backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' },
+  catBadgeText: { ...baseStyles.catBadgeText, color: '#4B5563' },
+  switchLabel: { ...baseStyles.switchLabel, color: '#374151' }
+});
+
+const darkStyles = StyleSheet.create({
+  ...baseStyles,
+  container: { flex: 1, backgroundColor: '#111827' },
+  navbar: { backgroundColor: '#064E3B', paddingHorizontal: 16, paddingVertical: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: '#047857' },
+  backBtnText: { color: '#A7F3D0', fontSize: 14, fontWeight: 'bold' },
+  navbarTitle: { color: '#F9FAFB', fontSize: 16, fontWeight: 'bold', flex: 1, textAlign: 'center' },
+  clearBtnText: { color: '#34D399', fontSize: 13, fontWeight: '600' },
+  ocrCard: { ...baseStyles.ocrCard, backgroundColor: '#1E293B', borderColor: '#3B82F6' },
+  ocrText: { ...baseStyles.ocrText, color: '#60A5FA' },
+  card: { ...baseStyles.card, backgroundColor: '#1F2937', borderColor: '#374151' },
+  label: { ...baseStyles.label, color: '#F9FAFB' },
+  input: { ...baseStyles.input, backgroundColor: '#111827', borderColor: '#4B5563', color: '#F9FAFB' },
+  typeBtn: { ...baseStyles.typeBtn, backgroundColor: '#111827', borderColor: '#374151' },
+  typeBtnText: { ...baseStyles.typeBtnText, color: '#F9FAFB' },
+  catBadge: { ...baseStyles.catBadge, backgroundColor: '#111827', borderColor: '#374151' },
+  catBadgeText: { ...baseStyles.catBadgeText, color: '#D1D5DB' },
+  switchLabel: { ...baseStyles.switchLabel, color: '#F9FAFB' }
 });
