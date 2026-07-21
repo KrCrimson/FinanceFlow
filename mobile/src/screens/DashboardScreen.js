@@ -100,7 +100,6 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           text: 'Sí, Comprado',
           onPress: async () => {
             try {
-              // 1. Crear el movimiento de egreso en el backend
               await createMovimiento({
                 nombre: compra.item,
                 tipo: 'egreso',
@@ -110,16 +109,30 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
                 fecha: new Date().toISOString()
               });
 
-              // 2. Eliminar de la lista de metas planificadas
               setComprasPlanificadas((prev) => prev.filter((c) => c.id !== compra.id));
-
-              // 3. Recargar el dashboard
               await loadData();
-
               Alert.alert('🎉 ¡Felicidades!', `Se registró el egreso de S/ ${compra.montoObjetivo} en tus movimientos.`);
             } catch (err) {
               Alert.alert('Error', 'No se pudo guardar el egreso de la compra.');
             }
+          }
+        }
+      ]
+    );
+  };
+
+  // Botón "Cancelar Planificación" -> Elimina la meta sin registrar egreso
+  const handleCancelarCompra = (id, nombre) => {
+    Alert.alert(
+      '❌ Cancelar Planificación',
+      `¿Estás seguro de cancelar la meta "${nombre}"?`,
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Sí, Cancelar',
+          style: 'destructive',
+          onPress: () => {
+            setComprasPlanificadas((prev) => prev.filter((c) => c.id !== id));
           }
         }
       ]
@@ -246,14 +259,25 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
                     <Text style={theme.goalAmount}>S/ {compra.montoAhorrado} / S/ {compra.montoObjetivo}</Text>
                   </View>
 
-                  {/* Botón Comprado */}
-                  <TouchableOpacity
-                    style={theme.compradoBtn}
-                    onPress={() => handleMarcarComprado(compra)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={theme.compradoBtnText}>🛒 Comprado</Text>
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 6 }}>
+                    {/* Botón Comprado */}
+                    <TouchableOpacity
+                      style={theme.compradoBtn}
+                      onPress={() => handleMarcarComprado(compra)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={theme.compradoBtnText}>🛒 Comprado</Text>
+                    </TouchableOpacity>
+
+                    {/* Botón Cancelar */}
+                    <TouchableOpacity
+                      style={theme.cancelGoalBtn}
+                      onPress={() => handleCancelarCompra(compra.id, compra.item)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={theme.cancelGoalBtnText}>❌</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 <View style={theme.goalTrack}>
@@ -400,6 +424,8 @@ const baseStyles = {
   goalAmount: { fontSize: 12, color: '#10B981', fontWeight: 'bold' },
   compradoBtn: { backgroundColor: '#10B981', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 },
   compradoBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' },
+  cancelGoalBtn: { backgroundColor: '#EF4444', paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6 },
+  cancelGoalBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' },
   goalTrack: { height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden' },
   goalFill: { height: '100%', backgroundColor: '#34D399', borderRadius: 4 },
   goalPercent: { fontSize: 11, alignSelf: 'flex-end', marginTop: 4 },

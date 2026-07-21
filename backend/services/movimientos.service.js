@@ -50,20 +50,75 @@ module.exports = {
     await movimiento.save();
     return movimiento;
   },
+
   listarMovimientos: async (userId) => {
-    return await Movimiento.find({ userId }).sort({ creadoEn: -1 });
+    // 1. Obtener todos los movimientos del usuario
+    let movimientos = await Movimiento.find({ userId }).sort({ creadoEn: -1 });
+
+    // 2. Auto-generar ingresos constantes recurrentes si la fecha del mes actual ya superó el día de cobro
+    try {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth(); // 0 - 11
+      const currentDay = today.getDate();
+
+      const recurrentes = movimientos.filter(
+        (m) => m.tipo === 'ingreso' && m.esRecurrente && m.estado === 'activo'
+      );
+
+      for (const rec of recurrentes) {
+        const fechaRec = new Date(rec.fecha);
+        const dayOfMonth = fechaRec.getDate(); // Ej: 15
+
+        // Si hoy ya pasó o es el día de cobro de este mes (ej: día 15 o posterior)
+        if (currentDay >= dayOfMonth) {
+          // Verificar si ya existe un movimiento generado para el mes y año actual
+          const yaExisteEsteMes = movimientos.some((m) => {
+            const f = new Date(m.fecha);
+            return (
+              m.nombre === rec.nombre &&
+              m.monto === rec.monto &&
+              f.getFullYear() === currentYear &&
+              f.getMonth() === currentMonth
+            );
+          });
+
+          if (!yaExisteEsteMes) {
+            // Crear automáticamente el movimiento del nuevo mes
+            const nuevaFecha = new Date(currentYear, currentMonth, dayOfMonth);
+            const nuevoMov = new Movimiento({
+              tipo: 'ingreso',
+              nombre: rec.nombre,
+              monto: rec.monto,
+              categoria: rec.categoria,
+              userId: userId,
+              fecha: nuevaFecha,
+              estado: 'activo',
+              esRecurrente: true,
+              creadoEn: new Date(),
+              actualizadoEn: new Date()
+            });
+            await nuevoMov.save();
+            movimientos.unshift(nuevoMov);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error en auto-generación de ingresos constantes:', e);
+    }
+
+    return movimientos;
   },
+
   editarMovimiento: async (id, data) => {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
 
-    // Verificar si el periodo original está cerrado
     const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
     if (isClosed) {
       throw new Error('No se puede modificar un movimiento perteneciente a un período cerrado');
     }
 
-    // Verificar si el nuevo periodo (si se cambia la fecha) está cerrado o en el futuro
     if (data.fecha !== undefined) {
       const isNewPeriodClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, data.fecha);
       if (isNewPeriodClosed) {
@@ -95,6 +150,7 @@ module.exports = {
     );
     return movimiento;
   },
+
   inhabilitarMovimiento: async (id) => {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
@@ -111,6 +167,7 @@ module.exports = {
     );
     return movimiento;
   },
+
   crearMovimientoHistorico: async (userId, data) => {
     if (!data.password) {
       throw new Error('La contraseña es requerida para validación de seguridad');
