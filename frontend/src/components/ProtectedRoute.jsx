@@ -4,8 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div>Cargando...</div>;
-  if (!user) return <Navigate to="/login" replace />;
+  if (loading) return <div className="flex justify-center items-center min-h-screen text-gray-400">Cargando FinanceFlow...</div>;
+  if (!user) return <Navigate to="/landing" replace />;
   return children;
 }
 

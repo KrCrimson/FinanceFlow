@@ -26,7 +26,7 @@ function Navbar() {
   ];
 
   // No mostrar navbar en páginas públicas
-  const publicPaths = ['/login', '/register'];
+  const publicPaths = ['/login', '/register', '/landing'];
   if (publicPaths.includes(location.pathname)) {
     return null;
   }
