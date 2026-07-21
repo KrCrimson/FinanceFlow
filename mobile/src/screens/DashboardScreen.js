@@ -22,8 +22,8 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
 
   // Planificador de Compras
   const [comprasPlanificadas, setComprasPlanificadas] = useState([
-    { id: '1', item: 'Laptop Nueva', montoObjetivo: 3500, montoAhorrado: 2100 },
-    { id: '2', item: 'Curso de Especialización', montoObjetivo: 800, montoAhorrado: 800 }
+    { id: '1', item: 'Laptop Nueva', montoObjetivo: 3500 },
+    { id: '2', item: 'Ram', montoObjetivo: 900 }
   ]);
   const [showAddCompraModal, setShowAddCompraModal] = useState(false);
   const [nuevaCompraItem, setNuevaCompraItem] = useState('');
@@ -46,7 +46,6 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
         const recDate = new Date(rec.fecha);
         const dayOfMonth = recDate.getDate();
 
-        // Si la fecha actual ya superó o es el día de cobro del mes
         if (currentDay >= dayOfMonth) {
           const yaExiste = data.some((m) => {
             const d = new Date(m.fecha);
@@ -56,7 +55,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
               m.monto === rec.monto &&
               d.getFullYear() === currentYear &&
               d.getMonth() === currentMonth &&
-              !m.esRecurrente // no comparar contra el propio template
+              !m.esRecurrente
             );
           });
 
@@ -88,10 +87,9 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
       setLoading(true);
       let data = await fetchMovimientos();
       
-      // Verificar si hay ingresos constantes pendientes por autogenerar este mes
       const created = await autoCheckRecurrentIncomes(data || []);
       if (created) {
-        data = await fetchMovimientos(); // Recargar datos si se inyectó el ingreso
+        data = await fetchMovimientos();
       }
 
       setMovimientos(data || []);
@@ -142,7 +140,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
 
     setComprasPlanificadas([
       ...comprasPlanificadas,
-      { id: Date.now().toString(), item: nuevaCompraItem.trim(), montoObjetivo: amount, montoAhorrado: 0 }
+      { id: Date.now().toString(), item: nuevaCompraItem.trim(), montoObjetivo: amount }
     ]);
     setNuevaCompraItem('');
     setNuevaCompraMonto('');
@@ -182,7 +180,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
     );
   };
 
-  // Botón "Cancelar Planificación" -> Elimina la meta sin registrar egreso
+  // Botón "Cancelar Planificación"
   const handleCancelarCompra = (id, nombre) => {
     Alert.alert(
       '❌ Cancelar Planificación',
@@ -218,6 +216,19 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
     .reduce((sum, m) => sum + m.monto, 0);
   const balanceTotal = totalIngresos - totalEgresos;
   const recurrentes = filteredActivos.filter((m) => m.esRecurrente);
+
+  // CÁLCULO DINÁMICO DE METAS BASADO EN EL BALANCE REAL
+  let saldoDisponible = Math.max(0, balanceTotal);
+  const comprasConAvance = comprasPlanificadas.map((compra) => {
+    const asignado = Math.min(saldoDisponible, compra.montoObjetivo);
+    saldoDisponible = Math.max(0, saldoDisponible - asignado);
+    const porcentaje = compra.montoObjetivo > 0 ? (asignado / compra.montoObjetivo) * 100 : 0;
+    return {
+      ...compra,
+      montoAhorrado: asignado,
+      porcentaje
+    };
+  });
 
   return (
     <SafeAreaView style={theme.container}>
@@ -307,47 +318,44 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           </TouchableOpacity>
         </View>
 
-        {comprasPlanificadas.length === 0 ? (
+        {comprasConAvance.length === 0 ? (
           <Text style={theme.emptyText}>No tienes compras planificadas en este momento.</Text>
         ) : (
-          comprasPlanificadas.map((compra) => {
-            const percent = Math.min(100, (compra.montoAhorrado / compra.montoObjetivo) * 100);
-            return (
-              <View key={compra.id} style={theme.goalCard}>
-                <View style={theme.goalHeader}>
-                  <View style={{ flex: 1, paddingRight: 8 }}>
-                    <Text style={theme.goalTitle}>{compra.item}</Text>
-                    <Text style={theme.goalAmount}>S/ {compra.montoAhorrado} / S/ {compra.montoObjetivo}</Text>
-                  </View>
-
-                  <View style={{ flexDirection: 'row', gap: 6 }}>
-                    {/* Botón Comprado */}
-                    <TouchableOpacity
-                      style={theme.compradoBtn}
-                      onPress={() => handleMarcarComprado(compra)}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={theme.compradoBtnText}>🛒 Comprado</Text>
-                    </TouchableOpacity>
-
-                    {/* Botón Cancelar */}
-                    <TouchableOpacity
-                      style={theme.cancelGoalBtn}
-                      onPress={() => handleCancelarCompra(compra.id, compra.item)}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={theme.cancelGoalBtnText}>❌</Text>
-                    </TouchableOpacity>
-                  </View>
+          comprasConAvance.map((compra) => (
+            <View key={compra.id} style={theme.goalCard}>
+              <View style={theme.goalHeader}>
+                <View style={{ flex: 1, paddingRight: 8 }}>
+                  <Text style={theme.goalTitle}>{compra.item}</Text>
+                  <Text style={theme.goalAmount}>S/ {compra.montoAhorrado.toFixed(2)} / S/ {compra.montoObjetivo.toFixed(2)}</Text>
                 </View>
 
-                <View style={theme.goalTrack}>
-                  <View style={[theme.goalFill, { width: `${percent}%` }]} />
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  {/* Botón Comprado */}
+                  <TouchableOpacity
+                    style={theme.compradoBtn}
+                    onPress={() => handleMarcarComprado(compra)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={theme.compradoBtnText}>🛒 Comprado</Text>
+                  </TouchableOpacity>
+
+                  {/* Botón Cancelar */}
+                  <TouchableOpacity
+                    style={theme.cancelGoalBtn}
+                    onPress={() => handleCancelarCompra(compra.id, compra.item)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={theme.cancelGoalBtnText}>❌</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text style={theme.goalPercent}>{percent.toFixed(0)}% Completado</Text>
               </View>
-            );
-          })
+
+              <View style={theme.goalTrack}>
+                <View style={[theme.goalFill, { width: `${compra.porcentaje}%` }]} />
+              </View>
+              <Text style={theme.goalPercent}>{compra.porcentaje.toFixed(0)}% Completado</Text>
+            </View>
+          ))
         )}
 
         {/* Sección de Movimientos Recientes */}
