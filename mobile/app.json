@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "extra": {
+      "eas": {
+        "projectId": "90276608-38e7-4bfe-bfcd-f53728920fd5"
+      }
+    },
     "android": {
       "package": "com.financeflow.app"
     }
