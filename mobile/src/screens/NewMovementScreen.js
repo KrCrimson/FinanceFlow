@@ -35,7 +35,7 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
       }
 
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ImagePicker.MediaTypeOptions ? ImagePicker.MediaTypeOptions.Images : 'images',
         allowsEditing: false,
         quality: 0.8,
         base64: true,

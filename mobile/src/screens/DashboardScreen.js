@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Modal, TextInput, Alert, Platform, StatusBar } from 'react-native';
 import { fetchMovimientos, createMovimiento, crearCierre, updateMovimiento, fetchCierresPendientes, fetchResumenPeriodo } from '../services/api';
-import * as Notifications from 'expo-notifications';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
 
 const MONTH_OPTIONS = [
   { label: 'Julio 2026', month: 6, year: 2026 },
@@ -108,27 +99,8 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
     }
   };
 
-  const triggerNotification = async (title, body) => {
-    try {
-      const { status } = await Notifications.getPermissionsAsync();
-      let finalStatus = status;
-      if (status !== 'granted') {
-        const { status: newStatus } = await Notifications.requestPermissionsAsync();
-        finalStatus = newStatus;
-      }
-      if (finalStatus === 'granted') {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title,
-            body,
-            sound: true,
-          },
-          trigger: null,
-        });
-      }
-    } catch (e) {
-      console.log('Error enviando notificación:', e);
-    }
+  const triggerNotification = (title, body) => {
+    Alert.alert(title, body);
   };
 
   const loadData = async () => {
