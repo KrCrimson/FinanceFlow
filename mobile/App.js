@@ -65,9 +65,7 @@ export default function App() {
       <View style={themeNav.navbar}>
         <View style={styles.topHeaderRow}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.2)', padding: 3, justifyContent: 'center', alignItems: 'center' }}>
-              <Image source={require('./assets/logo.png')} style={{ width: '100%', height: '100%', resizeMode: 'contain' }} />
-            </View>
+            <Image source={require('./assets/logo.png')} style={{ width: 36, height: 28, resizeMode: 'contain' }} />
             <Text style={themeNav.brandTitle}>FinanceFlow</Text>
           </View>
           

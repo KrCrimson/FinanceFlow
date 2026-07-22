@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { loginUser } from '../services/api';
 
 export default function LoginScreen({ onLoginSuccess, onNavigateToRegister, onNavigateToForgot }) {
@@ -29,7 +30,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister, onNa
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.logoIcon}>💰</Text>
+          <Image source={require('../../assets/logo.png')} style={{ width: 84, height: 64, resizeMode: 'contain', marginBottom: 8 }} />
           <Text style={styles.logoText}>FinanceFlow</Text>
           <Text style={styles.subtitle}>Inicia sesión para ver tu balance</Text>
         </View>

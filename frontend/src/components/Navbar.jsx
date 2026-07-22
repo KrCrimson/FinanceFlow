@@ -41,9 +41,7 @@ function Navbar() {
               to="/" 
               className="flex items-center space-x-3 text-white font-bold text-xl hover:opacity-90 transition-all duration-200"
             >
-              <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md p-1 border border-white/30 flex items-center justify-center shadow-inner">
-                <img src="/logo.png" alt="FinanceFlow Logo" className="w-full h-full object-contain filter drop-shadow" />
-              </div>
+              <img src="/logo.png" alt="FinanceFlow Logo" className="h-9 w-auto object-contain drop-shadow-md" />
               <span className="font-extrabold tracking-tight bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent text-2xl">
                 FinanceFlow
               </span>

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SplashScreen({ onFinish }) {
   useEffect(() => {
@@ -12,8 +13,7 @@ export default function SplashScreen({ onFinish }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
-        {/* Usamos un emoji o símbolo en lugar de imagen cargada para máxima fiabilidad */}
-        <Text style={styles.logoIcon}>💰</Text>
+        <Image source={require('../../assets/logo.png')} style={{ width: 120, height: 90, resizeMode: 'contain', marginBottom: 12 }} />
         <Text style={styles.title}>FinanceFlow</Text>
         <Text style={styles.subtitle}>Tu Sistema de Balance Personal</Text>
       </View>
