@@ -58,6 +58,14 @@ function DashboardPage() {
 
   useEffect(() => {
     cargarPendientesYPerfil();
+
+    const tutorialDesactivado = localStorage.getItem('tutorial_desactivado') === 'true';
+    const tutorialVisto = localStorage.getItem('tutorial_visto') === 'true';
+
+    if (!tutorialDesactivado && !tutorialVisto) {
+      setMostrarTutorial(true);
+      localStorage.setItem('tutorial_visto', 'true');
+    }
   }, []);
 
   const handleCierreExitoso = (tipo, periodo) => {

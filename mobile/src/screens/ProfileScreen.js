@@ -127,6 +127,21 @@ export default function ProfileScreen({ user, onLogout }) {
         <View style={styles.card}>
           <Text style={styles.cardSectionTitle}>⚙️ Configuración de Cuenta</Text>
 
+          {/* Toggle Modo Tutorial */}
+          <View style={[styles.actionBoxWarning, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0', marginBottom: 12 }]}>
+            <View style={{ flex: 1, paddingRight: 10 }}>
+              <Text style={[styles.actionTitleWarning, { color: '#166534' }]}>💡 Guía de Tutorial Automática</Text>
+              <Text style={[styles.actionSubWarning, { color: '#15803D' }]}>Muestra el tutorial explicativo al iniciar la app</Text>
+            </View>
+            <TouchableOpacity 
+              style={[styles.actionBtnWarning, { backgroundColor: '#22C55E' }]} 
+              onPress={() => Alert.alert('⚙️ Ajuste de Tutorial', 'Puedes activar o ver el tutorial en cualquier momento desde el botón 💡 Tutorial del inicio.')}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.actionBtnTextWarning}>Configurado</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Cerrar Sesión Box */}
           <View style={styles.actionBoxWarning}>
             <View style={{ flex: 1, paddingRight: 10 }}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const STEPS = [
   {
@@ -25,6 +25,17 @@ const STEPS = [
 
 function TutorialModal({ isOpen, onClose }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [dontShowAgain, setDontShowAgain] = useState(() => {
+    return localStorage.getItem('tutorial_desactivado') === 'true';
+  });
+
+  useEffect(() => {
+    if (dontShowAgain) {
+      localStorage.setItem('tutorial_desactivado', 'true');
+    } else {
+      localStorage.removeItem('tutorial_desactivado');
+    }
+  }, [dontShowAgain]);
 
   if (!isOpen) return null;
 
@@ -67,13 +78,27 @@ function TutorialModal({ isOpen, onClose }) {
         </div>
 
         {/* Indicadores de Pasos */}
-        <div className="flex justify-center space-x-2 my-6">
+        <div className="flex justify-center space-x-2 my-4">
           {STEPS.map((_, idx) => (
             <div 
               key={idx}
               className={`h-2 rounded-full transition-all duration-300 ${idx === currentStep ? 'w-8 bg-emerald-500' : 'w-2 bg-gray-300 dark:bg-gray-600'}`}
             />
           ))}
+        </div>
+
+        {/* Checkbox para no mostrar automáticamente */}
+        <div className="flex items-center justify-center space-x-2 my-4">
+          <input
+            type="checkbox"
+            id="dontShowAgain"
+            checked={dontShowAgain}
+            onChange={(e) => setDontShowAgain(e.target.checked)}
+            className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
+          />
+          <label htmlFor="dontShowAgain" className="text-xs font-semibold text-gray-600 dark:text-gray-400 cursor-pointer">
+            No mostrar automáticamente al iniciar
+          </label>
         </div>
 
         {/* Botones de Navegación */}
