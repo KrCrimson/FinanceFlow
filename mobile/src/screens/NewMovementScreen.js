@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Switch, ScrollView, Alert, SafeAreaView, Platform, StatusBar, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Switch, ScrollView, Alert, Platform, StatusBar, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { createMovimiento, fetchMovimientos, analyzeReceiptWithOCR } from '../services/api';
 
@@ -32,7 +33,7 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
         const customEgreso = new Set(DEFAULT_CATEGORIES.egreso.filter(c => c !== 'Otros'));
 
         movs.forEach(m => {
-          if (!m.categoria) return;
+          if (!m.categoria || m.categoria === 'Otros') return;
           if (m.tipo === 'ingreso') {
             customIngreso.add(m.categoria);
           } else if (m.tipo === 'egreso') {
@@ -224,9 +225,9 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
 
           <Text style={theme.label}>Categoría</Text>
           <View style={theme.catGrid}>
-            {currentCategories.map((cat) => (
+            {currentCategories.map((cat, idx) => (
               <TouchableOpacity
-                key={cat}
+                key={`${cat}-${idx}`}
                 style={[theme.catBadge, categoria === cat && theme.catBadgeActive]}
                 onPress={() => {
                   setCategoria(cat);
