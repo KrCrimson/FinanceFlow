@@ -188,6 +188,8 @@ function ProfilePage() {
                 required 
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               />
+            </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 🔤 Moneda de la Cuenta
