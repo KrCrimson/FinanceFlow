@@ -13,22 +13,24 @@ export function useAnalisisGastos() {
 
   // Calcular estadísticas cuando cambien los movimientos
   useEffect(() => {
-    if (movimientos.length === 0) return;
+    if (!movimientos || movimientos.length === 0) return;
 
-    const activos = movimientos.filter(m => m.estado !== 'inactivo');
+    // Solo considerar movimientos ACTIVOS (excluir planificados e inactivos)
+    const activos = movimientos.filter(m => m.estado === 'activo');
 
     const ahora = new Date();
     const mesActual = ahora.getMonth();
     const añoActual = ahora.getFullYear();
 
-    // Separar movimientos por períodos
+    // Movimientos del mes actual
     const movimientosActuales = activos.filter(m => {
-      const fecha = new Date(m.creadoEn || m.fecha);
+      const fecha = new Date(m.fecha || m.creadoEn);
       return fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual;
     });
 
+    // Movimientos de meses anteriores
     const movimientosAnteriores = activos.filter(m => {
-      const fecha = new Date(m.creadoEn || m.fecha);
+      const fecha = new Date(m.fecha || m.creadoEn);
       return !(fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual);
     });
 
@@ -37,11 +39,11 @@ export function useAnalisisGastos() {
     setEstadisticasPorCategoria(stats);
 
     // Calcular resumen mensual
-    const resumen = calcularResumenMensual(activos);
+    const resumen = calcularResumenMensual(activos, movimientosActuales);
     setResumenMensual(resumen);
 
-    // Generar alertas
-    const nuevasAlertas = generarAlertas(stats, resumen);
+    // Generar alertas inteligentes y humanas
+    const nuevasAlertas = generarAlertasInteligentes(stats, resumen, movimientosActuales);
     setAlertas(nuevasAlertas);
 
   }, [movimientos]);
@@ -49,9 +51,8 @@ export function useAnalisisGastos() {
   const calcularEstadisticasPorCategoria = (actuales, anteriores) => {
     const stats = {};
     
-    // Agrupar movimientos actuales por categoría
     actuales.forEach(movimiento => {
-      const categoria = movimiento.categoria || 'Sin categoría';
+      const categoria = movimiento.categoria || 'Otros';
       if (!stats[categoria]) {
         stats[categoria] = {
           gastoActual: 0,
@@ -69,14 +70,14 @@ export function useAnalisisGastos() {
 
     // Calcular promedio de meses anteriores
     const mesesUnicos = [...new Set(anteriores.map(m => {
-      const fecha = new Date(m.creadoEn || m.fecha);
+      const fecha = new Date(m.fecha || m.creadoEn);
       return `${fecha.getFullYear()}-${fecha.getMonth()}`;
     }))];
 
     const cantidadMeses = Math.max(mesesUnicos.length, 1);
 
     anteriores.forEach(movimiento => {
-      const categoria = movimiento.categoria || 'Sin categoría';
+      const categoria = movimiento.categoria || 'Otros';
       if (!stats[categoria]) {
         stats[categoria] = {
           gastoActual: 0,
@@ -91,38 +92,17 @@ export function useAnalisisGastos() {
       }
     });
 
-    // Calcular promedios y tendencias
+    // Calcular promedios
     Object.keys(stats).forEach(categoria => {
       stats[categoria].promedioAnterior = stats[categoria].promedioAnterior / cantidadMeses;
-      
-      // Determinar tendencia
-      const actual = stats[categoria].gastoActual;
-      const promedio = stats[categoria].promedioAnterior;
-      
-      if (promedio === 0) {
-        // Categoría nueva - solo alertar si el gasto es significativo
-        if (actual > 100) { // Gasto mayor a S/100 en categoría nueva
-          stats[categoria].tendencia = 'alto';
-        } else {
-          stats[categoria].tendencia = 'normal';
-        }
-      } else if (actual > promedio * 1.5) {
-        stats[categoria].tendencia = 'muy_alto';
-      } else if (actual > promedio * 1.2) {
-        stats[categoria].tendencia = 'alto';
-      } else if (actual < promedio * 0.8) {
-        stats[categoria].tendencia = 'bajo';
-      } else {
-        stats[categoria].tendencia = 'normal';
-      }
     });
 
     return stats;
   };
 
-  const calcularResumenMensual = (todosMovimientos) => {
+  const calcularResumenMensual = (todosMovimientos, actuales) => {
     const mesesUnicos = [...new Set(todosMovimientos.map(m => {
-      const fecha = new Date(m.creadoEn || m.fecha || new Date());
+      const fecha = new Date(m.fecha || m.creadoEn || new Date());
       return `${fecha.getFullYear()}-${fecha.getMonth()}`;
     }))];
 
@@ -137,64 +117,65 @@ export function useAnalisisGastos() {
       return acc;
     }, { ingresos: 0, gastos: 0 });
 
+    const ingresosMesActual = actuales
+      .filter(m => m.tipo === 'ingreso')
+      .reduce((sum, m) => sum + m.monto, 0);
+
+    const egresosMesActual = actuales
+      .filter(m => m.tipo === 'egreso')
+      .reduce((sum, m) => sum + m.monto, 0);
+
     return {
       ingresoPromedio: totales.ingresos / cantidadMeses,
       gastoPromedio: totales.gastos / cantidadMeses,
-      ahorroPromedio: (totales.ingresos - totales.gastos) / cantidadMeses
+      ahorroPromedio: (totales.ingresos - totales.gastos) / cantidadMeses,
+      ingresosMesActual,
+      egresosMesActual
     };
   };
 
-  const generarAlertas = (stats, resumen) => {
+  const generarAlertasInteligentes = (stats, resumen, actuales) => {
     const alertas = [];
+    const ingresosActuales = resumen.ingresosMesActual || resumen.ingresoPromedio || 1;
 
-    // Alertas por categoría
     Object.entries(stats).forEach(([categoria, data]) => {
-      if (data.tendencia === 'muy_alto') {
-        const porcentaje = data.promedioAnterior > 0 ? 
-          ((data.gastoActual / data.promedioAnterior) * 100).toFixed(0) : 
-          'nuevo';
-        
+      const gasto = data.gastoActual;
+      if (gasto <= 0) return;
+
+      const porcentajeDelIngreso = (gasto / ingresosActuales) * 100;
+      const promedio = data.promedioAnterior;
+
+      // 1. Alerta de Inversión Significativa / Gasto Elevado en Categoría
+      if (porcentajeDelIngreso >= 35) {
         alertas.push({
           tipo: 'gasto_elevado',
           categoria,
-          mensaje: `¡Gasto muy elevado en ${categoria}!`,
-          descripcion: `Has gastado S/${data.gastoActual.toFixed(2)} este mes${data.promedioAnterior > 0 ? ` vs S/${data.promedioAnterior.toFixed(2)} de promedio` : ' (categoría nueva)'}.`,
-          severidad: 'alta',
-          porcentaje: porcentaje
+          mensaje: `💡 Consumo relevante en ${categoria}`,
+          descripcion: `Has asignado S/${gasto.toFixed(2)} a ${categoria} este mes (representa el ${porcentajeDelIngreso.toFixed(0)}% de tus ingresos de este mes).`,
+          severidad: porcentajeDelIngreso >= 60 ? 'alta' : 'media',
+          porcentaje: `${porcentajeDelIngreso.toFixed(0)}% del ingreso`
         });
-      } else if (data.tendencia === 'alto') {
-        const porcentaje = data.promedioAnterior > 0 ? 
-          ((data.gastoActual / data.promedioAnterior) * 100).toFixed(0) : 
-          'nuevo';
-          
+      } else if (promedio > 0 && gasto > promedio * 2 && gasto > 150) {
+        const incremento = ((gasto / promedio) * 100).toFixed(0);
         alertas.push({
           tipo: 'gasto_alto',
           categoria,
-          mensaje: `Gasto elevado en ${categoria}`,
-          descripcion: `Estás gastando S/${data.gastoActual.toFixed(2)}${data.promedioAnterior > 0 ? ` vs S/${data.promedioAnterior.toFixed(2)} de promedio` : ' (categoría nueva)'}.`,
+          mensaje: `📊 Incremento notable en ${categoria}`,
+          descripcion: `Gastaste S/${gasto.toFixed(2)} este mes en ${categoria} vs un promedio habitual de S/${promedio.toFixed(2)}.`,
           severidad: 'media',
-          porcentaje: porcentaje
+          porcentaje: `${incremento}% del histórico`
         });
       }
     });
 
-    // Alerta de ahorro negativo
-    if (resumen.ahorroPromedio < 0) {
+    // 2. Alerta de Presupuesto / Balance Negativo del Mes
+    if (resumen.egresosMesActual > resumen.ingresosMesActual && resumen.ingresosMesActual > 0) {
+      const deficit = resumen.egresosMesActual - resumen.ingresosMesActual;
       alertas.push({
         tipo: 'ahorro_negativo',
-        mensaje: 'Gastas más de lo que ingresas',
-        descripcion: `Tu déficit promedio es de S/${Math.abs(resumen.ahorroPromedio).toFixed(2)} mensuales.`,
+        mensaje: '⚠️ Los egresos superan los ingresos del mes',
+        descripcion: `Llevas un déficit mensual de S/${deficit.toFixed(2)}. Revisa tus compras planificadas o disminuye egresos secundarios.`,
         severidad: 'alta'
-      });
-    }
-
-    // Alerta de ahorro bajo
-    if (resumen.ahorroPromedio > 0 && resumen.ahorroPromedio < resumen.ingresoPromedio * 0.1) {
-      alertas.push({
-        tipo: 'ahorro_bajo',
-        mensaje: 'Ahorro muy bajo',
-        descripcion: `Solo ahorras S/${resumen.ahorroPromedio.toFixed(2)} mensuales (menos del 10% de tus ingresos).`,
-        severidad: 'media'
       });
     }
 
@@ -218,29 +199,23 @@ export function useAnalisisGastos() {
       esviable: true,
       meses: mesesNecesarios,
       ahorroMensualNecesario: ahorroMensualDisponible,
-      fechaEstimada: new Date(new Date().setMonth(new Date().getMonth() + mesesNecesarios)),
-      mensaje: `Podrías comprarlo en ${mesesNecesarios} ${mesesNecesarios === 1 ? 'mes' : 'meses'}`,
-      sugerencia: mesesNecesarios > 12 ? 'Considera buscar alternativas más económicas' : 
-                  mesesNecesarios > 6 ? 'Planifica bien tu compra' : 
-                  '¡Meta alcanzable!'
+      sugerencia: `Ahorrando tu promedio de S/${ahorroMensualDisponible.toFixed(2)}/mes, alcanzarás esta meta en ${mesesNecesarios} mes(es).`
     };
   };
 
   const obtenerSugerenciasAhorro = () => {
     const sugerencias = [];
-    
     Object.entries(estadisticasPorCategoria).forEach(([categoria, data]) => {
-      if (data.tendencia === 'muy_alto' || data.tendencia === 'alto') {
-        const ahorroEstimado = data.gastoActual - data.promedioAnterior;
+      if (data.gastoActual > data.promedioAnterior * 1.3 && data.promedioAnterior > 0) {
+        const ahorroPotencial = data.gastoActual - data.promedioAnterior;
         sugerencias.push({
           categoria,
-          ahorroEstimado: ahorroEstimado,
-          mensaje: `Reduciendo ${categoria} al promedio ahorrarías S/${ahorroEstimado.toFixed(2)} este mes`
+          ahorroPotencial,
+          mensaje: `Si ajustas el gasto en ${categoria} a tu promedio habitual, ahorrarías S/${ahorroPotencial.toFixed(2)} este mes.`
         });
       }
     });
-
-    return sugerencias.sort((a, b) => b.ahorroEstimado - a.ahorroEstimado);
+    return sugerencias;
   };
 
   return {
