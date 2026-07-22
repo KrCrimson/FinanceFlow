@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Platform, StatusBar, Image } from 'react-native';
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
@@ -63,7 +63,12 @@ export default function App() {
       {/* Navbar Superior Global FinanceFlow */}
       <View style={themeNav.navbar}>
         <View style={styles.topHeaderRow}>
-          <Text style={themeNav.brandTitle}>💰 FinanceFlow</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.2)', padding: 3, justifyContent: 'center', alignItems: 'center' }}>
+              <Image source={require('./assets/logo.png')} style={{ width: '100%', height: '100%', resizeMode: 'contain' }} />
+            </View>
+            <Text style={themeNav.brandTitle}>FinanceFlow</Text>
+          </View>
           
           {/* Botón de Cambiar Modo Claro / Modo Oscuro */}
           <TouchableOpacity style={themeNav.themeToggleBtn} onPress={toggleTheme} activeOpacity={0.8}>

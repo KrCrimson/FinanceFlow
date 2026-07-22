@@ -39,10 +39,14 @@ function Navbar() {
           <div className="flex items-center">
             <Link 
               to="/" 
-              className="flex items-center space-x-2 text-white font-bold text-xl hover:text-accent transition-colors duration-200"
+              className="flex items-center space-x-3 text-white font-bold text-xl hover:opacity-90 transition-all duration-200"
             >
-              <span className="text-2xl">💰</span>
-              <span className="hidden sm:block">Sistema Balance</span>
+              <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md p-1 border border-white/30 flex items-center justify-center shadow-inner">
+                <img src="/logo.png" alt="FinanceFlow Logo" className="w-full h-full object-contain filter drop-shadow" />
+              </div>
+              <span className="font-extrabold tracking-tight bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent text-2xl">
+                FinanceFlow
+              </span>
             </Link>
           </div>
 
