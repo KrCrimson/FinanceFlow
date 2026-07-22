@@ -675,8 +675,8 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </Modal>
     </SafeAreaView>
   );
