@@ -162,6 +162,7 @@ function DashboardPage() {
   });
 
   const movimientosFiltrados = movimientosArray.filter(m => {
+    if (m.estado === 'planificado') return false;
     if (mesFiltro === 'general') return true;
     const date = new Date(m.fecha || m.creadoEn);
     return !isNaN(date.getTime()) && date.toISOString().slice(0, 7) === mesFiltro;
