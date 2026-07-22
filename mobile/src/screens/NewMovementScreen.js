@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Switch, ScrollView, Alert, SafeAreaView, Platform, StatusBar } from 'react-native';
-import { createMovimiento } from '../services/api';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Switch, ScrollView, Alert, SafeAreaView, Platform, StatusBar, ActivityIndicator } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { createMovimiento, analyzeReceiptWithOCR } from '../services/api';
 
 const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
@@ -23,6 +24,51 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
   const [esRecurrente, setEsRecurrente] = useState(false);
   const [descripcion, setDescripcion] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [analyzingOcr, setAnalyzingOcr] = useState(false);
+
+  const handlePickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permiso requerido', 'Se requiere acceso a la galería para escanear comprobantes.');
+        return;
+      }
+
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 0.8,
+        base64: true,
+      });
+
+      if (pickerResult.canceled || !pickerResult.assets || !pickerResult.assets[0]) {
+        return;
+      }
+
+      const asset = pickerResult.assets[0];
+      setAnalyzingOcr(true);
+
+      const res = await analyzeReceiptWithOCR(asset.base64, asset.mimeType || 'image/jpeg');
+
+      if (res.success && res.data) {
+        const data = res.data;
+        if (data.nombre) setNombre(data.nombre);
+        if (data.monto) setMonto(data.monto.toString());
+        if (data.tipo) setTipo(data.tipo);
+        if (data.categoria) {
+          const match = CATEGORIES.find(c => c.toLowerCase() === data.categoria.toLowerCase());
+          setCategoria(match || 'Otros');
+        }
+        Alert.alert('✨ ¡Datos Extraídos!', `Comprobante analizado con éxito:\n\n• Concepto: ${data.nombre}\n• Monto: S/ ${data.monto}`);
+      } else {
+        Alert.alert('OCR', 'No se pudieron extraer datos claros del comprobante.');
+      }
+    } catch (err) {
+      Alert.alert('Error OCR', err.message || 'Error al analizar la imagen.');
+    } finally {
+      setAnalyzingOcr(false);
+    }
+  };
 
   const handleSave = async () => {
     const numAmount = parseFloat(monto);
@@ -75,12 +121,19 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Placeholder OCR */}
+        {/* Card OCR Inteligente con Gemini Vision */}
         <View style={theme.ocrCard}>
           <Text style={theme.ocrText}>📷 Extraer datos de comprobante (OCR)</Text>
-          <TouchableOpacity style={theme.ocrBtn} activeOpacity={0.8}>
-            <Text style={theme.ocrBtnText}>Seleccionar archivo</Text>
-          </TouchableOpacity>
+          {analyzingOcr ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+              <ActivityIndicator color="#34D399" />
+              <Text style={{ color: '#34D399', fontWeight: 'bold', fontSize: 13 }}>Analizando comprobante con Gemini Vision...</Text>
+            </View>
+          ) : (
+            <TouchableOpacity style={theme.ocrBtn} onPress={handlePickImage} activeOpacity={0.8}>
+              <Text style={theme.ocrBtnText}>Seleccionar archivo / foto</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={theme.card}>
