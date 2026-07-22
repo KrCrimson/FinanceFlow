@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, ScrollView, RefreshControl, TouchableOpacity, Modal, TextInput, Alert, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchMovimientos, createMovimiento, crearCierre, updateMovimiento, fetchCierresPendientes, fetchResumenPeriodo } from '../services/api';
+import { getMobileCurrencySymbol } from '../utils/currency';
 
 const MONTH_OPTIONS = [
   { label: 'Julio 2026', month: 6, year: 2026 },
@@ -420,13 +421,13 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           <View style={[theme.balanceCard, { backgroundColor: '#10B981' }]}>
             <Text style={theme.balanceLabel}>Total Ingresos</Text>
             <Text style={theme.balanceValue} numberOfLines={1} adjustsFontSizeToFit>
-              S/ {totalIngresos.toFixed(2)}
+              {getMobileCurrencySymbol()} {totalIngresos.toFixed(2)}
             </Text>
           </View>
           <View style={[theme.balanceCard, { backgroundColor: '#EF4444' }]}>
             <Text style={theme.balanceLabel}>Total Egresos</Text>
             <Text style={theme.balanceValue} numberOfLines={1} adjustsFontSizeToFit>
-              S/ {totalEgresos.toFixed(2)}
+              {getMobileCurrencySymbol()} {totalEgresos.toFixed(2)}
             </Text>
           </View>
         </View>
@@ -434,7 +435,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
         <View style={[theme.balanceCardWide, { backgroundColor: '#3B82F6' }]}>
           <Text style={theme.balanceLabel}>Balance Total ({selectedMonth.label})</Text>
           <Text style={theme.balanceValueWide} numberOfLines={1} adjustsFontSizeToFit>
-            S/ {balanceTotal.toFixed(2)}
+            {getMobileCurrencySymbol()} {balanceTotal.toFixed(2)}
           </Text>
         </View>
 

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { getProfile, updateProfile, deleteAccount as deleteProfile } from '../services/usuarios-adapter';
 import { logout } from '../services/auth-adapter';
 import { useNavigate } from 'react-router-dom';
+import { CURRENCIES, getCurrencySymbol, setCurrencySymbol } from '../utils/currency';
 
 function ProfilePage() {
   const navigate = useNavigate();
   const [perfil, setPerfil] = useState(null);
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
+  const [moneda, setMoneda] = useState(getCurrencySymbol());
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -186,6 +188,27 @@ function ProfilePage() {
                 required 
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               />
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                🔤 Moneda de la Cuenta
+              </label>
+              <select
+                value={moneda}
+                onChange={(e) => {
+                  const newSym = e.target.value;
+                  setMoneda(newSym);
+                  setCurrencySymbol(newSym);
+                  setSuccess(`✅ Moneda principal cambiada a '${newSym}'`);
+                  setTimeout(() => setSuccess(''), 3000);
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white font-bold text-gray-800"
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.symbol}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
 

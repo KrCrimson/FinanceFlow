@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CURRENCIES, getMobileCurrencySymbol, setMobileCurrencySymbol } from '../utils/currency';
 
 export default function ProfileScreen({ user, onLogout }) {
   const [nombre, setNombre] = useState(user?.nombre || 'sebastian');
   const [email, setEmail] = useState(user?.email || 'sebastianarce2010@gmail.com');
+  const [moneda, setMoneda] = useState(getMobileCurrencySymbol());
   const [saving, setSaving] = useState(false);
 
   const handleReset = () => {
@@ -18,6 +20,12 @@ export default function ProfileScreen({ user, onLogout }) {
       setSaving(false);
       Alert.alert('¡Perfil Actualizado!', 'Tu información personal ha sido guardada con éxito.');
     }, 500);
+  };
+
+  const handleCurrencySelect = (item) => {
+    setMoneda(item.symbol);
+    setMobileCurrencySymbol(item.symbol);
+    Alert.alert('🔤 Moneda Principal Cambiada', `La moneda principal ahora es ${item.name}`);
   };
 
   const handleLogoutConfirm = () => {
@@ -82,6 +90,30 @@ export default function ProfileScreen({ user, onLogout }) {
             placeholder="tu@correo.com"
             placeholderTextColor="#9CA3AF"
           />
+
+          <Text style={styles.label}>🔤 Moneda de la Cuenta</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 6 }}>
+            <View style={{ flexDirection: 'row', gap: 6, paddingVertical: 4 }}>
+              {CURRENCIES.map((c) => (
+                <TouchableOpacity
+                  key={c.code}
+                  onPress={() => handleCurrencySelect(c)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    backgroundColor: moneda === c.symbol ? '#10B981' : '#F3F4F6',
+                    borderColor: moneda === c.symbol ? '#10B981' : '#E5E7EB'
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: 'bold', color: moneda === c.symbol ? '#FFFFFF' : '#374151' }}>
+                    {c.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
 
           <Text style={styles.label}>📅 Miembro desde</Text>
           <View style={styles.disabledInput}>

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Switch, ScrollView
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { createMovimiento, fetchMovimientos, analyzeReceiptWithOCR } from '../services/api';
+import { getMobileCurrencySymbol } from '../utils/currency';
 
 const DEFAULT_CATEGORIES = {
   ingreso: ['Sueldo', 'Ventas', 'Freelance', 'Préstamo', 'Cobro de préstamo', 'Otros'],
@@ -204,7 +205,7 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
             </TouchableOpacity>
           </View>
 
-          <Text style={theme.label}>Monto (S/)</Text>
+          <Text style={theme.label}>Monto ({getMobileCurrencySymbol()})</Text>
           <TextInput
             style={theme.input}
             placeholder="0.00"

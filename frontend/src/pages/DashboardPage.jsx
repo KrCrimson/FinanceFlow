@@ -9,6 +9,7 @@ import CajaChicaModal from '../components/CajaChicaModal';
 import ReabrirModal from '../components/ReabrirModal';
 import TutorialModal from '../components/TutorialModal';
 import { getProfile } from '../services/usuarios-adapter';
+import { getCurrencySymbol } from '../utils/currency';
 
 const currentMonthStr = new Date().toISOString().slice(0, 7);
 
@@ -28,6 +29,13 @@ function DashboardPage() {
   const [actualizando, setActualizando] = useState(null);
   const [feedback, setFeedback] = useState('');
   const [vistaActiva, setVistaActiva] = useState('dashboard'); // 'dashboard' o 'planificador'
+  const [currencySymbol, setCurrencySymbolState] = useState(getCurrencySymbol());
+
+  useEffect(() => {
+    const handleCurrencyChange = () => setCurrencySymbolState(getCurrencySymbol());
+    window.addEventListener('currency_changed', handleCurrencyChange);
+    return () => window.removeEventListener('currency_changed', handleCurrencyChange);
+  }, []);
   const [mesFiltro, setMesFiltro] = useState(currentMonthStr);
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
 
@@ -409,7 +417,7 @@ function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-green-100 font-medium">Total Ingresos</p>
-                <p className="text-3xl font-bold">${ingresos.toLocaleString()}</p>
+                <p className="text-3xl font-bold">{currencySymbol}{ingresos.toLocaleString()}</p>
               </div>
               <div className="text-4xl opacity-80">📈</div>
             </div>
@@ -419,7 +427,7 @@ function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-red-100 font-medium">Total Egresos</p>
-                <p className="text-3xl font-bold">${egresos.toLocaleString()}</p>
+                <p className="text-3xl font-bold">{currencySymbol}{egresos.toLocaleString()}</p>
               </div>
               <div className="text-4xl opacity-80">📉</div>
             </div>
@@ -429,7 +437,7 @@ function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/80 font-medium">Balance Total</p>
-                <p className="text-3xl font-bold">${balance.toLocaleString()}</p>
+                <p className="text-3xl font-bold">{currencySymbol}{balance.toLocaleString()}</p>
               </div>
               <div className="text-4xl opacity-80">{balance >= 0 ? '💰' : '⚠️'}</div>
             </div>
