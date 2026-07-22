@@ -18,5 +18,7 @@ router.patch('/:id/inhabilitar', auth, movimientosController.inhabilitarMovimien
 router.patch('/:id/inactivar', auth, movimientosController.inhabilitarMovimiento);
 // Registrar movimiento historico
 router.post('/historico', auth, movimientosController.crearMovimientoHistorico);
+// Analizar comprobante con Gemini Vision OCR
+router.post('/ocr', auth, movimientosController.analizarComprobante);
 
 module.exports = router;

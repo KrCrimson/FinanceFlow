@@ -47,4 +47,17 @@ module.exports = {
       }
     }
   },
+  analizarComprobante: async (req, res) => {
+    try {
+      const { imageBase64, mimeType } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: 'Se requiere la imagen en base64' });
+      }
+      const ocrService = require('../services/ocr.service');
+      const data = await ocrService.analizarComprobante(imageBase64, mimeType);
+      res.json({ success: true, data });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };

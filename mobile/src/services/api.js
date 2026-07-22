@@ -105,3 +105,10 @@ export const crearCierre = async (cierreData) => {
 export const fetchResumenPeriodo = async (tipo, periodo) => {
   return await apiFetch(`/cierres/resumen?tipo=${tipo}&periodo=${periodo}`);
 };
+
+export const analyzeReceiptWithOCR = async (imageBase64, mimeType = 'image/jpeg') => {
+  return await apiFetch('/movimientos/ocr', {
+    method: 'POST',
+    body: JSON.stringify({ imageBase64, mimeType })
+  });
+};
