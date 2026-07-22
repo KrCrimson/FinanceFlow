@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import FinanceFlowLogo from '../components/FinanceFlowLogo';
 
 function LandingPage() {
   return (
@@ -8,7 +9,9 @@ function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="FinanceFlow Logo" className="h-10 w-auto object-contain brightness-125 filter drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+            <div className="p-1.5 rounded-xl bg-emerald-950/60 border border-emerald-400/60 shadow-lg shadow-emerald-950/50 flex items-center justify-center">
+              <FinanceFlowLogo size={36} className="h-9 w-9" />
+            </div>
             <span className="text-2xl font-extrabold bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent">
               FinanceFlow
             </span>
@@ -299,7 +302,7 @@ function LandingPage() {
       {/* Footer */}
       <footer className="bg-gray-950 border-t border-gray-800 py-12 px-4 text-center text-xs text-gray-500 space-y-4">
         <div className="flex items-center justify-center space-x-2 text-lg font-bold text-gray-200">
-          <img src="/logo.png" alt="FinanceFlow Logo" className="h-7 w-auto object-contain" />
+          <FinanceFlowLogo size={24} className="h-6 w-6" />
           <span>FinanceFlow</span>
         </div>
         <p>© 2026 FinanceFlow Inc. Todos los derechos reservados. Sistema de Balance y Gestión Financiera Personal.</p>

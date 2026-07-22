@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import FinanceFlowLogo from './FinanceFlowLogo';
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -39,9 +40,11 @@ function Navbar() {
           <div className="flex items-center">
             <Link 
               to="/" 
-              className="flex items-center space-x-3 text-white font-bold text-xl hover:opacity-90 transition-all duration-200"
+              className="flex items-center space-x-3 text-white font-bold text-xl hover:opacity-90 transition-all duration-200 group"
             >
-              <img src="/logo.png" alt="FinanceFlow Logo" className="h-9 w-auto object-contain drop-shadow-md" />
+              <div className="p-1.5 rounded-xl bg-emerald-950/40 border border-emerald-300/50 shadow-md group-hover:border-emerald-200 transition-colors flex items-center justify-center">
+                <FinanceFlowLogo size={34} className="h-8 w-8" />
+              </div>
               <span className="font-extrabold tracking-tight bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent text-2xl">
                 FinanceFlow
               </span>
