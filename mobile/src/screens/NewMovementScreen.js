@@ -1,30 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Switch, ScrollView, Alert, SafeAreaView, Platform, StatusBar, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { createMovimiento, analyzeReceiptWithOCR } from '../services/api';
+import { createMovimiento, fetchMovimientos, analyzeReceiptWithOCR } from '../services/api';
 
-const STATUSBAR_HEIGHT = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
-
-const CATEGORIES = [
-  'Freelance',
-  'Comida',
-  'Educación',
-  'Entretenimiento',
-  'Servicios',
-  'Salario',
-  'Sueldo',
-  'Otros'
-];
+const DEFAULT_CATEGORIES = {
+  ingreso: ['Sueldo', 'Ventas', 'Freelance', 'Préstamo', 'Cobro de préstamo', 'Otros'],
+  egreso: ['Comida', 'Servicios', 'Entretenimiento', 'Educación', 'Transporte', 'Vivienda', 'Salud', 'Otros']
+};
 
 export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDarkMode }) {
   const [nombre, setNombre] = useState('');
   const [tipo, setTipo] = useState('ingreso');
   const [monto, setMonto] = useState('');
-  const [categoria, setCategoria] = useState(CATEGORIES[0]);
+  const [categoria, setCategoria] = useState(DEFAULT_CATEGORIES.ingreso[0]);
+  const [categoriaPersonalizada, setCategoriaPersonalizada] = useState('');
   const [esRecurrente, setEsRecurrente] = useState(false);
   const [descripcion, setDescripcion] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [analyzingOcr, setAnalyzingOcr] = useState(false);
+
+  const [categoriasDinamicas, setCategoriasDinamicas] = useState(DEFAULT_CATEGORIES);
+
+  useEffect(() => {
+    // Cargar historial de movimientos para añadir las categorías personalizadas del usuario
+    const loadUserCategories = async () => {
+      try {
+        const movs = await fetchMovimientos();
+        if (!movs || !Array.isArray(movs)) return;
+
+        const customIngreso = new Set(DEFAULT_CATEGORIES.ingreso.filter(c => c !== 'Otros'));
+        const customEgreso = new Set(DEFAULT_CATEGORIES.egreso.filter(c => c !== 'Otros'));
+
+        movs.forEach(m => {
+          if (!m.categoria) return;
+          if (m.tipo === 'ingreso') {
+            customIngreso.add(m.categoria);
+          } else if (m.tipo === 'egreso') {
+            customEgreso.add(m.categoria);
+          }
+        });
+
+        setCategoriasDinamicas({
+          ingreso: [...Array.from(customIngreso), 'Otros'],
+          egreso: [...Array.from(customEgreso), 'Otros']
+        });
+      } catch (err) {
+        console.log('Error cargando categorías personalizadas:', err);
+      }
+    };
+
+    loadUserCategories();
+  }, []);
+
+  const handleTipoChange = (newTipo) => {
+    setTipo(newTipo);
+    const available = categoriasDinamicas[newTipo] || DEFAULT_CATEGORIES[newTipo];
+    setCategoria(available[0]);
+    setCategoriaPersonalizada('');
+  };
 
   const handlePickImage = async () => {
     try {
@@ -54,10 +87,19 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
         const data = res.data;
         if (data.nombre) setNombre(data.nombre);
         if (data.monto) setMonto(data.monto.toString());
-        if (data.tipo) setTipo(data.tipo);
+        if (data.tipo) {
+          const detectedTipo = data.tipo.toLowerCase() === 'ingreso' ? 'ingreso' : 'egreso';
+          setTipo(detectedTipo);
+        }
         if (data.categoria) {
-          const match = CATEGORIES.find(c => c.toLowerCase() === data.categoria.toLowerCase());
-          setCategoria(match || 'Otros');
+          const catList = categoriasDinamicas[data.tipo] || DEFAULT_CATEGORIES[data.tipo] || [];
+          const match = catList.find(c => c.toLowerCase() === data.categoria.toLowerCase());
+          if (match) {
+            setCategoria(match);
+          } else {
+            setCategoria('Otros');
+            setCategoriaPersonalizada(data.categoria);
+          }
         }
         Alert.alert('✨ ¡Datos Extraídos!', `Comprobante analizado con éxito:\n\n• Concepto: ${data.nombre}\n• Monto: S/ ${data.monto}`);
       } else {
@@ -72,8 +114,13 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
 
   const handleSave = async () => {
     const numAmount = parseFloat(monto);
-    if (!nombre.trim() || isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert('Datos Inválidos', 'Por favor ingresa un nombre y un monto válido.');
+    let finalCategoria = categoria;
+    if (categoria === 'Otros' && categoriaPersonalizada.trim()) {
+      finalCategoria = categoriaPersonalizada.trim();
+    }
+
+    if (!nombre.trim() || isNaN(numAmount) || numAmount <= 0 || !finalCategoria) {
+      Alert.alert('Datos Inválidos', 'Por favor completa todos los campos requeridos correctamente.');
       return;
     }
 
@@ -83,8 +130,8 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
         nombre: nombre.trim(),
         tipo,
         monto: numAmount,
-        categoria,
-        esRecurrente,
+        categoria: finalCategoria,
+        esRecurrente: tipo === 'ingreso' ? esRecurrente : false,
         descripcion: descripcion.trim(),
         fecha: new Date().toISOString()
       });
@@ -100,6 +147,7 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
   };
 
   const theme = isDarkMode ? darkStyles : lightStyles;
+  const currentCategories = categoriasDinamicas[tipo] || DEFAULT_CATEGORIES[tipo];
 
   return (
     <SafeAreaView style={theme.container}>
@@ -111,7 +159,7 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
           <Text style={theme.backBtnText}>← Volver</Text>
         </TouchableOpacity>
         <Text style={theme.navbarTitle} numberOfLines={1}>Registrar Movimiento</Text>
-        <TouchableOpacity style={theme.navActionBtn} onPress={() => { setNombre(''); setMonto(''); setDescripcion(''); }} activeOpacity={0.7}>
+        <TouchableOpacity style={theme.navActionBtn} onPress={() => { setNombre(''); setMonto(''); setDescripcion(''); setCategoriaPersonalizada(''); }} activeOpacity={0.7}>
           <Text style={theme.clearBtnText}>Limpiar</Text>
         </TouchableOpacity>
       </View>
@@ -141,17 +189,17 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
           <View style={theme.typeSelector}>
             <TouchableOpacity
               style={[theme.typeBtn, tipo === 'ingreso' && theme.typeBtnActiveIncome]}
-              onPress={() => setTipo('ingreso')}
+              onPress={() => handleTipoChange('ingreso')}
               activeOpacity={0.8}
             >
-              <Text style={[theme.typeBtnText, tipo === 'ingreso' && { color: '#FFFFFF' }]}>Ingreso</Text>
+              <Text style={[theme.typeBtnText, tipo === 'ingreso' && { color: '#FFFFFF' }]}>💰 Ingreso</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[theme.typeBtn, tipo === 'egreso' && theme.typeBtnActiveExpense]}
-              onPress={() => setTipo('egreso')}
+              onPress={() => handleTipoChange('egreso')}
               activeOpacity={0.8}
             >
-              <Text style={[theme.typeBtnText, tipo === 'egreso' && { color: '#FFFFFF' }]}>Egreso</Text>
+              <Text style={[theme.typeBtnText, tipo === 'egreso' && { color: '#FFFFFF' }]}>💸 Egreso</Text>
             </TouchableOpacity>
           </View>
 
@@ -176,11 +224,14 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
 
           <Text style={theme.label}>Categoría</Text>
           <View style={theme.catGrid}>
-            {CATEGORIES.map((cat) => (
+            {currentCategories.map((cat) => (
               <TouchableOpacity
                 key={cat}
                 style={[theme.catBadge, categoria === cat && theme.catBadgeActive]}
-                onPress={() => setCategoria(cat)}
+                onPress={() => {
+                  setCategoria(cat);
+                  if (cat !== 'Otros') setCategoriaPersonalizada('');
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={[theme.catBadgeText, categoria === cat && theme.catBadgeTextActive]}>
@@ -190,15 +241,33 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
             ))}
           </View>
 
-          <View style={theme.switchRow}>
-            <Text style={theme.switchLabel}>Ingreso Constante (Mensual)</Text>
-            <Switch
-              value={esRecurrente}
-              onValueChange={setEsRecurrente}
-              trackColor={{ false: '#D1D5DB', true: '#6EE7B7' }}
-              thumbColor={esRecurrente ? '#34D399' : '#F3F4F6'}
-            />
-          </View>
+          {/* Campo para Categoría Personalizada al seleccionar 'Otros' */}
+          {categoria === 'Otros' && (
+            <View style={{ marginTop: 10 }}>
+              <TextInput
+                style={[theme.input, { borderColor: '#3B82F6', backgroundColor: isDarkMode ? '#1E293B' : '#EFF6FF' }]}
+                placeholder="Escriba su categoría personalizada"
+                placeholderTextColor="#9CA3AF"
+                value={categoriaPersonalizada}
+                onChangeText={setCategoriaPersonalizada}
+              />
+              <Text style={{ fontSize: 11, color: '#3B82F6', fontWeight: 'bold', marginTop: 4 }}>
+                💡 Esta categoría se guardará para futuros usos
+              </Text>
+            </View>
+          )}
+
+          {tipo === 'ingreso' && (
+            <View style={theme.switchRow}>
+              <Text style={theme.switchLabel}>Ingreso Constante (Mensual)</Text>
+              <Switch
+                value={esRecurrente}
+                onValueChange={setEsRecurrente}
+                trackColor={{ false: '#D1D5DB', true: '#6EE7B7' }}
+                thumbColor={esRecurrente ? '#34D399' : '#F3F4F6'}
+              />
+            </View>
+          )}
 
           <Text style={theme.label}>Descripción (Opcional)</Text>
           <TextInput
@@ -212,7 +281,7 @@ export default function NewMovementScreen({ onSaveSuccess, onNavigateBack, isDar
           />
 
           <TouchableOpacity style={theme.saveBtn} onPress={handleSave} disabled={submitting} activeOpacity={0.8}>
-            <Text style={theme.saveBtnText}>{submitting ? 'Guardando...' : 'Guardar Movimiento'}</Text>
+            <Text style={theme.saveBtnText}>{submitting ? 'Guardando...' : '💾 Guardar Movimiento'}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
