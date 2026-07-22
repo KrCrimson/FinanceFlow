@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 
-function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrearEgreso }) {
-  const [comprasPlanificadas, setComprasPlanificadas] = useState([
-    { id: '1', item: 'Laptop Nueva', montoObjetivo: 3500 },
-    { id: '2', item: 'Ram', montoObjetivo: 900 }
-  ]);
+function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrearEgreso, onUpdateEgreso }) {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoMonto, setNuevoMonto] = useState('');
 
-  const handleAgregarMeta = (e) => {
+  // LEER DE LA BASE DE DATOS
+  const comprasPlanificadas = (movimientos || [])
+    .filter((m) => m.estado === 'planificado')
+    .map((m) => ({
+      id: m._id,
+      item: m.nombre,
+      montoObjetivo: m.monto
+    }));
+
+  const handleAgregarMeta = async (e) => {
     e.preventDefault();
     const amount = parseFloat(nuevoMonto);
     if (!nuevoNombre.trim() || isNaN(amount) || amount <= 0) {
@@ -17,10 +22,16 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
       return;
     }
 
-    setComprasPlanificadas([
-      ...comprasPlanificadas,
-      { id: Date.now().toString(), item: nuevoNombre.trim(), montoObjetivo: amount }
-    ]);
+    if (onCrearEgreso) {
+      await onCrearEgreso({
+        nombre: nuevoNombre.trim(),
+        monto: amount,
+        tipo: 'egreso',
+        categoria: 'Otros',
+        estado: 'planificado',
+        fecha: new Date().toISOString()
+      });
+    }
     setNuevoNombre('');
     setNuevoMonto('');
     setMostrarModal(false);
@@ -28,22 +39,22 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
 
   const handleMarcarComprado = async (compra) => {
     if (window.confirm(`¿Deseas cerrar "${compra.item}" y registrar el egreso por S/${compra.montoObjetivo}?`)) {
-      if (onCrearEgreso) {
-        await onCrearEgreso({
-          nombre: compra.item,
-          monto: compra.montoObjetivo,
-          tipo: 'egreso',
-          categoria: 'Otros',
-          descripcion: 'Compra finalizada desde el Planificador de Compras'
+      if (onUpdateEgreso) {
+        await onUpdateEgreso(compra.id, {
+          estado: 'activo',
+          fecha: new Date().toISOString()
         });
       }
-      setComprasPlanificadas(prev => prev.filter(c => c.id !== compra.id));
     }
   };
 
-  const handleCancelarCompra = (id, nombre) => {
+  const handleCancelarCompra = async (id, nombre) => {
     if (window.confirm(`¿Estás seguro de cancelar la planificación de "${nombre}"?`)) {
-      setComprasPlanificadas(prev => prev.filter(c => c.id !== id));
+      if (onUpdateEgreso) {
+        await onUpdateEgreso(id, {
+          estado: 'inactivo'
+        });
+      }
     }
   };
 
@@ -87,7 +98,7 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
         {comprasConAvance.length === 0 ? (
           <div className="text-center py-10 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
             <span className="text-3xl">🛍️</span>
-            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mt-2">No tienes compras planificadas activas.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mt-2">No tienes compras planificadas activas en la base de datos.</p>
           </div>
         ) : (
           comprasConAvance.map((compra) => (

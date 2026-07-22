@@ -42,7 +42,7 @@ module.exports = {
       categoria: data.categoria.trim(),
       userId: data.userId,
       fecha: data.fecha ? new Date(data.fecha) : new Date(),
-      estado: 'activo',
+      estado: data.estado || 'activo',
       esRecurrente: !!data.esRecurrente,
       creadoEn: new Date(),
       actualizadoEn: new Date(),

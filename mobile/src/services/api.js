@@ -78,12 +78,20 @@ export const toggleMovimientoEstado = async (id) => {
   });
 };
 
+export const updateMovimiento = async (id, movimientoData) => {
+  return await apiFetch(`/movimientos/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(movimientoData)
+  });
+};
+
 // Endpoints de Arqueos / Cierres
-export const fetchCierresPendientes = async () => {
+export const fetchCierresPendientes = async (localDate) => {
   try {
-    return await apiFetch('/cierres/pendientes');
+    const query = localDate ? `?localDate=${localDate}` : '';
+    return await apiFetch(`/cierres/pendientes${query}`);
   } catch (err) {
-    return [];
+    return null;
   }
 };
 
@@ -92,4 +100,8 @@ export const crearCierre = async (cierreData) => {
     method: 'POST',
     body: JSON.stringify(cierreData)
   });
+};
+
+export const fetchResumenPeriodo = async (tipo, periodo) => {
+  return await apiFetch(`/cierres/resumen?tipo=${tipo}&periodo=${periodo}`);
 };

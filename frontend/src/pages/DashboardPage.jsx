@@ -669,6 +669,10 @@ function DashboardPage() {
               await createMovimiento(data);
               window.location.reload();
             }}
+            onUpdateEgreso={async (id, data) => {
+              await updateMovimiento(id, data);
+              window.location.reload();
+            }}
           />
         )}
       </div>

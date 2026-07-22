@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Modal, TextInput, Alert, Platform, StatusBar } from 'react-native';
-import { fetchMovimientos, createMovimiento, crearCierre } from '../services/api';
+import { fetchMovimientos, createMovimiento, crearCierre, updateMovimiento, fetchCierresPendientes, fetchResumenPeriodo } from '../services/api';
 
 const MONTH_OPTIONS = [
   { label: 'Julio 2026', month: 6, year: 2026 },
@@ -14,20 +14,37 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [arqueoRealizado, setArqueoRealizado] = useState(false);
+  const [pendientes, setPendientes] = useState(null);
 
   // Filtro por Meses
   const [selectedMonth, setSelectedMonth] = useState(MONTH_OPTIONS[0]);
   const [showMonthModal, setShowMonthModal] = useState(false);
 
   // Planificador de Compras
-  const [comprasPlanificadas, setComprasPlanificadas] = useState([
-    { id: '1', item: 'Laptop Nueva', montoObjetivo: 3500 },
-    { id: '2', item: 'Ram', montoObjetivo: 900 }
-  ]);
   const [showAddCompraModal, setShowAddCompraModal] = useState(false);
   const [nuevaCompraItem, setNuevaCompraItem] = useState('');
   const [nuevaCompraMonto, setNuevaCompraMonto] = useState('');
+
+  // Modal de Arqueo Completo (Caja Chica)
+  const [showArqueoModal, setShowArqueoModal] = useState(false);
+  const [cierreTipo, setCierreTipo] = useState('diario'); // 'diario' o 'mensual'
+  const [cierrePeriodo, setCierrePeriodo] = useState('');
+  const [cierreResumen, setCierreResumen] = useState({ ingresosTotales: 0, egresosTotales: 0 });
+  const [fondoFijo, setFondoFijo] = useState('0');
+  const [saldoFisico, setSaldoFisico] = useState('');
+  const [comentarios, setComentarios] = useState('');
+  const [password, setPassword] = useState('');
+  const [submittingCierre, setSubmittingCierre] = useState(false);
+  const [cierreError, setCierreError] = useState('');
+
+  // Planificador de Compras derivados de la base de datos
+  const comprasPlanificadas = movimientos
+    .filter((m) => m.estado === 'planificado')
+    .map((m) => ({
+      id: m._id,
+      item: m.nombre,
+      montoObjetivo: m.monto
+    }));
 
   const autoCheckRecurrentIncomes = async (data) => {
     try {
@@ -93,6 +110,11 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
       }
 
       setMovimientos(data || []);
+
+      // Cargar cierres pendientes con fecha local YYYY-MM-DD
+      const localDate = new Date().toISOString().slice(0, 10);
+      const dataPendientes = await fetchCierresPendientes(localDate);
+      setPendientes(dataPendientes);
     } catch (err) {
       console.error(err);
     } finally {
@@ -110,42 +132,90 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
     loadData();
   };
 
-  const handleArqueoAction = async (coincidio) => {
+  const handleOpenArqueoModal = async (tipo, periodo, resumen) => {
     try {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
+      setCierreTipo(tipo);
+      setCierrePeriodo(periodo);
+      setFondoFijo('0');
+      setSaldoFisico('');
+      setComentarios('');
+      setPassword('');
+      setCierreError('');
       
-      await crearCierre({
-        fecha: yesterday.toISOString(),
-        tipo: 'diario',
-        coincidio
-      });
-
-      setArqueoRealizado(true);
-      Alert.alert(
-        'Arqueo Registrado',
-        coincidio ? '¡Excelente! El arqueo diario fue registrado como conforme.' : 'El arqueo fue registrado con observaciones.'
-      );
+      if (resumen) {
+        setCierreResumen(resumen);
+      } else {
+        // Cargar resumen del periodo desde la API
+        const dataResumen = await fetchResumenPeriodo(tipo, periodo);
+        setCierreResumen({
+          ingresosTotales: dataResumen?.ingresosTotales || 0,
+          egresosTotales: dataResumen?.egresosTotales || 0
+        });
+      }
+      setShowArqueoModal(true);
     } catch (err) {
-      setArqueoRealizado(true);
+      Alert.alert('Error', 'No se pudo obtener el resumen del periodo.');
     }
   };
 
-  const handleAddCompra = () => {
+  const handleConfirmarCierre = async () => {
+    if (saldoFisico === '') {
+      setCierreError('Por favor digite el dinero físico en caja');
+      return;
+    }
+    if (cierreTipo === 'mensual' && !password) {
+      setCierreError('Se requiere la contraseña para cerrar el mes');
+      return;
+    }
+
+    try {
+      setSubmittingCierre(true);
+      setCierreError('');
+
+      await crearCierre({
+        tipo: cierreTipo,
+        periodo: cierrePeriodo,
+        fondoFijo: Number(fondoFijo) || 0,
+        saldoFisico: Number(saldoFisico),
+        comentarios,
+        password
+      });
+
+      setShowArqueoModal(false);
+      Alert.alert('¡Cierre Exitoso!', `El arqueo ${cierreTipo} ha sido registrado de forma segura.`);
+      await loadData();
+    } catch (err) {
+      setCierreError(err.message || 'Error al guardar el cierre. Verifique sus datos.');
+    } finally {
+      setSubmittingCierre(false);
+    }
+  };
+
+  const handleAddCompra = async () => {
     const amount = parseFloat(nuevaCompraMonto);
     if (!nuevaCompraItem.trim() || isNaN(amount) || amount <= 0) {
       Alert.alert('Datos Inválidos', 'Ingresa una meta y un monto válido.');
       return;
     }
 
-    setComprasPlanificadas([
-      ...comprasPlanificadas,
-      { id: Date.now().toString(), item: nuevaCompraItem.trim(), montoObjetivo: amount }
-    ]);
-    setNuevaCompraItem('');
-    setNuevaCompraMonto('');
-    setShowAddCompraModal(false);
-    Alert.alert('¡Meta Agregada!', 'Tu meta de compra ha sido añadida al planificador.');
+    try {
+      await createMovimiento({
+        nombre: nuevaCompraItem.trim(),
+        tipo: 'egreso',
+        monto: amount,
+        categoria: 'Otros',
+        descripcion: 'Meta planificada',
+        fecha: new Date().toISOString(),
+        estado: 'planificado'
+      });
+      setNuevaCompraItem('');
+      setNuevaCompraMonto('');
+      setShowAddCompraModal(false);
+      await loadData();
+      Alert.alert('¡Meta Agregada!', 'Tu meta de compra ha sido añadida y sincronizada.');
+    } catch (err) {
+      Alert.alert('Error', 'No se pudo guardar la meta de compra.');
+    }
   };
 
   // Botón "Comprado" -> Convierte la meta en Egreso y refresca el Dashboard
@@ -159,20 +229,16 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           text: 'Sí, Comprado',
           onPress: async () => {
             try {
-              await createMovimiento({
-                nombre: compra.item,
-                tipo: 'egreso',
-                monto: compra.montoObjetivo,
-                categoria: 'Otros',
-                descripcion: 'Compra finalizada desde el Planificador de Compras',
-                fecha: new Date().toISOString()
+              await updateMovimiento(compra.id, {
+                estado: 'activo',
+                fecha: new Date().toISOString(),
+                descripcion: 'Meta cumplida y convertida en egreso real'
               });
 
-              setComprasPlanificadas((prev) => prev.filter((c) => c.id !== compra.id));
               await loadData();
               Alert.alert('🎉 ¡Felicidades!', `Se registró el egreso de S/ ${compra.montoObjetivo} en tus movimientos.`);
             } catch (err) {
-              Alert.alert('Error', 'No se pudo guardar el egreso de la compra.');
+              Alert.alert('Error', 'No se pudo registrar la compra.');
             }
           }
         }
@@ -190,8 +256,14 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
         {
           text: 'Sí, Cancelar',
           style: 'destructive',
-          onPress: () => {
-            setComprasPlanificadas((prev) => prev.filter((c) => c.id !== id));
+          onPress: async () => {
+            try {
+              await updateMovimiento(id, { estado: 'inactivo' });
+              await loadData();
+              Alert.alert('Meta Cancelada', 'La planificación ha sido removida.');
+            } catch (err) {
+              Alert.alert('Error', 'No se pudo cancelar la meta.');
+            }
           }
         }
       ]
@@ -217,7 +289,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
   const balanceTotal = totalIngresos - totalEgresos;
   const recurrentes = filteredActivos.filter((m) => m.esRecurrente);
 
-  // CARRERA DE METAS: CADA META EVALÚA SU ALCANCE CONTRA EL BALANCE DISPONIBLE REAL
+  // CARRERA DE METAS CONTRA BALANCE TOTAL
   const balanceDisponible = Math.max(0, balanceTotal);
   const comprasConAvance = comprasPlanificadas.map((compra) => {
     const asignado = Math.min(balanceDisponible, compra.montoObjetivo);
@@ -232,6 +304,11 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
       alcanzado: balanceDisponible >= compra.montoObjetivo
     };
   });
+
+  // Cálculos dinámicos de arqueo en el modal
+  const ff = Number(fondoFijo) || 0;
+  const saldoEsperado = ff + (cierreResumen?.ingresosTotales || 0) - (cierreResumen?.egresosTotales || 0);
+  const diferencia = saldoFisico !== '' ? Number(saldoFisico) - saldoEsperado : 0;
 
   return (
     <SafeAreaView style={theme.container}>
@@ -249,7 +326,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
             <Text style={theme.welcomeSubtitle}>Resumen de tu actividad financiera</Text>
           </View>
 
-          {/* Selector de Mes (Dropdown) */}
+          {/* Selector de Mes */}
           <TouchableOpacity
             style={theme.monthSelectorBtn}
             onPress={() => setShowMonthModal(true)}
@@ -259,32 +336,49 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           </TouchableOpacity>
         </View>
 
-        {/* Alerta Arqueo Diario */}
-        {!arqueoRealizado && (
+        {/* Banner Arqueo Diario Pendiente */}
+        {pendientes && pendientes.yesterday && !pendientes.yesterday.isClosed && (
           <View style={theme.arqueoCard}>
             <View style={theme.arqueoHeader}>
               <Text style={theme.arqueoIcon}>📅</Text>
               <View style={{ flex: 1 }}>
-                <Text style={theme.arqueoTitle}>Arqueo Diario: Ayer (2026-07-20)</Text>
+                <Text style={theme.arqueoTitle}>Arqueo Diario: Ayer ({pendientes.yesterday.date})</Text>
                 <Text style={theme.arqueoSummary}>
-                  Ingresos: <Text style={{ color: '#059669', fontWeight: 'bold' }}>+$0</Text> | Egresos: <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>-$0</Text>
+                  Ingresos: <Text style={{ color: '#059669', fontWeight: 'bold' }}>+${pendientes.yesterday.resumen?.ingresosTotales || 0}</Text> | Egresos: <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>-${pendientes.yesterday.resumen?.egresosTotales || 0}</Text>
                 </Text>
               </View>
             </View>
             <View style={theme.arqueoActions}>
               <TouchableOpacity
                 style={[theme.arqueoBtn, theme.arqueoBtnGreen]}
-                onPress={() => handleArqueoAction(true)}
+                onPress={() => handleOpenArqueoModal('diario', pendientes.yesterday.date, pendientes.yesterday.resumen)}
                 activeOpacity={0.8}
               >
-                <Text style={theme.arqueoBtnText}>Sí, todo cuadra</Text>
+                <Text style={theme.arqueoBtnText}>✅ Hacer Arqueo</Text>
               </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* Banner Cierre Mensual Pendiente */}
+        {pendientes && pendientes.prevMonth && !pendientes.prevMonth.isClosed && (
+          <View style={[theme.arqueoCard, { borderColor: '#EF4444', backgroundColor: '#FEF2F2' }]}>
+            <View style={theme.arqueoHeader}>
+              <Text style={theme.arqueoIcon}>🚨</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[theme.arqueoTitle, { color: '#991B1B' }]}>Cierre Mensual Requerido: {pendientes.prevMonth.periodo}</Text>
+                <Text style={[theme.arqueoSummary, { color: '#B91C1C' }]}>
+                  El mes anterior está abierto. Cerrar el mes requiere contraseña y bloqueará sus transacciones.
+                </Text>
+              </View>
+            </View>
+            <View style={theme.arqueoActions}>
               <TouchableOpacity
-                style={[theme.arqueoBtn, theme.arqueoBtnBlue]}
-                onPress={() => handleArqueoAction(false)}
+                style={[theme.arqueoBtn, { backgroundColor: '#EF4444' }]}
+                onPress={() => handleOpenArqueoModal('mensual', pendientes.prevMonth.periodo)}
                 activeOpacity={0.8}
               >
-                <Text style={theme.arqueoBtnText}>No, registrar arqueo</Text>
+                <Text style={theme.arqueoBtnText}>🔒 Cerrar Mes Anterior</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -313,7 +407,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           </Text>
         </View>
 
-        {/* Sección: Planificador de Compras */}
+        {/* Planificador de Compras */}
         <View style={theme.sectionHeaderRow}>
           <Text style={theme.sectionHeader}>🏁 Carrera de Compras Planificadas</Text>
           <TouchableOpacity style={theme.addGoalBtn} onPress={() => setShowAddCompraModal(true)} activeOpacity={0.8}>
@@ -322,7 +416,7 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
         </View>
 
         {comprasConAvance.length === 0 ? (
-          <Text style={theme.emptyText}>No tienes compras planificadas en este momento.</Text>
+          <Text style={theme.emptyText}>No tienes compras planificadas activas.</Text>
         ) : (
           comprasConAvance.map((compra) => (
             <View key={compra.id} style={[theme.goalCard, compra.alcanzado && { borderColor: '#10B981', borderWidth: 2 }]}>
@@ -467,13 +561,130 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
           </View>
         </View>
       </Modal>
+
+      {/* MODAL DE ARQUEO / CIERRE DE CAJA (Caja Chica) */}
+      <Modal visible={showArqueoModal} transparent animationType="slide">
+        <View style={theme.modalOverlay}>
+          <ScrollView contentContainerStyle={{ justifyContent: 'center', minHeight: '100%', width: '100%', paddingVertical: 40 }}>
+            <View style={theme.modalContent}>
+              <Text style={theme.modalTitle}>🏛️ Cierre {cierreTipo === 'diario' ? 'Diario' : 'Mensual'}</Text>
+              <Text style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, marginBottom: 12 }}>Periodo: {cierrePeriodo}</Text>
+
+              {/* Resumen Contable */}
+              <View style={{ backgroundColor: isDarkMode ? '#1F2937' : '#F3F4F6', borderRadius: 12, padding: 12, marginBottom: 14 }}>
+                <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#9CA3AF', marginBottom: 6 }}>RESUMEN CONTABLE</Text>
+                
+                <View style={{ flexDirection: 'row', justifycontent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 13, color: isDarkMode ? '#D1D5DB' : '#374151' }}>💵 Saldo Inicial (Fondo):</Text>
+                  <TextInput
+                    style={{ borderBottomWidth: 1, borderBottomColor: '#9CA3AF', width: 80, textAlign: 'right', fontSize: 13, color: isDarkMode ? '#FFF' : '#000', fontWeight: 'bold', padding: 0 }}
+                    value={fondoFijo}
+                    onChangeText={setFondoFijo}
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                <View style={{ flexDirection: 'row', justifycontent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 13, color: isDarkMode ? '#D1D5DB' : '#374151' }}>📈 (+) Ingresos Totales:</Text>
+                  <Text style={{ fontSize: 13, color: '#10B981', fontWeight: 'bold' }}>+S/ {cierreResumen.ingresosTotales.toFixed(2)}</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', justifycontent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 13, color: isDarkMode ? '#D1D5DB' : '#374151' }}>📉 (-) Egresos Totales:</Text>
+                  <Text style={{ fontSize: 13, color: '#EF4444', fontWeight: 'bold' }}>-S/ {cierreResumen.egresosTotales.toFixed(2)}</Text>
+                </View>
+
+                <View style={{ borderTopWidth: 1, borderTopColor: '#9CA3AF', paddingTop: 6, marginTop: 6, flexDirection: 'row', justifycontent: 'space-between' }}>
+                  <Text style={{ fontSize: 13, fontWeight: 'bold', color: isDarkMode ? '#FFF' : '#1F2937' }}>💰 (=) Saldo Esperado:</Text>
+                  <Text style={{ fontSize: 13, fontWeight: 'bold', color: isDarkMode ? '#FFF' : '#1F2937' }}>S/ {saldoEsperado.toFixed(2)}</Text>
+                </View>
+              </View>
+
+              {/* Input Dinero Físico */}
+              <Text style={theme.inputLabel}>💵 Dinero Físico Real en Caja</Text>
+              <TextInput
+                style={[theme.modalInput, { fontSize: 18, fontWeight: 'bold', textAlign: 'center' }]}
+                placeholder="0.00"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={saldoFisico}
+                onChangeText={setSaldoFisico}
+              />
+
+              {/* Diferencia */}
+              {saldoFisico !== '' && (
+                <View style={{
+                  backgroundColor: diferencia === 0 ? '#ECFDF5' : diferencia < 0 ? '#FEF2F2' : '#FFFBEB',
+                  borderColor: diferencia === 0 ? '#10B981' : diferencia < 0 ? '#EF4444' : '#F59E0B',
+                  borderWidth: 1, borderRadius: 10, padding: 10, marginTop: 10, flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center'
+                }}>
+                  <View style={{ flex: 1, paddingRight: 8 }}>
+                    <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#9CA3AF' }}>RESULTADO DEL ARQUEO</Text>
+                    <Text style={{ fontSize: 11, color: diferencia === 0 ? '#065F46' : diferencia < 0 ? '#991B1B' : '#92400E' }}>
+                      {diferencia === 0 ? '✅ Caja cuadra perfectamente.' : diferencia < 0 ? '⚠️ Caja no cuadra. Faltante.' : '💡 Caja no cuadra. Sobrante.'}
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 15, fontWeight: 'bold', color: diferencia === 0 ? '#065F46' : diferencia < 0 ? '#991B1B' : '#92400E' }}>
+                    S/ {diferencia.toFixed(2)}
+                  </Text>
+                </View>
+              )}
+
+              {/* Comentarios */}
+              <Text style={theme.inputLabel}>📝 Comentarios del Arqueo</Text>
+              <TextInput
+                style={[theme.modalInput, { height: 50, textAlignVertical: 'top' }]}
+                placeholder="Notas u observaciones de faltantes/sobrantes..."
+                placeholderTextColor="#9CA3AF"
+                multiline
+                value={comentarios}
+                onChangeText={setComentarios}
+              />
+
+              {/* Contraseña para Cierre Mensual */}
+              {cierreTipo === 'mensual' && (
+                <View style={{ marginTop: 12, padding: 10, backgroundColor: '#FEF2F2', borderRadius: 10, borderWidth: 1, borderColor: '#FCA5A5' }}>
+                  <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#991B1B', marginBottom: 4 }}>🔒 Ingrese Contraseña de Cuenta</Text>
+                  <TextInput
+                    style={[theme.modalInput, { backgroundColor: '#FFF' }]}
+                    placeholder="Contraseña"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                  />
+                  <Text style={{ fontSize: 9, color: '#B91C1C', marginTop: 4 }}>
+                    ⚠️ Acción irreversible. Cierra definitivamente el mes.
+                  </Text>
+                </View>
+              )}
+
+              {cierreError !== '' && (
+                <Text style={{ color: '#EF4444', fontWeight: 'bold', fontSize: 12, textAlign: 'center', marginTop: 10 }}>❌ {cierreError}</Text>
+              )}
+
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 18 }}>
+                <TouchableOpacity style={theme.cancelBtn} onPress={() => setShowArqueoModal(false)}>
+                  <Text style={theme.cancelBtnText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[theme.saveGoalBtn, { backgroundColor: '#3B82F6' }]}
+                  onPress={handleConfirmarCierre}
+                  disabled={submittingCierre || saldoFisico === ''}
+                >
+                  <Text style={theme.saveGoalBtnText}>{submittingCierre ? 'Guardando...' : '💾 Guardar Cierre'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const baseStyles = {
   scrollContent: { padding: 16, paddingBottom: 60 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  headerRow: { flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center', marginBottom: 16 },
   monthSelectorBtn: { borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
   monthSelectorText: { fontSize: 12, fontWeight: 'bold' },
   arqueoCard: { borderWidth: 1, borderRadius: 12, padding: 14, marginBottom: 16 },
@@ -492,12 +703,12 @@ const baseStyles = {
   balanceLabel: { color: '#FFFFFF', opacity: 0.9, fontSize: 12, fontWeight: '600' },
   balanceValue: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold', marginTop: 4 },
   balanceValueWide: { color: '#FFFFFF', fontSize: 22, fontWeight: 'bold', marginTop: 4 },
-  sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, marginBottom: 10 },
+  sectionHeaderRow: { flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center', marginTop: 14, marginBottom: 10 },
   sectionHeader: { fontSize: 16, fontWeight: 'bold' },
   addGoalBtn: { backgroundColor: '#34D399', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
   addGoalBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' },
   goalCard: { borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1 },
-  goalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  goalHeader: { flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center', marginBottom: 6 },
   goalTitle: { fontSize: 13, fontWeight: 'bold' },
   goalAmount: { fontSize: 12, color: '#10B981', fontWeight: 'bold' },
   compradoBtn: { backgroundColor: '#10B981', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 },
@@ -508,15 +719,15 @@ const baseStyles = {
   goalFill: { height: '100%', backgroundColor: '#34D399', borderRadius: 4 },
   goalPercent: { fontSize: 11, alignSelf: 'flex-end', marginTop: 4 },
   emptyText: { padding: 20, textAlign: 'center' },
-  txCard: { borderRadius: 12, padding: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, borderWidth: 1 },
+  txCard: { borderRadius: 12, padding: 12, flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center', marginBottom: 8, borderWidth: 1 },
   txName: { fontSize: 14, fontWeight: 'bold' },
   txMeta: { fontSize: 11, marginTop: 2 },
   txAmount: { fontSize: 14, fontWeight: 'bold' },
-  recurrenteCard: { borderLeftWidth: 4, borderLeftColor: '#3B82F6', padding: 12, borderRadius: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, borderWidth: 1 },
+  recurrenteCard: { borderLeftWidth: 4, borderLeftColor: '#3B82F6', padding: 12, borderRadius: 8, flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center', marginBottom: 8, borderWidth: 1 },
   recurrenteTitle: { fontSize: 13, fontWeight: 'bold' },
   recurrenteSubtitle: { fontSize: 11, marginTop: 2 },
   recurrenteAmount: { fontSize: 14, fontWeight: 'bold', color: '#10B981' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifycontent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { width: '100%', borderRadius: 16, padding: 20, borderWidth: 1 },
   modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 14, textAlign: 'center' },
   monthOption: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8, borderWidth: 1, marginBottom: 8 },
