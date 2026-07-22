@@ -7,6 +7,7 @@ import PlanificadorCompras from '../components/PlanificadorCompras';
 import { getCierresPendientes, crearCierre, getCierres } from '../services/cierresService';
 import CajaChicaModal from '../components/CajaChicaModal';
 import ReabrirModal from '../components/ReabrirModal';
+import TutorialModal from '../components/TutorialModal';
 import { getProfile } from '../services/usuarios-adapter';
 
 const currentMonthStr = new Date().toISOString().slice(0, 7);
@@ -37,6 +38,7 @@ function DashboardPage() {
   const [modalCierre, setModalCierre] = useState({ isOpen: false, tipo: 'diario', periodo: '' });
   const [cierresRealizados, setCierresRealizados] = useState([]);
   const [modalReabrir, setModalReabrir] = useState({ isOpen: false, tipo: 'mensual', periodo: '' });
+  const [mostrarTutorial, setMostrarTutorial] = useState(false);
 
   const cargarPendientesYPerfil = async () => {
     try {
@@ -285,6 +287,13 @@ function DashboardPage() {
                 <span>📊</span>
                 <span>Ver Reportes</span>
               </a>
+              <button 
+                onClick={() => setMostrarTutorial(true)} 
+                className="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-4 py-2 rounded-xl transition-colors duration-200 flex items-center space-x-2 text-sm"
+              >
+                <span>💡</span>
+                <span>Ver Tutorial</span>
+              </button>
             </div>
           </div>
         </div>
@@ -695,6 +704,12 @@ function DashboardPage() {
         tipo={modalReabrir.tipo}
         periodo={modalReabrir.periodo}
         onSuccess={handleReabrirExitoso}
+      />
+
+      {/* Modal Tutorial Guía Explicativa */}
+      <TutorialModal
+        isOpen={mostrarTutorial}
+        onClose={() => setMostrarTutorial(false)}
       />
     </div>
   );

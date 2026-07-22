@@ -27,6 +27,8 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
 
   // Modal de Arqueo Completo (Caja Chica)
   const [showArqueoModal, setShowArqueoModal] = useState(false);
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
   const [cierreTipo, setCierreTipo] = useState('diario'); // 'diario' o 'mensual'
   const [cierrePeriodo, setCierrePeriodo] = useState('');
   const [cierreResumen, setCierreResumen] = useState({ ingresosTotales: 0, egresosTotales: 0 });
@@ -327,6 +329,26 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#34D399" colors={['#34D399']} />}
         showsVerticalScrollIndicator={false}
       >
+        {/* Tarjeta de Bienvenida */}
+        <View style={{ backgroundColor: isDarkMode ? '#1E293B' : '#E0F2FE', borderRadius: 16, padding: 14, marginBottom: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: isDarkMode ? '#334155' : '#BAE6FD' }}>
+          <Text style={{ fontSize: 26, marginRight: 10 }}>👋</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: isDarkMode ? '#F8FAFC' : '#0369A1' }}>
+              ¡Hola, {user?.nombre || 'Sebastián'}!
+            </Text>
+            <Text style={{ fontSize: 11, color: isDarkMode ? '#94A3B8' : '#0284C7', marginTop: 2 }}>
+              Bienvenido a FinanceFlow. ¿Listo para controlar tus finanzas hoy?
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={{ backgroundColor: '#0284C7', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+            onPress={() => { setTutorialStep(0); setShowTutorialModal(true); }}
+            activeOpacity={0.8}
+          >
+            <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' }}>💡 Tutorial</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Header con Titulo & Selector de Meses */}
         <View style={theme.headerRow}>
           <View style={{ flex: 1 }}>
@@ -684,6 +706,98 @@ export default function DashboardScreen({ user, onNavigateToNewMovement, isDarkM
               </View>
             </View>
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* MODAL TUTORIAL INTERACTIVO MÓVIL */}
+      <Modal visible={showTutorialModal} transparent animationType="fade">
+        <View style={theme.modalOverlay}>
+          <View style={theme.modalContent}>
+            <View style={{ flexDirection: 'row', justifycontent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#10B981', textTransform: 'uppercase' }}>
+                💡 Guía Interactiva ({tutorialStep + 1} de 4)
+              </Text>
+              <TouchableOpacity onPress={() => setShowTutorialModal(false)}>
+                <Text style={{ color: '#9CA3AF', fontSize: 16, fontWeight: 'bold' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {tutorialStep === 0 && (
+              <View style={{ alignItems: 'center', paddingVertical: 10 }}>
+                <Text style={{ fontSize: 44, marginBottom: 8 }}>🏠</Text>
+                <Text style={theme.modalTitle}>Dashboard y Balances</Text>
+                <Text style={{ textAlign: 'center', color: isDarkMode ? '#D1D5DB' : '#4B5563', fontSize: 13 }}>
+                  Monitorea en tiempo real tus ingresos, egresos y tu balance total disponible.
+                </Text>
+              </View>
+            )}
+
+            {tutorialStep === 1 && (
+              <View style={{ alignItems: 'center', paddingVertical: 10 }}>
+                <Text style={{ fontSize: 44, marginBottom: 8 }}>🏁</Text>
+                <Text style={theme.modalTitle}>Carrera de Compras</Text>
+                <Text style={{ textAlign: 'center', color: isDarkMode ? '#D1D5DB' : '#4B5563', fontSize: 13 }}>
+                  Agrega metas de compra. Cada meta evalúa su avance en simultáneo contra tu dinero real sin alterar tus fondos hasta que presiones Comprado.
+                </Text>
+              </View>
+            )}
+
+            {tutorialStep === 2 && (
+              <View style={{ alignItems: 'center', paddingVertical: 10 }}>
+                <Text style={{ fontSize: 44, marginBottom: 8 }}>🏛️</Text>
+                <Text style={theme.modalTitle}>Arqueo de Caja Chica</Text>
+                <Text style={{ textAlign: 'center', color: isDarkMode ? '#D1D5DB' : '#4B5563', fontSize: 13 }}>
+                  Realiza cierres diarios y mensuales comparando tu saldo contable con el dinero físico real en caja.
+                </Text>
+              </View>
+            )}
+
+            {tutorialStep === 3 && (
+              <View style={{ alignItems: 'center', paddingVertical: 10 }}>
+                <Text style={{ fontSize: 44, marginBottom: 8 }}>📷</Text>
+                <Text style={theme.modalTitle}>Escáner OCR con IA</Text>
+                <Text style={{ textAlign: 'center', color: isDarkMode ? '#D1D5DB' : '#4B5563', fontSize: 13 }}>
+                  Sube capturas de Yape, Plin o boletas. Gemini Vision autocompletará el monto y concepto en segundos.
+                </Text>
+              </View>
+            )}
+
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, marginVertical: 14 }}>
+              {[0, 1, 2, 3].map((idx) => (
+                <View
+                  key={idx}
+                  style={{
+                    height: 6,
+                    borderRadius: 3,
+                    width: idx === tutorialStep ? 24 : 6,
+                    backgroundColor: idx === tutorialStep ? '#10B981' : '#6B7280'
+                  }}
+                />
+              ))}
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
+              {tutorialStep > 0 && (
+                <TouchableOpacity style={theme.cancelBtn} onPress={() => setTutorialStep(prev => prev - 1)}>
+                  <Text style={theme.cancelBtnText}>Anterior</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={theme.saveGoalBtn}
+                onPress={() => {
+                  if (tutorialStep < 3) {
+                    setTutorialStep(prev => prev + 1);
+                  } else {
+                    setShowTutorialModal(false);
+                  }
+                }}
+              >
+                <Text style={theme.saveGoalBtnText}>
+                  {tutorialStep === 3 ? '🎉 ¡Entendido!' : 'Siguiente →'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </Modal>
     </SafeAreaView>
