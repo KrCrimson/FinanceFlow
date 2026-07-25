@@ -124,6 +124,26 @@ export const solicitarPlanPro = async (email, metodo, nroOperacion, monto) => {
   });
 };
 
+export const checkoutDirectoPro = async (
+  email,
+  metodo,
+  pais,
+  monto,
+  moneda,
+) => {
+  return await apiFetch("/pagos/checkout-directo", {
+    method: "POST",
+    body: JSON.stringify({ email, metodo, pais, monto, moneda }),
+  });
+};
+
+export const toggleDevPlan = async (email) => {
+  return await apiFetch("/pagos/toggle-dev-plan", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+};
+
 export const getEstadoPlan = async (email) => {
   try {
     return await apiFetch(`/pagos/estado-plan/${encodeURIComponent(email)}`);

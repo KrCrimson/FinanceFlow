@@ -51,3 +51,21 @@ export async function getEstadoPlan(email) {
     return { esPremium: false, planTipo: "free", conteoOcrMes: 0 };
   }
 }
+
+export async function toggleDevPlan(email) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/pagos/toggle-dev-plan`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Error al alternar modo dev");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error en toggleDevPlan:", error);
+    throw error;
+  }
+}

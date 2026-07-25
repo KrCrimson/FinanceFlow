@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { solicitarPlanPro, checkoutDirectoPro } from "../services/pagosService";
 
 const LISTA_PAISES = [
@@ -21,21 +21,21 @@ const LISTA_PAISES = [
     moneda: "COP",
     simbolo: "$",
     monto: 21500,
-    desc: "$21,500 COP (S/ 19.90 Soles)",
+    desc: "$21,500 COP",
   },
   {
     nombre: "Chile",
     moneda: "CLP",
     simbolo: "$",
     monto: 5200,
-    desc: "$5,200 CLP (S/ 19.90 Soles)",
+    desc: "$5,200 CLP",
   },
   {
     nombre: "Argentina",
     moneda: "ARS",
     simbolo: "$",
     monto: 5500,
-    desc: "$5,500 ARS (S/ 19.90 Soles)",
+    desc: "$5,500 ARS",
   },
   {
     nombre: "Estados Unidos",
@@ -52,7 +52,7 @@ const LISTA_PAISES = [
     desc: "€5.99 EUR",
   },
   {
-    nombre: "Otro País (Resto del Mundo)",
+    nombre: "Otro País",
     moneda: "USD",
     simbolo: "$",
     monto: 5.99,
@@ -68,7 +68,7 @@ export default function PaywallModal({
   title = "⭐ FinanceFlow Pro Checkout",
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape' | 'bcp'
+  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
 
   // Campos de tarjeta
@@ -76,17 +76,41 @@ export default function PaywallModal({
   const [caducidad, setCaducidad] = useState("");
   const [cvc, setCvc] = useState("");
   const [nombreTitular, setNombreTitular] = useState(userNombre || "");
-  const [direccion, setDireccion] = useState("");
   const [nroOperacionYape, setNroOperacionYape] = useState("");
 
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState("");
 
+  // Detección automática de País por Zona Horaria / Navegador
+  useEffect(() => {
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      const lang = navigator.language || "";
+
+      if (timeZone.includes("Lima") || lang.includes("PE")) {
+        setPaisSeleccionado(LISTA_PAISES[0]); // Perú
+      } else if (timeZone.includes("Mexico") || lang.includes("MX")) {
+        setPaisSeleccionado(LISTA_PAISES[1]); // México
+      } else if (timeZone.includes("Bogota") || lang.includes("CO")) {
+        setPaisSeleccionado(LISTA_PAISES[2]); // Colombia
+      } else if (timeZone.includes("Santiago") || lang.includes("CL")) {
+        setPaisSeleccionado(LISTA_PAISES[3]); // Chile
+      } else if (timeZone.includes("Buenos_Aires") || lang.includes("AR")) {
+        setPaisSeleccionado(LISTA_PAISES[4]); // Argentina
+      } else if (timeZone.includes("Madrid") || lang.includes("ES")) {
+        setPaisSeleccionado(LISTA_PAISES[6]); // España
+      } else if (!timeZone.includes("America/")) {
+        setPaisSeleccionado(LISTA_PAISES[5]); // EE.UU. / Resto
+      }
+    } catch (e) {
+      console.log("Auto-detection fallback applied");
+    }
+  }, []);
+
   if (!isOpen) return null;
 
-  const handleCopiarText = (txt, label) => {
-    navigator.clipboard.writeText(txt);
-  };
+  // URL del QR dinámico de Yape con monto de S/ 19.90 pre-cargado
+  const yapeQrMontoUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent("https://yape.pe/pay?amount=19.90&ref=FinanceFlowPro")}&color=7C3AED`;
 
   // Procesar pago automático con Tarjeta o Google Pay (Opción B)
   const handlePagarCheckoutDirecto = async (e) => {
@@ -96,7 +120,7 @@ export default function PaywallModal({
       setError("");
 
       if (metodo === "card" && (!numTarjeta || !caducidad || !cvc)) {
-        throw new Error("Por favor completa todos los datos de la tarjeta.");
+        throw new Error("Por favor completa los datos de la tarjeta.");
       }
 
       await checkoutDirectoPro(
@@ -115,8 +139,8 @@ export default function PaywallModal({
     }
   };
 
-  // Procesar constancia Yape / BCP
-  const handleEnviarYapeBcp = async (e) => {
+  // Procesar constancia Yape con monto
+  const handleEnviarYape = async (e) => {
     e.preventDefault();
     if (!nroOperacionYape.trim()) {
       setError("Por favor ingresa el número de operación.");
@@ -128,9 +152,9 @@ export default function PaywallModal({
       setError("");
       await solicitarPlanPro(
         userEmail || "usuario@financeflow.com",
-        metodo,
+        "yape",
         nroOperacionYape.trim(),
-        paisSeleccionado.monto,
+        19.9,
       );
       setPaso("exito");
     } catch (err) {
@@ -228,11 +252,16 @@ export default function PaywallModal({
                 </div>
               </div>
 
-              {/* Selector de Precio por País / Moneda Local */}
+              {/* Detección de País y Moneda */}
               <div className="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-3">
-                <label className="block text-xs font-bold text-gray-400">
-                  Selecciona tu País (Tarifa Local LATAM / Resto del Mundo):
-                </label>
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-gray-400">
+                    País / Región Detectado:
+                  </label>
+                  <span className="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full">
+                    Auto-detectado
+                  </span>
+                </div>
                 <select
                   value={paisSeleccionado.nombre}
                   onChange={(e) => {
@@ -245,7 +274,7 @@ export default function PaywallModal({
                 >
                   {LISTA_PAISES.map((p) => (
                     <option key={p.nombre} value={p.nombre}>
-                      {p.nombre} — {p.desc}
+                      {p.nombre} ({p.desc})
                     </option>
                   ))}
                 </select>
@@ -273,7 +302,7 @@ export default function PaywallModal({
 
           {paso === "pago" && (
             <div className="space-y-5 animate-fade-in">
-              {/* Estilo Vercel/Stripe Checkout Tab Bar */}
+              {/* Vercel/Stripe Checkout Tab Bar */}
               <div className="grid grid-cols-3 gap-2 bg-gray-950 p-1.5 rounded-2xl border border-gray-800">
                 <button
                   onClick={() => setMetodo("card")}
@@ -304,13 +333,13 @@ export default function PaywallModal({
                 <button
                   onClick={() => setMetodo("yape")}
                   className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
-                    metodo === "yape" || metodo === "bcp"
+                    metodo === "yape"
                       ? "bg-purple-600/20 border border-purple-500 text-white shadow-md"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
                   <span className="text-lg">📱</span>
-                  <span>Yape / BCP</span>
+                  <span>Yape (QR)</span>
                 </button>
               </div>
 
@@ -330,7 +359,7 @@ export default function PaywallModal({
                         placeholder="1234 1234 1234 1234"
                         value={numTarjeta}
                         onChange={(e) => setNumTarjeta(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
                         required
                       />
                       <div className="absolute right-3 top-3 flex space-x-1">
@@ -464,80 +493,35 @@ export default function PaywallModal({
                 </div>
               )}
 
-              {/* Pestaña Yape / BCP (CCI Único) */}
-              {(metodo === "yape" || metodo === "bcp") && (
-                <div className="space-y-4">
-                  {/* Selector Yape o BCP */}
-                  <div className="flex bg-gray-950 p-1 rounded-xl border border-gray-800">
-                    <button
-                      onClick={() => setMetodo("yape")}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
-                        metodo === "yape"
-                          ? "bg-purple-600 text-white"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      Yape (QR)
-                    </button>
-                    <button
-                      onClick={() => setMetodo("bcp")}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
-                        metodo === "bcp"
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      BCP (CCI)
-                    </button>
+              {/* Pestaña Yape con QR de Monto Automático (SIN BCP) */}
+              {metodo === "yape" && (
+                <div className="space-y-4 bg-purple-950/20 p-5 rounded-2xl border border-purple-800/50 text-center">
+                  <span className="inline-block px-3 py-1 bg-purple-500/20 text-purple-300 font-bold text-xs rounded-full">
+                    QR de Yape con Monto Automático (S/ 19.90)
+                  </span>
+
+                  <p className="text-xs text-purple-200">
+                    Al escanear el QR desde tu Yape,{" "}
+                    <b>
+                      el monto de S/ 19.90 aparecerá precargado automáticamente
+                    </b>{" "}
+                    en tu pantalla.
+                  </p>
+
+                  <div className="flex justify-center py-2">
+                    <img
+                      src={yapeQrMontoUrl}
+                      alt="QR Yape con Monto"
+                      className="h-56 w-56 object-contain rounded-2xl border-2 border-purple-500/50 shadow-2xl bg-white p-2"
+                    />
                   </div>
 
-                  {metodo === "yape" ? (
-                    <div className="text-center space-y-3 bg-purple-950/20 p-4 rounded-2xl border border-purple-800/50">
-                      <p className="text-xs font-bold text-purple-300">
-                        Escanea el código QR desde tu app de Yape:
-                      </p>
-                      <div className="flex justify-center">
-                        <img
-                          src="/yape-qr.png"
-                          alt="Yape QR FinanceFlow"
-                          className="h-56 w-auto object-contain rounded-xl border border-purple-500/40 shadow-lg"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 bg-blue-950/20 p-4 rounded-2xl border border-blue-800/50 text-xs">
-                      <p className="font-bold text-blue-300 text-sm text-center mb-1">
-                        Código de Cuenta Interbancario (CCI BCP)
-                      </p>
-
-                      <div className="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-1">
-                        <p className="text-gray-400 text-[11px]">
-                          CCI Oficial BCP:
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <span className="font-mono font-bold text-sm text-blue-400">
-                            00254010858204505637
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleCopiarText("00254010858204505637", "cci")
-                            }
-                            className="text-xs text-emerald-400 hover:underline font-bold"
-                          >
-                            Copiar CCI
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <form
-                    onSubmit={handleEnviarYapeBcp}
-                    className="space-y-3 pt-1"
+                    onSubmit={handleEnviarYape}
+                    className="space-y-3 pt-2 text-left"
                   >
-                    <label className="block text-xs font-bold text-gray-400">
-                      Ingresa tu Número de Operación / Código de Yape:
+                    <label className="block text-xs font-bold text-gray-300">
+                      Ingresa tu Número de Operación de Yape:
                     </label>
                     <input
                       type="text"
@@ -558,8 +542,8 @@ export default function PaywallModal({
                       className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl shadow-lg transition-all text-sm disabled:opacity-50"
                     >
                       {procesando
-                        ? "Enviando..."
-                        : "Confirmar Comprobante Yape / BCP"}
+                        ? "Enviando Comprobante..."
+                        : "Confirmar Comprobante Yape"}
                     </button>
                   </form>
                 </div>

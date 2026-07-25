@@ -57,18 +57,18 @@ router.post("/solicitar-pro", async (req, res) => {
 // 1.5 Checkout Directo (Activación Automática Instantánea Opción B con Tarjeta / Google Pay)
 router.post("/checkout-directo", async (req, res) => {
   try {
-    const { email, metodo, pais, monto, moneda } = req.body;
+    let { email, metodo, pais, monto, moneda } = req.body;
 
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        error: "Email es requerido para activar la cuenta Pro",
-      });
+    let usuario = null;
+    if (email && email !== "usuario@financeflow.com") {
+      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     }
 
-    const usuario = await Usuario.findOne({
-      email: email.toLowerCase().trim(),
-    });
+    if (!usuario) {
+      // Buscar el usuario más recientemente activo como fallback
+      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
+    }
+
     if (!usuario) {
       return res
         .status(404)
@@ -102,6 +102,44 @@ router.post("/checkout-directo", async (req, res) => {
     res
       .status(500)
       .json({ success: false, error: "Error procesando el pago instantáneo" });
+  }
+});
+
+// 1.8 Alternar Modo Desarrollador (Free <-> Pro)
+router.post("/toggle-dev-plan", async (req, res) => {
+  try {
+    let { email } = req.body;
+
+    let usuario = null;
+    if (email && email !== "usuario@financeflow.com") {
+      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
+    }
+    if (!usuario) {
+      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
+    }
+
+    if (!usuario) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Usuario no encontrado" });
+    }
+
+    // Cambiar estado
+    usuario.esPremium = !usuario.esPremium;
+    usuario.planTipo = usuario.esPremium ? "pro" : "free";
+    await usuario.save();
+
+    res.json({
+      success: true,
+      message: `Modo Desarrollador: Tu cuenta ahora es ${usuario.esPremium ? "PRO (Premium)" : "FREE (Gratuita)"}`,
+      esPremium: usuario.esPremium,
+      planTipo: usuario.planTipo,
+    });
+  } catch (err) {
+    console.error("Error al alternar plan dev:", err);
+    res
+      .status(500)
+      .json({ success: false, error: "Error al alternar modo desarrollador" });
   }
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -27,7 +27,7 @@ const LISTA_PAISES = [
     moneda: "MXN",
     simbolo: "$",
     monto: 99.0,
-    desc: "$99 MXN (S/ 19.90 Soles)",
+    desc: "$99 MXN",
   },
   {
     nombre: "Colombia",
@@ -80,7 +80,7 @@ export default function PaywallModal({
   userEmail,
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape' | 'bcp'
+  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
 
   // Formulario tarjeta
@@ -92,7 +92,30 @@ export default function PaywallModal({
 
   const [enviando, setEnviando] = useState(false);
 
+  useEffect(() => {
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      if (timeZone.includes("Lima")) setPaisSeleccionado(LISTA_PAISES[0]);
+      else if (timeZone.includes("Mexico"))
+        setPaisSeleccionado(LISTA_PAISES[1]);
+      else if (timeZone.includes("Bogota"))
+        setPaisSeleccionado(LISTA_PAISES[2]);
+      else if (timeZone.includes("Santiago"))
+        setPaisSeleccionado(LISTA_PAISES[3]);
+      else if (timeZone.includes("Buenos_Aires"))
+        setPaisSeleccionado(LISTA_PAISES[4]);
+      else if (timeZone.includes("Madrid"))
+        setPaisSeleccionado(LISTA_PAISES[6]);
+      else if (!timeZone.includes("America/"))
+        setPaisSeleccionado(LISTA_PAISES[5]);
+    } catch (e) {
+      console.log("Mobile auto-detect fallback applied");
+    }
+  }, []);
+
   if (!visible) return null;
+
+  const yapeQrMontoUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent("https://yape.pe/pay?amount=19.90&ref=FinanceFlowPro")}&color=7C3AED`;
 
   const handleCheckoutDirecto = async () => {
     try {
@@ -125,11 +148,11 @@ export default function PaywallModal({
     }
   };
 
-  const handleEnviarYapeBcp = async () => {
+  const handleEnviarYape = async () => {
     if (!nroOperacionYape.trim()) {
       Alert.alert(
         "Código Requerido",
-        "Por favor ingresa tu número de operación o código de Yape.",
+        "Por favor ingresa tu número de operación de Yape.",
       );
       return;
     }
@@ -138,9 +161,9 @@ export default function PaywallModal({
       setEnviando(true);
       await solicitarPlanPro(
         userEmail || "usuario@financeflow.com",
-        metodo,
+        "yape",
         nroOperacionYape.trim(),
-        paisSeleccionado.monto,
+        19.9,
       );
       setPaso("exito");
     } catch (err) {
@@ -238,7 +261,7 @@ export default function PaywallModal({
                   </Text>
                   <Text style={styles.offerPrice}>{paisSeleccionado.desc}</Text>
                   <Text style={styles.offerDetail}>
-                    Pago único • Licencia Multidispositivo
+                    País Auto-detectado: {paisSeleccionado.nombre}
                   </Text>
                 </View>
 
@@ -293,19 +316,17 @@ export default function PaywallModal({
                   <TouchableOpacity
                     style={[
                       styles.tabBtn,
-                      (metodo === "yape" || metodo === "bcp") &&
-                        styles.tabBtnActiveYape,
+                      metodo === "yape" && styles.tabBtnActiveYape,
                     ]}
                     onPress={() => setMetodo("yape")}
                   >
                     <Text
                       style={[
                         styles.tabBtnText,
-                        (metodo === "yape" || metodo === "bcp") &&
-                          styles.tabBtnTextActive,
+                        metodo === "yape" && styles.tabBtnTextActive,
                       ]}
                     >
-                      📱 Yape / BCP
+                      📱 Yape (QR)
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -433,49 +454,17 @@ export default function PaywallModal({
                   </View>
                 )}
 
-                {(metodo === "yape" || metodo === "bcp") && (
+                {metodo === "yape" && (
                   <View style={styles.formCard}>
-                    <View style={styles.tabSelectorSub}>
-                      <TouchableOpacity
-                        style={[
-                          styles.tabBtnSub,
-                          metodo === "yape" && styles.tabBtnActiveYape,
-                        ]}
-                        onPress={() => setMetodo("yape")}
-                      >
-                        <Text style={styles.tabBtnTextActive}>Yape (QR)</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.tabBtnSub,
-                          metodo === "bcp" && styles.tabBtnActiveBcp,
-                        ]}
-                        onPress={() => setMetodo("bcp")}
-                      >
-                        <Text style={styles.tabBtnTextActive}>BCP (CCI)</Text>
-                      </TouchableOpacity>
+                    <View style={styles.qrCard}>
+                      <Text style={styles.qrInstruction}>
+                        QR de Yape con Monto Automático (S/ 19.90):
+                      </Text>
+                      <Image
+                        source={{ uri: yapeQrMontoUrl }}
+                        style={styles.qrImage}
+                      />
                     </View>
-
-                    {metodo === "yape" ? (
-                      <View style={styles.qrCard}>
-                        <Text style={styles.qrInstruction}>
-                          Escanea el código QR desde Yape:
-                        </Text>
-                        <Image
-                          source={require("../../assets/yape-qr.png")}
-                          style={styles.qrImage}
-                        />
-                      </View>
-                    ) : (
-                      <View style={styles.bcpCard}>
-                        <Text style={styles.bcpHeader}>
-                          Código Interbancario (CCI BCP)
-                        </Text>
-                        <Text style={styles.bcpValue}>
-                          00254010858204505637
-                        </Text>
-                      </View>
-                    )}
 
                     <Text style={styles.inputLabel}>
                       Número de Operación / Código de Yape
@@ -495,14 +484,14 @@ export default function PaywallModal({
                         { backgroundColor: "#7C3AED" },
                         enviando && { opacity: 0.6 },
                       ]}
-                      onPress={handleEnviarYapeBcp}
+                      onPress={handleEnviarYape}
                       disabled={enviando}
                     >
                       {enviando ? (
                         <ActivityIndicator color="#FFF" size="small" />
                       ) : (
                         <Text style={styles.confirmBtnText}>
-                          Confirmar Yape / BCP
+                          Confirmar Yape
                         </Text>
                       )}
                     </TouchableOpacity>
@@ -569,7 +558,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.85)",
-    justify: "flex-end",
+    justifyContent: "flex-end",
   },
   container: {
     borderTopLeftRadius: 28,
@@ -702,9 +691,6 @@ const styles = StyleSheet.create({
   tabBtnActiveYape: {
     backgroundColor: "#7C3AED",
   },
-  tabBtnActiveBcp: {
-    backgroundColor: "#2563EB",
-  },
   tabBtnText: {
     fontSize: 12,
     fontWeight: "bold",
@@ -747,19 +733,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
-  tabSelectorSub: {
-    flexDirection: "row",
-    backgroundColor: "#030712",
-    borderRadius: 12,
-    padding: 3,
-    gap: 4,
-  },
-  tabBtnSub: {
-    flex: 1,
-    paddingVertical: 6,
-    alignItems: "center",
-    borderRadius: 8,
-  },
   qrCard: {
     backgroundColor: "#2E1065",
     padding: 12,
@@ -773,27 +746,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   qrImage: {
-    width: 180,
-    height: 180,
+    width: 200,
+    height: 200,
     resizeMode: "contain",
     borderRadius: 12,
-  },
-  bcpCard: {
-    backgroundColor: "#1E3A8A",
-    padding: 14,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  bcpHeader: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: "#BFDBFE",
-  },
-  bcpValue: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#FFF",
-    marginTop: 4,
-    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    backgroundColor: "#FFF",
   },
 });

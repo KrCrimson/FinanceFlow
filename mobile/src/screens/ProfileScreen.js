@@ -17,6 +17,7 @@ import {
   setMobileCurrencySymbol,
 } from "../utils/currency";
 import PaywallModal from "../components/PaywallModal";
+import { toggleDevPlan } from "../services/api";
 
 export default function ProfileScreen({
   user,
@@ -31,6 +32,7 @@ export default function ProfileScreen({
   const [moneda, setMoneda] = useState(getMobileCurrencySymbol());
   const [saving, setSaving] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showNovedades, setShowNovedades] = useState(false);
 
   const handleReset = () => {
     setNombre(user?.nombre || "sebastian");
@@ -275,6 +277,65 @@ export default function ProfileScreen({
           </TouchableOpacity>
         </View>
 
+        {/* Sección: Modo Desarrollador (Dev Controls) & Novedades */}
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: "#111827", borderColor: "#10B981" },
+          ]}
+        >
+          <Text style={[styles.cardSectionTitle, { color: "#F59E0B" }]}>
+            🛠️ Modo Desarrollador & Novedades
+          </Text>
+          <Text style={{ color: "#9CA3AF", fontSize: 11, marginBottom: 10 }}>
+            Cambia el plan de tu cuenta al instante o consulta las últimas
+            novedades del sistema.
+          </Text>
+
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: "#F59E0B",
+                paddingVertical: 10,
+                borderRadius: 12,
+                alignItems: "center",
+              }}
+              onPress={async () => {
+                try {
+                  const res = await toggleDevPlan(email);
+                  Alert.alert("Modo Dev", res.message || "Plan actualizado");
+                } catch (e) {
+                  Alert.alert("Error", "No se pudo alternar el modo dev");
+                }
+              }}
+            >
+              <Text
+                style={{ color: "#111827", fontWeight: "bold", fontSize: 12 }}
+              >
+                ⚡ Alternar Plan Dev
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: "#10B981",
+                paddingVertical: 10,
+                borderRadius: 12,
+                alignItems: "center",
+              }}
+              onPress={() => setShowNovedades(true)}
+            >
+              <Text
+                style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 12 }}
+              >
+                📢 Ver Novedades
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Sección: Exportación Contable (Exclusiva de Web) */}
         <View style={styles.card}>
           <Text style={styles.cardSectionTitle}>
@@ -404,6 +465,146 @@ export default function ProfileScreen({
         isDarkMode={isDarkMode}
         userEmail={user?.email}
       />
+
+      {/* Modal de Novedades del Sistema */}
+      <Modal
+        visible={showNovedades}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowNovedades(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            justifyContent: "center",
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#111827",
+              borderRadius: 24,
+              padding: 20,
+              borderWidth: 1,
+              borderColor: "#374151",
+              gap: 14,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFF" }}>
+                📢 Novedades v2.5.0
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowNovedades(false)}
+                style={{
+                  backgroundColor: "#374151",
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: "#FFF", fontWeight: "bold" }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={{ maxHeight: 350 }}>
+              <View
+                style={{
+                  backgroundColor: "#1F2937",
+                  padding: 12,
+                  borderRadius: 14,
+                  marginBottom: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "bold",
+                    color: "#10B981",
+                    marginBottom: 2,
+                  }}
+                >
+                  💳 Pasarela Vercel Checkout & QR Yape con Monto
+                </Text>
+                <Text style={{ fontSize: 11, color: "#D1D5DB" }}>
+                  Detección de país automática y QR de Yape con monto precargado
+                  de S/ 19.90.
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  backgroundColor: "#1F2937",
+                  padding: 12,
+                  borderRadius: 14,
+                  marginBottom: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "bold",
+                    color: "#3B82F6",
+                    marginBottom: 2,
+                  }}
+                >
+                  📸 Escaneo OCR de Comprobantes con IA
+                </Text>
+                <Text style={{ fontSize: 11, color: "#D1D5DB" }}>
+                  Reconocimiento instantáneo de fechas, categorías y montos en
+                  fotos de facturas y boletas.
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  backgroundColor: "#1F2937",
+                  padding: 12,
+                  borderRadius: 14,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "bold",
+                    color: "#8B5CF6",
+                    marginBottom: 2,
+                  }}
+                >
+                  🛠️ Modo Desarrollador
+                </Text>
+                <Text style={{ fontSize: 11, color: "#D1D5DB" }}>
+                  Alterna tu cuenta entre Free y Pro con 1 solo clic desde tu
+                  Perfil para hacer pruebas de desarrollo.
+                </Text>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#10B981",
+                paddingVertical: 12,
+                borderRadius: 12,
+                alignItems: "center",
+              }}
+              onPress={() => setShowNovedades(false)}
+            >
+              <Text style={{ color: "#000", fontWeight: "bold", fontSize: 14 }}>
+                ¡Entendido!
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
