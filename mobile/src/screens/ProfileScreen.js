@@ -85,7 +85,7 @@ export default function ProfileScreen({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#6EE7B7"
@@ -605,7 +605,7 @@ export default function ProfileScreen({
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 

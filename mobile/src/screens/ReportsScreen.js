@@ -128,7 +128,7 @@ export default function ReportsScreen({ isDarkMode, currency }) {
   ];
 
   return (
-    <SafeAreaView style={theme.container}>
+    <View style={theme.container}>
       <StatusBar
         barStyle={isDarkMode ? "light-content" : "dark-content"}
         backgroundColor={isDarkMode ? "#064E3B" : "#6EE7B7"}
@@ -693,7 +693,7 @@ export default function ReportsScreen({ isDarkMode, currency }) {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
