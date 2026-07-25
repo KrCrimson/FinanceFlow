@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = (process.env.REACT_APP_API_URL || 'https://financeflow-backend-4fbw.onrender.com') + '/api/admin';
+const API_URL = (process.env.REACT_APP_API_URL || 'https://financeflow-production-be78.up.railway.app') + '/api/admin';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
