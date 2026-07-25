@@ -70,6 +70,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Ruta Administradora Privada */}
           <Route path="/admin-portal-privado" element={<AdminDashboardPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
