@@ -12,7 +12,6 @@ import DashboardPage from "./pages/DashboardPage";
 import MovimientoFormPage from "./pages/MovimientoFormPage";
 import ReportesPage from "./pages/ReportesPage";
 import PlanificadorPage from "./pages/PlanificadorPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
@@ -70,7 +69,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </ErrorBoundary>
