@@ -19,12 +19,12 @@ function Navbar() {
     return location.pathname === path;
   };
 
+  // Rutas públicas en la navegación
   const navLinks = [
     { path: "/", label: "Dashboard", icon: "🏠" },
     { path: "/movimiento", label: "Nuevo Movimiento", icon: "➕" },
     { path: "/reportes", label: "Reportes", icon: "📊" },
     { path: "/perfil", label: "Perfil", icon: "👤" },
-    { path: "/admin", label: "Admin", icon: "🛡️" },
   ];
 
   // No mostrar navbar en páginas públicas
