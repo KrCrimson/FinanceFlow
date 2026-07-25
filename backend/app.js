@@ -26,10 +26,11 @@ const corsOptions = {
       allowedOrigins.push(process.env.CORS_ORIGIN);
     }
 
-    // Permitir cualquier subdominio de Vercel (.vercel.app)
+    // Permitir cualquier subdominio de Vercel (.vercel.app) y GitHub Pages (.github.io)
     const isVercel = /\.vercel\.app$/.test(origin);
+    const isGithubPages = /\.github\.io$/.test(origin);
 
-    if (allowedOrigins.includes(origin) || isVercel) {
+    if (allowedOrigins.includes(origin) || isVercel || isGithubPages) {
       callback(null, true);
     } else {
       callback(new Error('Bloqueado por CORS: Origen no permitido'));
