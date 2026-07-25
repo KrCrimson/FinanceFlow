@@ -10,7 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { checkoutDirectoPro } from "../services/api";
+import { solicitarPlanPro } from "../services/api";
 
 const LISTA_PAISES = [
   {
@@ -78,7 +78,6 @@ export default function PaywallModal({
   userEmail,
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
 
   // Formulario tarjeta
@@ -112,31 +111,36 @@ export default function PaywallModal({
 
   if (!visible) return null;
 
-  const handleCheckoutDirecto = async () => {
+  const handlePagarTarjeta = async () => {
     try {
       setEnviando(true);
-      if (metodo === "card" && (!numTarjeta || !caducidad || !cvc)) {
+      if (
+        !numTarjeta.trim() ||
+        !caducidad.trim() ||
+        !cvc.trim() ||
+        !nombreTitular.trim()
+      ) {
         Alert.alert(
           "Datos requeridos",
-          "Por favor ingresa los datos de tu tarjeta.",
+          "Por favor ingresa todos los datos de tu tarjeta.",
         );
         setEnviando(false);
         return;
       }
 
-      await checkoutDirectoPro(
+      const nroOp = `CARD-${Date.now().toString().slice(-6)}`;
+      await solicitarPlanPro(
         userEmail || "admin@empresa.com",
-        metodo,
-        paisSeleccionado.nombre,
+        "tarjeta",
+        nroOp,
         paisSeleccionado.monto,
-        paisSeleccionado.moneda,
       );
 
       setPaso("exito");
     } catch (err) {
       Alert.alert(
         "Error",
-        err.message || "No se pudo procesar la suscripción.",
+        err.message || "No se pudo enviar la solicitud de pago.",
       );
     } finally {
       setEnviando(false);
@@ -240,172 +244,87 @@ export default function PaywallModal({
                   onPress={() => setPaso("pago")}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.mainBtnText}>Continuar al Pago →</Text>
+                  <Text style={styles.mainBtnText}>
+                    Continuar al Pago con Tarjeta →
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
 
             {paso === "pago" && (
               <View style={styles.stepContainer}>
-                {/* Únicamente 2 Métodos de Pago: Tarjeta y Google Pay */}
-                <View style={styles.tabSelector}>
-                  <TouchableOpacity
-                    style={[
-                      styles.tabBtn,
-                      metodo === "card" && styles.tabBtnActiveCard,
-                    ]}
-                    onPress={() => setMetodo("card")}
+                <View style={styles.formCard}>
+                  <Text
+                    style={{
+                      color: "#3B82F6",
+                      fontWeight: "bold",
+                      fontSize: 13,
+                      marginBottom: 4,
+                    }}
                   >
-                    <Text
-                      style={[
-                        styles.tabBtnText,
-                        metodo === "card" && styles.tabBtnTextActive,
-                      ]}
-                    >
-                      💳 Tarjeta
-                    </Text>
-                  </TouchableOpacity>
+                    💳 Pago Seguro con Tarjeta (Visa / MasterCard / Amex)
+                  </Text>
+                  <Text style={styles.inputLabel}>Número De Tarjeta</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="1234 1234 1234 1234"
+                    placeholderTextColor="#6B7280"
+                    keyboardType="number-pad"
+                    value={numTarjeta}
+                    onChangeText={setNumTarjeta}
+                  />
+
+                  <View style={{ flexDirection: "row", gap: 10 }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.inputLabel}>Caducidad</Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="MM / AA"
+                        placeholderTextColor="#6B7280"
+                        value={caducidad}
+                        onChangeText={setCaducidad}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.inputLabel}>CVC</Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="CVC 123"
+                        placeholderTextColor="#6B7280"
+                        keyboardType="number-pad"
+                        secureTextEntry
+                        maxLength={4}
+                        value={cvc}
+                        onChangeText={setCvc}
+                      />
+                    </View>
+                  </View>
+
+                  <Text style={styles.inputLabel}>
+                    Nombre Completo del Titular
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nombre en la tarjeta"
+                    placeholderTextColor="#6B7280"
+                    value={nombreTitular}
+                    onChangeText={setNombreTitular}
+                  />
 
                   <TouchableOpacity
-                    style={[
-                      styles.tabBtn,
-                      metodo === "gpay" && styles.tabBtnActiveGpay,
-                    ]}
-                    onPress={() => setMetodo("gpay")}
+                    style={[styles.confirmBtn, enviando && { opacity: 0.6 }]}
+                    onPress={handlePagarTarjeta}
+                    disabled={enviando}
                   >
-                    <Text
-                      style={[
-                        styles.tabBtnText,
-                        metodo === "gpay" && { color: "#000" },
-                      ]}
-                    >
-                      GPay Google Play
-                    </Text>
+                    {enviando ? (
+                      <ActivityIndicator color="#FFF" size="small" />
+                    ) : (
+                      <Text style={styles.confirmBtnText}>
+                        Pagar {paisSeleccionado.desc} con Tarjeta
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 </View>
-
-                {metodo === "card" && (
-                  <View style={styles.formCard}>
-                    <Text style={styles.inputLabel}>Número De Tarjeta</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="1234 1234 1234 1234"
-                      placeholderTextColor="#6B7280"
-                      keyboardType="number-pad"
-                      value={numTarjeta}
-                      onChangeText={setNumTarjeta}
-                    />
-
-                    <View style={{ flexDirection: "row", gap: 10 }}>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.inputLabel}>Caducidad</Text>
-                        <TextInput
-                          style={styles.input}
-                          placeholder="MM / AA"
-                          placeholderTextColor="#6B7280"
-                          value={caducidad}
-                          onChangeText={setCaducidad}
-                        />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.inputLabel}>CVC</Text>
-                        <TextInput
-                          style={styles.input}
-                          placeholder="CVC 123"
-                          placeholderTextColor="#6B7280"
-                          keyboardType="number-pad"
-                          secureTextEntry
-                          maxLength={4}
-                          value={cvc}
-                          onChangeText={setCvc}
-                        />
-                      </View>
-                    </View>
-
-                    <Text style={styles.inputLabel}>Nombre Completo</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Nombre en la tarjeta"
-                      placeholderTextColor="#6B7280"
-                      value={nombreTitular}
-                      onChangeText={setNombreTitular}
-                    />
-
-                    <TouchableOpacity
-                      style={[styles.confirmBtn, enviando && { opacity: 0.6 }]}
-                      onPress={handleCheckoutDirecto}
-                      disabled={enviando}
-                    >
-                      {enviando ? (
-                        <ActivityIndicator color="#FFF" size="small" />
-                      ) : (
-                        <Text style={styles.confirmBtnText}>
-                          Pagar {paisSeleccionado.desc} y Activar Pro
-                        </Text>
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {metodo === "gpay" && (
-                  <View
-                    style={[
-                      styles.formCard,
-                      { alignItems: "center", paddingVertical: 20 },
-                    ]}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        color: "#FFF",
-                      }}
-                    >
-                      GPay / Google Play
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        color: "#9CA3AF",
-                        textAlign: "center",
-                        marginVertical: 8,
-                      }}
-                    >
-                      Paga de forma segura utilizando Google Play o tus tarjetas
-                      guardadas en Google.
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        color: "#10B981",
-                        marginBottom: 14,
-                      }}
-                    >
-                      {paisSeleccionado.desc}
-                    </Text>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.confirmBtn,
-                        { backgroundColor: "#FFF" },
-                        enviando && { opacity: 0.6 },
-                      ]}
-                      onPress={handleCheckoutDirecto}
-                      disabled={enviando}
-                    >
-                      {enviando ? (
-                        <ActivityIndicator color="#000" size="small" />
-                      ) : (
-                        <Text
-                          style={[styles.confirmBtnText, { color: "#000" }]}
-                        >
-                          Pagar con Google Play 🚀
-                        </Text>
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                )}
 
                 <TouchableOpacity
                   style={{ marginTop: 10, alignSelf: "center" }}
@@ -431,28 +350,25 @@ export default function PaywallModal({
                   { alignItems: "center", paddingVertical: 20 },
                 ]}
               >
-                <Text style={{ fontSize: 50, marginBottom: 10 }}>🎉</Text>
+                <Text style={{ fontSize: 50, marginBottom: 10 }}>⏳</Text>
                 <Text
                   style={[
                     styles.title,
                     { color: textColor, textAlign: "center" },
                   ]}
                 >
-                  ¡Suscripción Pro Activada!
+                  Solicitud de Pago Registrada
                 </Text>
                 <Text style={[styles.subtitle, { textAlign: "center" }]}>
-                  Tu cuenta ha sido actualizada con éxito a{" "}
-                  <Text style={{ fontWeight: "bold", color: "#10B981" }}>
-                    FinanceFlow Pro
-                  </Text>
-                  .
+                  Tu solicitud de pago ha sido registrada correctamente. El
+                  administrador confirmará el comprobante en breve.
                 </Text>
 
                 <TouchableOpacity
                   style={[styles.mainBtn, { marginTop: 20 }]}
                   onPress={onClose}
                 >
-                  <Text style={styles.mainBtnText}>¡Comenzar a usar Pro!</Text>
+                  <Text style={styles.mainBtnText}>Entendido</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -481,7 +397,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justify: "space-between",
     alignItems: "center",
   },
   headerTitle: {
@@ -577,33 +493,6 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  tabSelector: {
-    flexDirection: "row",
-    backgroundColor: "#030712",
-    borderRadius: 14,
-    padding: 4,
-    gap: 6,
-  },
-  tabBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  tabBtnActiveCard: {
-    backgroundColor: "#2563EB",
-  },
-  tabBtnActiveGpay: {
-    backgroundColor: "#FFFFFF",
-  },
-  tabBtnText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#9CA3AF",
-  },
-  tabBtnTextActive: {
-    color: "#FFF",
   },
   formCard: {
     backgroundColor: "#1F2937",

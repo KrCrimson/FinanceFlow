@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { checkoutDirectoPro } from "../services/pagosService";
+import { solicitarPlanPro } from "../services/pagosService";
 
 const LISTA_PAISES = [
   {
@@ -68,7 +68,6 @@ export default function PaywallModal({
   title = "⭐ FinanceFlow Pro Checkout",
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
 
   // Campos de tarjeta
@@ -108,28 +107,34 @@ export default function PaywallModal({
 
   if (!isOpen) return null;
 
-  // Procesar pago automático con Tarjeta o Google Pay
-  const handlePagarCheckoutDirecto = async (e) => {
+  // Procesar solicitud de tarjeta
+  const handlePagarTarjeta = async (e) => {
     if (e) e.preventDefault();
     try {
       setProcesando(true);
       setError("");
 
-      if (metodo === "card" && (!numTarjeta || !caducidad || !cvc)) {
-        throw new Error("Por favor completa los datos de la tarjeta.");
+      if (
+        !numTarjeta.trim() ||
+        !caducidad.trim() ||
+        !cvc.trim() ||
+        !nombreTitular.trim()
+      ) {
+        throw new Error("Por favor completa todos los datos de la tarjeta.");
       }
 
-      await checkoutDirectoPro(
+      // Enviar solicitud de pago registrada para verificación del administrador
+      const nroOp = `CARD-${Date.now().toString().slice(-6)}`;
+      await solicitarPlanPro(
         userEmail || localStorage.getItem("userEmail") || "admin@empresa.com",
-        metodo,
-        paisSeleccionado.nombre,
+        "tarjeta",
+        nroOp,
         paisSeleccionado.monto,
-        paisSeleccionado.moneda,
       );
 
       setPaso("exito");
     } catch (err) {
-      setError(err.message || "Error procesando el pago.");
+      setError(err.message || "Error procesando el pago con tarjeta.");
     } finally {
       setProcesando(false);
     }
@@ -266,191 +271,131 @@ export default function PaywallModal({
                 onClick={() => setPaso("pago")}
                 className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all text-base flex items-center justify-center space-x-2"
               >
-                <span>Continuar al Pago →</span>
+                <span>Continuar al Pago con Tarjeta →</span>
               </button>
             </div>
           )}
 
           {paso === "pago" && (
             <div className="space-y-5 animate-fade-in">
-              {/* Selector de ÚNICAMENTE 2 Métodos de Pago: Tarjeta y Google Pay */}
-              <div className="grid grid-cols-2 gap-3 bg-gray-950 p-2 rounded-2xl border border-gray-800">
-                <button
-                  onClick={() => setMetodo("card")}
-                  className={`py-3.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
-                    metodo === "card"
-                      ? "bg-blue-600/20 border border-blue-500 text-white shadow-md"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  <span className="text-2xl">💳</span>
-                  <span className="font-extrabold text-sm">Tarjeta</span>
-                </button>
-
-                <button
-                  onClick={() => setMetodo("gpay")}
-                  className={`py-3.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
-                    metodo === "gpay"
-                      ? "bg-white text-gray-950 shadow-md font-black"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  <span className="text-xl font-black tracking-tighter">
-                    GPay
-                  </span>
-                  <span className="font-extrabold text-sm">Google Pay</span>
-                </button>
+              <div className="bg-blue-600/10 border border-blue-500/30 p-3.5 rounded-2xl flex items-center space-x-3">
+                <span className="text-2xl">💳</span>
+                <div>
+                  <h4 className="font-extrabold text-xs text-blue-400">
+                    Pago Seguro con Tarjeta de Crédito / Débito
+                  </h4>
+                  <p className="text-[11px] text-gray-300">
+                    Aceptamos Visa, MasterCard, American Express y Diners.
+                  </p>
+                </div>
               </div>
 
               {/* Formulario Tarjeta */}
-              {metodo === "card" && (
-                <form
-                  onSubmit={handlePagarCheckoutDirecto}
-                  className="space-y-4"
-                >
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-400 mb-1">
-                      Número De Tarjeta
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="1234 1234 1234 1234"
-                        value={numTarjeta}
-                        onChange={(e) => setNumTarjeta(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
-                        required
-                      />
-                      <div className="absolute right-3 top-3 flex space-x-1">
-                        <span className="bg-blue-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded text-white">
-                          VISA
-                        </span>
-                        <span className="bg-red-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded text-white">
-                          MC
-                        </span>
-                      </div>
+              <form onSubmit={handlePagarTarjeta} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 mb-1">
+                    Número De Tarjeta
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="1234 1234 1234 1234"
+                      value={numTarjeta}
+                      onChange={(e) => setNumTarjeta(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
+                      required
+                    />
+                    <div className="absolute right-3 top-3 flex space-x-1">
+                      <span className="bg-blue-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded text-white">
+                        VISA
+                      </span>
+                      <span className="bg-red-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded text-white">
+                        MC
+                      </span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-bold text-gray-400 mb-1">
-                        Fecha De Caducidad
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="MM / AA"
-                        value={caducidad}
-                        onChange={(e) => setCaducidad(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-gray-400 mb-1">
-                        Código De Seguridad
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="CVC 123"
-                        maxLength={4}
-                        value={cvc}
-                        onChange={(e) => setCvc(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
-                        required
-                      />
-                    </div>
-                  </div>
-
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold text-gray-400 mb-1">
-                      Nombre Completo
+                      Fecha De Caducidad
                     </label>
                     <input
                       type="text"
-                      placeholder="Tu nombre en la tarjeta"
-                      value={nombreTitular}
-                      onChange={(e) => setNombreTitular(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-bold text-sm focus:border-blue-500"
+                      placeholder="MM / AA"
+                      value={caducidad}
+                      onChange={(e) => setCaducidad(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-[11px] font-bold text-gray-400 mb-1">
-                      País O Región
+                      Código De Seguridad
                     </label>
-                    <select
-                      value={paisSeleccionado.nombre}
-                      onChange={(e) => {
-                        const p = LISTA_PAISES.find(
-                          (item) => item.nombre === e.target.value,
-                        );
-                        if (p) setPaisSeleccionado(p);
-                      }}
-                      className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-bold text-xs"
-                    >
-                      {LISTA_PAISES.map((p) => (
-                        <option key={p.nombre} value={p.nombre}>
-                          {p.nombre} ({p.desc})
-                        </option>
-                      ))}
-                    </select>
+                    <input
+                      type="password"
+                      placeholder="CVC 123"
+                      maxLength={4}
+                      value={cvc}
+                      onChange={(e) => setCvc(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-blue-500"
+                      required
+                    />
                   </div>
-
-                  {error && (
-                    <p className="text-xs text-red-400 font-bold">{error}</p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={procesando}
-                    className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold rounded-xl shadow-lg transition-all text-sm disabled:opacity-50"
-                  >
-                    {procesando
-                      ? "Procesando Pago Seguro..."
-                      : `Pagar ${paisSeleccionado.desc} y Activar Pro Instantáneamente`}
-                  </button>
-                </form>
-              )}
-
-              {/* Pestaña Google Pay */}
-              {metodo === "gpay" && (
-                <div className="space-y-4 text-center py-4 bg-gray-950 p-6 rounded-2xl border border-gray-800">
-                  <div className="inline-flex items-center justify-center p-3 bg-white rounded-2xl mb-2 shadow">
-                    <span className="text-2xl font-black text-gray-900 tracking-tighter">
-                      GPay
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm text-white">
-                    Pago Rápido con Google Pay
-                  </h4>
-                  <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                    Paga de forma rápida y segura utilizando tus tarjetas
-                    guardadas en tu cuenta de Google.
-                  </p>
-
-                  <div className="p-3 bg-gray-900 rounded-xl border border-gray-800 text-xs text-emerald-400 font-mono font-bold">
-                    Monto Total: {paisSeleccionado.desc}
-                  </div>
-
-                  {error && (
-                    <p className="text-xs text-red-400 font-bold">{error}</p>
-                  )}
-
-                  <button
-                    onClick={handlePagarCheckoutDirecto}
-                    disabled={procesando}
-                    className="w-full py-3.5 bg-white hover:bg-gray-100 text-gray-950 font-black rounded-xl shadow-xl transition-all text-base flex items-center justify-center space-x-2 disabled:opacity-50"
-                  >
-                    <span>
-                      {procesando
-                        ? "Procesando GPay..."
-                        : "Pagar ahora con Google Pay 🚀"}
-                    </span>
-                  </button>
                 </div>
-              )}
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 mb-1">
+                    Nombre Completo del Titular
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Tu nombre completo"
+                    value={nombreTitular}
+                    onChange={(e) => setNombreTitular(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-bold text-sm focus:border-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 mb-1">
+                    País O Región
+                  </label>
+                  <select
+                    value={paisSeleccionado.nombre}
+                    onChange={(e) => {
+                      const p = LISTA_PAISES.find(
+                        (item) => item.nombre === e.target.value,
+                      );
+                      if (p) setPaisSeleccionado(p);
+                    }}
+                    className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-bold text-xs"
+                  >
+                    {LISTA_PAISES.map((p) => (
+                      <option key={p.nombre} value={p.nombre}>
+                        {p.nombre} ({p.desc})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {error && (
+                  <p className="text-xs text-red-400 font-bold">{error}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={procesando}
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold rounded-xl shadow-lg transition-all text-sm disabled:opacity-50"
+                >
+                  {procesando
+                    ? "Procesando Solicitud..."
+                    : `Pagar ${paisSeleccionado.desc} con Tarjeta`}
+                </button>
+              </form>
 
               <button
                 type="button"
@@ -465,27 +410,21 @@ export default function PaywallModal({
           {paso === "exito" && (
             <div className="text-center space-y-4 py-6 animate-fade-in">
               <div className="inline-flex items-center justify-center p-4 bg-emerald-500/10 text-emerald-400 rounded-full text-5xl mb-2">
-                🎉
+                ⏳
               </div>
               <h3 className="text-2xl font-black text-white">
-                ¡Suscripción FinanceFlow Pro Activada!
+                Solicitud de Pago Registrada
               </h3>
               <p className="text-xs text-gray-300 max-w-sm mx-auto leading-relaxed">
-                Tu pago ha sido procesado exitosamente. Tu cuenta ahora cuenta
-                con{" "}
-                <span className="text-emerald-400 font-bold">
-                  Licencia Pro Ilimitada
-                </span>{" "}
-                para Web y Móvil.
+                Tu solicitud de pago con tarjeta ha sido enviada para
+                verificación. El administrador confirmará la transacción en
+                breve.
               </p>
               <button
-                onClick={() => {
-                  onClose();
-                  window.location.reload();
-                }}
+                onClick={onClose}
                 className="py-3.5 px-8 bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black rounded-xl shadow-lg transition-all text-sm"
               >
-                ¡Comenzar a Usar Pro!
+                Entendido
               </button>
             </div>
           )}

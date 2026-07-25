@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import FinanceFlowLogo from './FinanceFlowLogo';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import FinanceFlowLogo from "./FinanceFlowLogo";
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -11,7 +11,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
     setIsMenuOpen(false);
   };
 
@@ -20,14 +20,15 @@ function Navbar() {
   };
 
   const navLinks = [
-    { path: '/', label: 'Dashboard', icon: '🏠' },
-    { path: '/movimiento', label: 'Nuevo Movimiento', icon: '➕' },
-    { path: '/reportes', label: 'Reportes', icon: '📊' },
-    { path: '/perfil', label: 'Perfil', icon: '👤' }
+    { path: "/", label: "Dashboard", icon: "🏠" },
+    { path: "/movimiento", label: "Nuevo Movimiento", icon: "➕" },
+    { path: "/reportes", label: "Reportes", icon: "📊" },
+    { path: "/perfil", label: "Perfil", icon: "👤" },
+    { path: "/admin", label: "Admin", icon: "🛡️" },
   ];
 
   // No mostrar navbar en páginas públicas
-  const publicPaths = ['/login', '/register', '/landing'];
+  const publicPaths = ["/login", "/register", "/landing"];
   if (publicPaths.includes(location.pathname)) {
     return null;
   }
@@ -38,8 +39,8 @@ function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex items-center space-x-3 text-white font-bold text-xl hover:opacity-90 transition-all duration-200 group"
             >
               <div className="p-1.5 rounded-xl bg-emerald-950/40 border border-emerald-300/50 shadow-md group-hover:border-emerald-200 transition-colors flex items-center justify-center">
@@ -62,8 +63,8 @@ function Navbar() {
                       to={link.path}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                         isActivePath(link.path)
-                          ? 'bg-white/20 text-white shadow-md'
-                          : 'text-white/80 hover:text-white hover:bg-white/10'
+                          ? "bg-white/20 text-white shadow-md"
+                          : "text-white/80 hover:text-white hover:bg-white/10"
                       }`}
                     >
                       <span className="text-lg">{link.icon}</span>
@@ -78,7 +79,10 @@ function Navbar() {
                 <div className="ml-4 flex items-center md:ml-6">
                   <div className="flex items-center space-x-3">
                     <span className="text-white/80 text-sm">
-                      Hola, <span className="font-semibold text-white">{user?.nombre || 'Usuario'}</span>
+                      Hola,{" "}
+                      <span className="font-semibold text-white">
+                        {user?.nombre || "Usuario"}
+                      </span>
                     </span>
                     <button
                       onClick={handleLogout}
@@ -109,22 +113,22 @@ function Navbar() {
           ) : (
             /* Auth Links for non-authenticated users */
             <div className="flex items-center space-x-4">
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActivePath('/login')
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                  isActivePath("/login")
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
                 }`}
               >
                 🔑 Iniciar Sesión
               </Link>
-              <Link 
-                to="/register" 
+              <Link
+                to="/register"
                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-white/30 ${
-                  isActivePath('/register')
-                    ? 'bg-white text-primary'
-                    : 'text-white hover:bg-white hover:text-primary'
+                  isActivePath("/register")
+                    ? "bg-white text-primary"
+                    : "text-white hover:bg-white hover:text-primary"
                 }`}
               >
                 📝 Registrarse
@@ -144,8 +148,8 @@ function Navbar() {
                   onClick={() => setIsMenuOpen(false)}
                   className={`block px-3 py-2 rounded-md text-base font-medium transition-all duration-200 flex items-center space-x-3 ${
                     isActivePath(link.path)
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                      ? "bg-white/20 text-white"
+                      : "text-white/80 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <span className="text-lg">{link.icon}</span>
@@ -154,7 +158,7 @@ function Navbar() {
               ))}
               <div className="border-t border-white/20 mt-3 pt-3">
                 <div className="px-3 py-2 text-white/60 text-sm">
-                  {user?.nombre || 'Usuario'}
+                  {user?.nombre || "Usuario"}
                 </div>
                 <button
                   onClick={handleLogout}
