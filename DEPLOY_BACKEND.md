@@ -16,8 +16,8 @@
 3. En "Environment Variables" añade:
 
 ```
-MONGODB_URI=mongodb+srv://user_prod:secure_password@cluster0.mongodb.net/financeflow
-JWT_SECRET=production_jwt_secret_token_financeflow_2026
+MONGODB_URI=mongodb+srv://<USUARIO>:<PASSWORD>@cluster0.mongodb.net/<NOMBRE_DB>
+JWT_SECRET=tu_jwt_secret_personalizado_aqui
 NODE_ENV=production
 PORT=5000
 CORS_ORIGIN=https://financeflow-frontend.vercel.app
