@@ -513,59 +513,59 @@ export default function NewMovementScreen({
             </Text>
           </TouchableOpacity>
         </View>
-
-        {/* Modal Selector de Fecha */}
-        <Modal visible={showDatePickerModal} transparent animationType="slide">
-          <View style={theme.modalOverlay}>
-            <View style={[theme.modalContent, { maxHeight: "80%" }]}>
-              <Text style={theme.modalTitle}>📅 Seleccionar Fecha</Text>
-              <ScrollView
-                style={{ width: "100%", marginVertical: 10 }}
-                showsVerticalScrollIndicator={false}
-              >
-                {last30Days.map((d, index) => {
-                  const label =
-                    index === 0
-                      ? "Hoy"
-                      : index === 1
-                        ? "Ayer"
-                        : formatFechaSegura(d, false);
-                  const isSelected = d.toDateString() === fecha.toDateString();
-                  return (
-                    <TouchableOpacity
-                      key={d.toISOString()}
-                      style={[
-                        theme.monthOption,
-                        isSelected && theme.monthOptionActive,
-                      ]}
-                      onPress={() => {
-                        setFecha(d);
-                        setShowDatePickerModal(false);
-                      }}
-                      activeOpacity={0.7}
-                    >
-                      <Text
-                        style={[
-                          theme.monthOptionText,
-                          isSelected && theme.monthOptionTextActive,
-                        ]}
-                      >
-                        {label} ({d.toLocaleDateString()})
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-              <TouchableOpacity
-                style={theme.modalCloseBtn}
-                onPress={() => setShowDatePickerModal(false)}
-              >
-                <Text style={theme.modalCloseBtnText}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </ScrollView>
+
+      {/* Modal Selector de Fecha */}
+      <Modal visible={showDatePickerModal} transparent animationType="fade" onRequestClose={() => setShowDatePickerModal(false)}>
+        <View style={theme.modalOverlay}>
+          <View style={[theme.modalContent, { maxHeight: "80%" }]}>
+            <Text style={theme.modalTitle}>📅 Seleccionar Fecha</Text>
+            <ScrollView
+              style={{ width: "100%", marginVertical: 10 }}
+              showsVerticalScrollIndicator={false}
+            >
+              {last30Days.map((d, index) => {
+                const label =
+                  index === 0
+                    ? "Hoy"
+                    : index === 1
+                      ? "Ayer"
+                      : formatFechaSegura(d, false);
+                const isSelected = d.toDateString() === fecha.toDateString();
+                return (
+                  <TouchableOpacity
+                    key={d.toISOString()}
+                    style={[
+                      theme.monthOption,
+                      isSelected && theme.monthOptionActive,
+                    ]}
+                    onPress={() => {
+                      setFecha(d);
+                      setShowDatePickerModal(false);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        theme.monthOptionText,
+                        isSelected && theme.monthOptionTextActive,
+                      ]}
+                    >
+                      {label} ({d.toLocaleDateString()})
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+            <TouchableOpacity
+              style={theme.modalCloseBtn}
+              onPress={() => setShowDatePickerModal(false)}
+            >
+              <Text style={theme.modalCloseBtnText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -639,6 +639,55 @@ const baseStyles = {
     marginTop: 16,
   },
   saveBtnText: { color: "#FFFFFF", fontSize: 15, fontWeight: "bold" },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    borderRadius: 20,
+    padding: 20,
+    width: "100%",
+    maxWidth: 400,
+    borderWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  monthOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginVertical: 4,
+    borderWidth: 1,
+  },
+  monthOptionActive: {
+    backgroundColor: "#10B981",
+    borderColor: "#10B981",
+  },
+  monthOptionText: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  monthOptionTextActive: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
+  modalCloseBtn: {
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  modalCloseBtnText: {
+    fontWeight: "bold",
+    fontSize: 14,
+  },
 };
 
 const lightStyles = StyleSheet.create({
@@ -694,6 +743,12 @@ const lightStyles = StyleSheet.create({
   },
   catBadgeText: { ...baseStyles.catBadgeText, color: "#4B5563" },
   switchLabel: { ...baseStyles.switchLabel, color: "#374151" },
+  modalContent: { ...baseStyles.modalContent, backgroundColor: "#FFFFFF", borderColor: "#E5E7EB" },
+  modalTitle: { ...baseStyles.modalTitle, color: "#1F2937" },
+  monthOption: { ...baseStyles.monthOption, backgroundColor: "#F3F4F6", borderColor: "#E5E7EB" },
+  monthOptionText: { ...baseStyles.monthOptionText, color: "#374151" },
+  modalCloseBtn: { ...baseStyles.modalCloseBtn, backgroundColor: "#E5E7EB" },
+  modalCloseBtnText: { ...baseStyles.modalCloseBtnText, color: "#374151" },
 });
 
 const darkStyles = StyleSheet.create({
@@ -749,4 +804,10 @@ const darkStyles = StyleSheet.create({
   },
   catBadgeText: { ...baseStyles.catBadgeText, color: "#D1D5DB" },
   switchLabel: { ...baseStyles.switchLabel, color: "#F9FAFB" },
+  modalContent: { ...baseStyles.modalContent, backgroundColor: "#1F2937", borderColor: "#374151" },
+  modalTitle: { ...baseStyles.modalTitle, color: "#F9FAFB" },
+  monthOption: { ...baseStyles.monthOption, backgroundColor: "#111827", borderColor: "#374151" },
+  monthOptionText: { ...baseStyles.monthOptionText, color: "#D1D5DB" },
+  modalCloseBtn: { ...baseStyles.modalCloseBtn, backgroundColor: "#374151" },
+  modalCloseBtnText: { ...baseStyles.modalCloseBtnText, color: "#FFFFFF" },
 });

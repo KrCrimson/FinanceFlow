@@ -10,7 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { solicitarPlanPro } from "../services/api";
+import { solicitarPlanPro, checkoutDirectoPro } from "../services/api";
 
 const LISTA_PAISES = [
   {
@@ -129,11 +129,12 @@ export default function PaywallModal({
       }
 
       const nroOp = `CARD-${Date.now().toString().slice(-6)}`;
-      await solicitarPlanPro(
-        userEmail || "admin@empresa.com",
+      await checkoutDirectoPro(
+        userEmail || "usuario@financeflow.com",
         "tarjeta",
-        nroOp,
+        paisSeleccionado.nombre,
         paisSeleccionado.monto,
+        paisSeleccionado.moneda,
       );
 
       setPaso("exito");
@@ -350,25 +351,24 @@ export default function PaywallModal({
                   { alignItems: "center", paddingVertical: 20 },
                 ]}
               >
-                <Text style={{ fontSize: 50, marginBottom: 10 }}>⏳</Text>
+                <Text style={{ fontSize: 50, marginBottom: 10 }}>🎉</Text>
                 <Text
                   style={[
                     styles.title,
                     { color: textColor, textAlign: "center" },
                   ]}
                 >
-                  Solicitud de Pago Registrada
+                  ¡Bienvenido a FinanceFlow Pro!
                 </Text>
                 <Text style={[styles.subtitle, { textAlign: "center" }]}>
-                  Tu solicitud de pago ha sido registrada correctamente. El
-                  administrador confirmará el comprobante en breve.
+                  Tu suscripción Pro se ha activado correctamente al instante. Ahora puedes disfrutar de escaneo OCR ilimitado y todas las funciones avanzadas.
                 </Text>
 
                 <TouchableOpacity
                   style={[styles.mainBtn, { marginTop: 20 }]}
                   onPress={onClose}
                 >
-                  <Text style={styles.mainBtnText}>Entendido</Text>
+                  <Text style={styles.mainBtnText}>¡Disfrutar de Pro!</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.85)",
-    justify: "flex-end",
+    justifyContent: "flex-end",
   },
   container: {
     borderTopLeftRadius: 28,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     flexDirection: "row",
-    justify: "space-between",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   headerTitle: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     alignItems: "center",
-    justify: "center",
+    justifyContent: "center",
   },
   closeBtnText: {
     color: "#FFF",
