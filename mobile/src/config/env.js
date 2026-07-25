@@ -1,4 +1,4 @@
-// Conectarse directamente al backend de producción real en Render
-export const API_URL = 'https://financeflow-production-be78.up.railway.app/api';
+// Conectarse al backend de producción en Render
+export const API_URL = 'https://financeflow-backend-4fbw.onrender.com/api';
 
-console.log('📡 FinanceFlow Mobile API URL configurada (Railway Cloud Real):', API_URL);
+console.log('📡 FinanceFlow Mobile API URL configurada (Render Cloud Real):', API_URL);

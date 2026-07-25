@@ -18,7 +18,7 @@ export function useImageToMovimiento() {
     
     try {
       const base64 = await fileToBase64(file);
-      const API_BASE = process.env.REACT_APP_API_URL || 'https://financeflow-production-be78.up.railway.app';
+      const API_BASE = process.env.REACT_APP_API_URL || 'https://financeflow-backend-4fbw.onrender.com';
       const token = localStorage.getItem('token');
 
       // 1. Potenciado con Gemini 1.5 Flash Vision mediante el Backend
