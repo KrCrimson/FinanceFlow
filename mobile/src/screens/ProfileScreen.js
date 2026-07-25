@@ -16,6 +16,7 @@ import {
   getMobileCurrencySymbol,
   setMobileCurrencySymbol,
 } from "../utils/currency";
+import PaywallModal from "../components/PaywallModal";
 
 export default function ProfileScreen({
   user,
@@ -29,6 +30,7 @@ export default function ProfileScreen({
   );
   const [moneda, setMoneda] = useState(getMobileCurrencySymbol());
   const [saving, setSaving] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const handleReset = () => {
     setNombre(user?.nombre || "sebastian");
@@ -232,6 +234,94 @@ export default function ProfileScreen({
           </View>
         </View>
 
+        {/* Sección: Planes y Suscripción Pro */}
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: "#064E3B", borderColor: "#10B981" },
+          ]}
+        >
+          <Text style={[styles.cardSectionTitle, { color: "#FFFFFF" }]}>
+            👑 Suscripción FinanceFlow Pro
+          </Text>
+          <Text
+            style={{
+              color: "#A7F3D0",
+              fontSize: 12,
+              marginBottom: 12,
+              lineHeight: 16,
+            }}
+          >
+            Accede a escaneo ilimitado de comprobantes, exportaciones contables
+            en Web, carreras de metas ilimitadas y soporte prioritario.
+          </Text>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#F59E0B",
+              paddingVertical: 12,
+              borderRadius: 12,
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+            onPress={() => setShowPaywall(true)}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={{ color: "#111827", fontWeight: "bold", fontSize: 14 }}
+            >
+              ⭐ Actualizar a Pro (S/ 19.90)
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sección: Exportación Contable (Exclusiva de Web) */}
+        <View style={styles.card}>
+          <Text style={styles.cardSectionTitle}>
+            📥 Exportación de Reportes (PDF / Excel)
+          </Text>
+          <Text
+            style={{
+              color: "#6B7280",
+              fontSize: 12,
+              marginBottom: 12,
+              lineHeight: 16,
+            }}
+          >
+            Genera documentos contables oficiales de tus ingresos y egresos para
+            declaración o control de caja.
+          </Text>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#EEF2FF",
+              borderColor: "#C7D2FE",
+              borderWidth: 1,
+              paddingVertical: 12,
+              paddingHorizontal: 14,
+              borderRadius: 12,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 8,
+            }}
+            onPress={() => {
+              Alert.alert(
+                "🌐 Exportación Exclusiva de la Web",
+                "La generación e impresión de reportes contables en formatos PDF y Microsoft Excel es una función ejecutiva disponible ingresando desde tu navegador web en:\n\nhttps://financeflow-swart.vercel.app\n\n¡Ingresa desde tu computadora para descargar tus archivos!",
+                [{ text: "Entendido", style: "default" }],
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={{ color: "#4338CA", fontWeight: "bold", fontSize: 13 }}
+            >
+              📄 Descargar PDF / Excel (Instrucciones)
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Sección: Configuración de Cuenta */}
         <View style={styles.card}>
           <Text style={styles.cardSectionTitle}>
@@ -306,6 +396,14 @@ export default function ProfileScreen({
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal Paywall Pro Yape / BCP */}
+      <PaywallModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        isDarkMode={isDarkMode}
+        userEmail={user?.email}
+      />
     </SafeAreaView>
   );
 }

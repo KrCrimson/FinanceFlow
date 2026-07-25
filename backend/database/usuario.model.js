@@ -42,6 +42,23 @@ const usuarioSchema = new mongoose.Schema({
 		type: Date,
 		default: null,
 	},
+	esPremium: {
+		type: Boolean,
+		default: false,
+	},
+	planTipo: {
+		type: String,
+		enum: ['free', 'pro'],
+		default: 'free',
+	},
+	conteoOcrMes: {
+		type: Number,
+		default: 0,
+	},
+	ultimoReinicioOcr: {
+		type: Date,
+		default: Date.now,
+	},
 });
 
 usuarioSchema.pre('save', function () {
