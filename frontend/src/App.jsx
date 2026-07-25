@@ -1,6 +1,6 @@
 import React from "react";
 import "./index.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -19,9 +19,17 @@ import Navbar from "./components/Navbar";
 import DevLogger from "./components/DevLogger";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-function App() {
+function MainRoutes() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const isPortalAdmin = searchParams.get("portal") === "admin" || location.pathname === "/admin-portal-privado";
+
+  if (isPortalAdmin) {
+    return <AdminDashboardPage />;
+  }
+
   return (
-    <Router>
+    <>
       <Navbar />
       <ErrorBoundary debug={process.env.NODE_ENV === "development"}>
         <Routes>
@@ -70,13 +78,18 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Ruta Administradora Privada */}
           <Route path="/admin-portal-privado" element={<AdminDashboardPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </ErrorBoundary>
+    </>
+  );
+}
 
-      {/* Dev Logger - Solo visible en desarrollo */}
+function App() {
+  return (
+    <Router>
+      <MainRoutes />
       <DevLogger />
     </Router>
   );
