@@ -73,6 +73,40 @@ export default function NewMovementScreen({
   };
   const last30Days = generateLast30Days();
 
+  const formatFechaSegura = (d, includeYear = true) => {
+    if (!d || !(d instanceof Date)) return "";
+    const dias = [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+    ];
+    const meses = [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Oct",
+      "Nov",
+      "Dic",
+    ];
+    const diaNombre = dias[d.getDay()];
+    const diaNum = d.getDate();
+    const mesNombre = meses[d.getMonth()];
+    const anio = d.getFullYear();
+    return includeYear
+      ? `${diaNombre}, ${diaNum} ${mesNombre} ${anio}`
+      : `${diaNombre}, ${diaNum} ${mesNombre}`;
+  };
+
   useEffect(() => {
     // Cargar historial de movimientos para añadir las categorías personalizadas del usuario
     const loadUserCategories = async () => {
@@ -440,13 +474,7 @@ export default function NewMovementScreen({
                 fontWeight: "bold",
               }}
             >
-              📅{" "}
-              {fecha.toLocaleDateString("es-ES", {
-                weekday: "long",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
+              📅 {formatFechaSegura(fecha, true)}
             </Text>
           </TouchableOpacity>
 
@@ -500,11 +528,7 @@ export default function NewMovementScreen({
                       ? "Hoy"
                       : index === 1
                         ? "Ayer"
-                        : d.toLocaleDateString("es-ES", {
-                            weekday: "long",
-                            day: "numeric",
-                            month: "short",
-                          });
+                        : formatFechaSegura(d, false);
                   const isSelected = d.toDateString() === fecha.toDateString();
                   return (
                     <TouchableOpacity

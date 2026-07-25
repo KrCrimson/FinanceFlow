@@ -18,6 +18,24 @@ export async function solicitarPlanPro(email, metodo, nroOperacion, monto) {
   }
 }
 
+export async function checkoutDirectoPro(email, metodo, pais, monto, moneda) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/pagos/checkout-directo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, metodo, pais, monto, moneda }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Error al procesar la suscripción");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error en checkoutDirectoPro:", error);
+    throw error;
+  }
+}
+
 export async function getEstadoPlan(email) {
   try {
     const res = await fetch(

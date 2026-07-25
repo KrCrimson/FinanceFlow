@@ -54,6 +54,57 @@ router.post("/solicitar-pro", async (req, res) => {
   }
 });
 
+// 1.5 Checkout Directo (Activación Automática Instantánea Opción B con Tarjeta / Google Pay)
+router.post("/checkout-directo", async (req, res) => {
+  try {
+    const { email, metodo, pais, monto, moneda } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: "Email es requerido para activar la cuenta Pro",
+      });
+    }
+
+    const usuario = await Usuario.findOne({
+      email: email.toLowerCase().trim(),
+    });
+    if (!usuario) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Usuario no encontrado" });
+    }
+
+    // Activar Premium al instante
+    usuario.esPremium = true;
+    usuario.planTipo = "pro";
+    await usuario.save();
+
+    const nroOpAutogenerado = `AUT-${Date.now().toString().slice(-6)}`;
+    const nuevoPago = new Pago({
+      usuario: usuario._id,
+      email: usuario.email,
+      metodo: metodo || "card",
+      nroOperacion: nroOpAutogenerado,
+      monto: Number(monto) || 19.9,
+      estado: "aprobado",
+    });
+    await nuevoPago.save();
+
+    res.json({
+      success: true,
+      message: "¡Pago procesado con éxito! Tu cuenta ahora es FinanceFlow Pro.",
+      esPremium: true,
+      planTipo: "pro",
+    });
+  } catch (err) {
+    console.error("Error en checkout directo:", err);
+    res
+      .status(500)
+      .json({ success: false, error: "Error procesando el pago instantáneo" });
+  }
+});
+
 // 2. Obtener estado de suscripción y límites del usuario
 router.get("/estado-plan/:email", async (req, res) => {
   try {

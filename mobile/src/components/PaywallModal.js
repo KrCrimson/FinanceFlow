@@ -10,8 +10,68 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
-import { solicitarPlanPro } from "../services/api";
+import { solicitarPlanPro, checkoutDirectoPro } from "../services/api";
+
+const LISTA_PAISES = [
+  {
+    nombre: "Perú",
+    moneda: "PEN",
+    simbolo: "S/",
+    monto: 19.9,
+    desc: "S/ 19.90 PEN",
+  },
+  {
+    nombre: "México",
+    moneda: "MXN",
+    simbolo: "$",
+    monto: 99.0,
+    desc: "$99 MXN (S/ 19.90 Soles)",
+  },
+  {
+    nombre: "Colombia",
+    moneda: "COP",
+    simbolo: "$",
+    monto: 21500,
+    desc: "$21,500 COP",
+  },
+  {
+    nombre: "Chile",
+    moneda: "CLP",
+    simbolo: "$",
+    monto: 5200,
+    desc: "$5,200 CLP",
+  },
+  {
+    nombre: "Argentina",
+    moneda: "ARS",
+    simbolo: "$",
+    monto: 5500,
+    desc: "$5,500 ARS",
+  },
+  {
+    nombre: "Estados Unidos",
+    moneda: "USD",
+    simbolo: "$",
+    monto: 5.99,
+    desc: "$5.99 USD",
+  },
+  {
+    nombre: "España / Europa",
+    moneda: "EUR",
+    simbolo: "€",
+    monto: 5.99,
+    desc: "€5.99 EUR",
+  },
+  {
+    nombre: "Otro País",
+    moneda: "USD",
+    simbolo: "$",
+    monto: 5.99,
+    desc: "$5.99 USD",
+  },
+];
 
 export default function PaywallModal({
   visible,
@@ -20,14 +80,53 @@ export default function PaywallModal({
   userEmail,
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("yape"); // 'yape' | 'bcp'
-  const [nroOperacion, setNroOperacion] = useState("");
+  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape' | 'bcp'
+  const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
+
+  // Formulario tarjeta
+  const [numTarjeta, setNumTarjeta] = useState("");
+  const [caducidad, setCaducidad] = useState("");
+  const [cvc, setCvc] = useState("");
+  const [nombreTitular, setNombreTitular] = useState("");
+  const [nroOperacionYape, setNroOperacionYape] = useState("");
+
   const [enviando, setEnviando] = useState(false);
 
   if (!visible) return null;
 
-  const handleConfirmarPago = async () => {
-    if (!nroOperacion.trim()) {
+  const handleCheckoutDirecto = async () => {
+    try {
+      setEnviando(true);
+      if (metodo === "card" && (!numTarjeta || !caducidad || !cvc)) {
+        Alert.alert(
+          "Datos requeridos",
+          "Por favor ingresa los datos de tu tarjeta.",
+        );
+        setEnviando(false);
+        return;
+      }
+
+      await checkoutDirectoPro(
+        userEmail || "usuario@financeflow.com",
+        metodo,
+        paisSeleccionado.nombre,
+        paisSeleccionado.monto,
+        paisSeleccionado.moneda,
+      );
+
+      setPaso("exito");
+    } catch (err) {
+      Alert.alert(
+        "Error",
+        err.message || "No se pudo procesar la suscripción.",
+      );
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  const handleEnviarYapeBcp = async () => {
+    if (!nroOperacionYape.trim()) {
       Alert.alert(
         "Código Requerido",
         "Por favor ingresa tu número de operación o código de Yape.",
@@ -40,8 +139,8 @@ export default function PaywallModal({
       await solicitarPlanPro(
         userEmail || "usuario@financeflow.com",
         metodo,
-        nroOperacion.trim(),
-        19.9,
+        nroOperacionYape.trim(),
+        paisSeleccionado.monto,
       );
       setPaso("exito");
     } catch (err) {
@@ -51,9 +150,9 @@ export default function PaywallModal({
     }
   };
 
-  const bgModal = isDarkMode ? "#111827" : "#FFFFFF";
-  const textColor = isDarkMode ? "#FFFFFF" : "#111827";
-  const cardBg = isDarkMode ? "#1F2937" : "#F0FDF4";
+  const bgModal = "#111827";
+  const textColor = "#FFFFFF";
+  const cardBg = "#1F2937";
 
   return (
     <Modal
@@ -64,9 +163,9 @@ export default function PaywallModal({
     >
       <View style={styles.overlay}>
         <View style={[styles.container, { backgroundColor: bgModal }]}>
-          {/* Header Superior Decorativo */}
+          {/* Header Superior */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>👑 FinanceFlow Pro</Text>
+            <Text style={styles.headerTitle}>💳 FinanceFlow Pro Checkout</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>
@@ -79,11 +178,10 @@ export default function PaywallModal({
             {paso === "beneficios" && (
               <View style={styles.stepContainer}>
                 <Text style={[styles.title, { color: textColor }]}>
-                  Desbloquea el Máximo Potencial Financiero
+                  Suscripción FinanceFlow Pro
                 </Text>
                 <Text style={styles.subtitle}>
-                  Obtén acceso total y sin restricciones en la App Móvil y en la
-                  Web.
+                  Acceso total en la App Móvil y en la Web sin restricciones.
                 </Text>
 
                 {/* Grid de Beneficios */}
@@ -97,7 +195,7 @@ export default function PaywallModal({
                         OCR Gemini Ilimitado
                       </Text>
                       <Text style={styles.benefitSub}>
-                        Escaneo ilimitado de recibos y boletas con Inteligencia
+                        Escaneo ilimitado de comprobantes con Inteligencia
                         Artificial.
                       </Text>
                     </View>
@@ -112,8 +210,7 @@ export default function PaywallModal({
                         Exportación PDF / Excel
                       </Text>
                       <Text style={styles.benefitSub}>
-                        Generación e impresión de reportes oficiales desde la
-                        Web.
+                        Descarga de reportes contables oficiales en la Web.
                       </Text>
                     </View>
                   </View>
@@ -124,7 +221,7 @@ export default function PaywallModal({
                     <Text style={styles.benefitIcon}>🏁</Text>
                     <View style={styles.benefitTextCol}>
                       <Text style={[styles.benefitTitle, { color: textColor }]}>
-                        Carreras de Metas Ilimitadas
+                        Metas Ilimitadas
                       </Text>
                       <Text style={styles.benefitSub}>
                         Planifica compras grandes sin límite de ahorro
@@ -132,28 +229,16 @@ export default function PaywallModal({
                       </Text>
                     </View>
                   </View>
-
-                  <View
-                    style={[styles.benefitCard, { backgroundColor: cardBg }]}
-                  >
-                    <Text style={styles.benefitIcon}>🔒</Text>
-                    <View style={styles.benefitTextCol}>
-                      <Text style={[styles.benefitTitle, { color: textColor }]}>
-                        Cierres de Caja Avanzados
-                      </Text>
-                      <Text style={styles.benefitSub}>
-                        Bloqueo seguro con contraseña y auditoría completa.
-                      </Text>
-                    </View>
-                  </View>
                 </View>
 
-                {/* Banner de Oferta */}
+                {/* Selector de Moneda / Precio */}
                 <View style={styles.offerCard}>
-                  <Text style={styles.offerBadge}>OFERTA DE LANZAMIENTO</Text>
-                  <Text style={styles.offerPrice}>S/ 19.90</Text>
+                  <Text style={styles.offerBadge}>
+                    TARIFA PROMO LATAM & MUNDO
+                  </Text>
+                  <Text style={styles.offerPrice}>{paisSeleccionado.desc}</Text>
                   <Text style={styles.offerDetail}>
-                    Pago único • Licencia Pro Multidispositivo
+                    Pago único • Licencia Multidispositivo
                   </Text>
                 </View>
 
@@ -162,140 +247,282 @@ export default function PaywallModal({
                   onPress={() => setPaso("pago")}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.mainBtnText}>
-                    🚀 Pagar con Yape o BCP
-                  </Text>
+                  <Text style={styles.mainBtnText}>Continuar al Pago →</Text>
                 </TouchableOpacity>
               </View>
             )}
 
             {paso === "pago" && (
               <View style={styles.stepContainer}>
-                <Text style={[styles.title, { color: textColor }]}>
-                  Realiza tu Pago
-                </Text>
-
-                {/* Selector de Método */}
+                {/* Selector de Método Estilo Vercel */}
                 <View style={styles.tabSelector}>
                   <TouchableOpacity
                     style={[
                       styles.tabBtn,
-                      metodo === "yape" && styles.tabBtnActiveYape,
+                      metodo === "card" && styles.tabBtnActiveCard,
+                    ]}
+                    onPress={() => setMetodo("card")}
+                  >
+                    <Text
+                      style={[
+                        styles.tabBtnText,
+                        metodo === "card" && styles.tabBtnTextActive,
+                      ]}
+                    >
+                      💳 Tarjeta
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.tabBtn,
+                      metodo === "gpay" && styles.tabBtnActiveGpay,
+                    ]}
+                    onPress={() => setMetodo("gpay")}
+                  >
+                    <Text
+                      style={[
+                        styles.tabBtnText,
+                        metodo === "gpay" && { color: "#000" },
+                      ]}
+                    >
+                      GPay
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.tabBtn,
+                      (metodo === "yape" || metodo === "bcp") &&
+                        styles.tabBtnActiveYape,
                     ]}
                     onPress={() => setMetodo("yape")}
                   >
                     <Text
                       style={[
                         styles.tabBtnText,
-                        metodo === "yape" && styles.tabBtnTextActive,
+                        (metodo === "yape" || metodo === "bcp") &&
+                          styles.tabBtnTextActive,
                       ]}
                     >
-                      📱 Yape (QR)
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.tabBtn,
-                      metodo === "bcp" && styles.tabBtnActiveBcp,
-                    ]}
-                    onPress={() => setMetodo("bcp")}
-                  >
-                    <Text
-                      style={[
-                        styles.tabBtnText,
-                        metodo === "bcp" && styles.tabBtnTextActive,
-                      ]}
-                    >
-                      🏛️ BCP
+                      📱 Yape / BCP
                     </Text>
                   </TouchableOpacity>
                 </View>
 
-                {metodo === "yape" ? (
-                  <View style={styles.qrCard}>
-                    <Text style={styles.qrInstruction}>
-                      Escanea el código QR en tu app Yape:
-                    </Text>
-                    <Image
-                      source={require("../../assets/yape-qr.png")}
-                      style={styles.qrImage}
+                {metodo === "card" && (
+                  <View style={styles.formCard}>
+                    <Text style={styles.inputLabel}>Número De Tarjeta</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="1234 1234 1234 1234"
+                      placeholderTextColor="#6B7280"
+                      keyboardType="number-pad"
+                      value={numTarjeta}
+                      onChangeText={setNumTarjeta}
                     />
-                    <Text style={styles.qrHolder}>
-                      Titular:{" "}
-                      <Text style={{ fontWeight: "bold", color: "#7C3AED" }}>
-                        Sebastian Rodrigo Arce Bracamonte
-                      </Text>
-                    </Text>
-                  </View>
-                ) : (
-                  <View style={styles.bcpCard}>
-                    <Text style={styles.bcpHeader}>
-                      Datos Bancarios Oficiales BCP
-                    </Text>
 
-                    <View style={styles.bcpBox}>
-                      <Text style={styles.bcpLabel}>Cuenta BCP Soles:</Text>
-                      <Text style={styles.bcpValue}>54008582045056</Text>
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.inputLabel}>Caducidad</Text>
+                        <TextInput
+                          style={styles.input}
+                          placeholder="MM / AA"
+                          placeholderTextColor="#6B7280"
+                          value={caducidad}
+                          onChangeText={setCaducidad}
+                        />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.inputLabel}>CVC</Text>
+                        <TextInput
+                          style={styles.input}
+                          placeholder="CVC 123"
+                          placeholderTextColor="#6B7280"
+                          keyboardType="number-pad"
+                          secureTextEntry
+                          maxLength={4}
+                          value={cvc}
+                          onChangeText={setCvc}
+                        />
+                      </View>
                     </View>
 
-                    <View style={styles.bcpBox}>
-                      <Text style={styles.bcpLabel}>
-                        Código Interbancario (CCI):
-                      </Text>
-                      <Text style={styles.bcpValue}>00254010858204505637</Text>
-                    </View>
+                    <Text style={styles.inputLabel}>Nombre Completo</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Nombre en la tarjeta"
+                      placeholderTextColor="#6B7280"
+                      value={nombreTitular}
+                      onChangeText={setNombreTitular}
+                    />
 
-                    <Text style={styles.bcpHolder}>
-                      Titular:{" "}
-                      <Text style={{ fontWeight: "bold", color: "#2563EB" }}>
-                        Sebastian Rodrigo Arce Bracamonte
-                      </Text>
-                    </Text>
+                    <TouchableOpacity
+                      style={[styles.confirmBtn, enviando && { opacity: 0.6 }]}
+                      onPress={handleCheckoutDirecto}
+                      disabled={enviando}
+                    >
+                      {enviando ? (
+                        <ActivityIndicator color="#FFF" size="small" />
+                      ) : (
+                        <Text style={styles.confirmBtnText}>
+                          Pagar {paisSeleccionado.desc} y Activar Pro
+                        </Text>
+                      )}
+                    </TouchableOpacity>
                   </View>
                 )}
 
-                {/* Campo de Código de Operación */}
-                <View style={styles.inputGroup}>
-                  <Text style={[styles.inputLabel, { color: textColor }]}>
-                    Número de Operación / Código de Yape:
-                  </Text>
-                  <TextInput
+                {metodo === "gpay" && (
+                  <View
                     style={[
-                      styles.input,
-                      {
-                        color: textColor,
-                        borderColor: isDarkMode ? "#374151" : "#D1D5DB",
-                      },
+                      styles.formCard,
+                      { alignItems: "center", paddingVertical: 20 },
                     ]}
-                    placeholder="Ej: 0928174"
-                    placeholderTextColor="#9CA3AF"
-                    value={nroOperacion}
-                    onChangeText={setNroOperacion}
-                    keyboardType="number-pad"
-                  />
-                </View>
-
-                <View style={styles.actionRow}>
-                  <TouchableOpacity
-                    style={styles.backBtn}
-                    onPress={() => setPaso("beneficios")}
                   >
-                    <Text style={styles.backBtnText}>← Volver</Text>
-                  </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 24,
+                        fontWeight: "bold",
+                        color: "#FFF",
+                      }}
+                    >
+                      GPay Google Pay
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "#9CA3AF",
+                        textAlign: "center",
+                        marginVertical: 8,
+                      }}
+                    >
+                      Paga rápido utilizando tus tarjetas guardadas en tu cuenta
+                      de Google.
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#10B981",
+                        marginBottom: 14,
+                      }}
+                    >
+                      {paisSeleccionado.desc}
+                    </Text>
 
-                  <TouchableOpacity
-                    style={[styles.confirmBtn, enviando && { opacity: 0.6 }]}
-                    onPress={handleConfirmarPago}
-                    disabled={enviando}
-                  >
-                    {enviando ? (
-                      <ActivityIndicator color="#FFF" size="small" />
+                    <TouchableOpacity
+                      style={[
+                        styles.confirmBtn,
+                        { backgroundColor: "#FFF" },
+                        enviando && { opacity: 0.6 },
+                      ]}
+                      onPress={handleCheckoutDirecto}
+                      disabled={enviando}
+                    >
+                      {enviando ? (
+                        <ActivityIndicator color="#000" size="small" />
+                      ) : (
+                        <Text
+                          style={[styles.confirmBtnText, { color: "#000" }]}
+                        >
+                          Pagar ahora con Google Pay 🚀
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {(metodo === "yape" || metodo === "bcp") && (
+                  <View style={styles.formCard}>
+                    <View style={styles.tabSelectorSub}>
+                      <TouchableOpacity
+                        style={[
+                          styles.tabBtnSub,
+                          metodo === "yape" && styles.tabBtnActiveYape,
+                        ]}
+                        onPress={() => setMetodo("yape")}
+                      >
+                        <Text style={styles.tabBtnTextActive}>Yape (QR)</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.tabBtnSub,
+                          metodo === "bcp" && styles.tabBtnActiveBcp,
+                        ]}
+                        onPress={() => setMetodo("bcp")}
+                      >
+                        <Text style={styles.tabBtnTextActive}>BCP (CCI)</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {metodo === "yape" ? (
+                      <View style={styles.qrCard}>
+                        <Text style={styles.qrInstruction}>
+                          Escanea el código QR desde Yape:
+                        </Text>
+                        <Image
+                          source={require("../../assets/yape-qr.png")}
+                          style={styles.qrImage}
+                        />
+                      </View>
                     ) : (
-                      <Text style={styles.confirmBtnText}>Confirmar Pago</Text>
+                      <View style={styles.bcpCard}>
+                        <Text style={styles.bcpHeader}>
+                          Código Interbancario (CCI BCP)
+                        </Text>
+                        <Text style={styles.bcpValue}>
+                          00254010858204505637
+                        </Text>
+                      </View>
                     )}
-                  </TouchableOpacity>
-                </View>
+
+                    <Text style={styles.inputLabel}>
+                      Número de Operación / Código de Yape
+                    </Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Ej: 0491820"
+                      placeholderTextColor="#6B7280"
+                      keyboardType="number-pad"
+                      value={nroOperacionYape}
+                      onChangeText={setNroOperacionYape}
+                    />
+
+                    <TouchableOpacity
+                      style={[
+                        styles.confirmBtn,
+                        { backgroundColor: "#7C3AED" },
+                        enviando && { opacity: 0.6 },
+                      ]}
+                      onPress={handleEnviarYapeBcp}
+                      disabled={enviando}
+                    >
+                      {enviando ? (
+                        <ActivityIndicator color="#FFF" size="small" />
+                      ) : (
+                        <Text style={styles.confirmBtnText}>
+                          Confirmar Yape / BCP
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  style={{ marginTop: 10, alignSelf: "center" }}
+                  onPress={() => setPaso("beneficios")}
+                >
+                  <Text
+                    style={{
+                      color: "#9CA3AF",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ← Volver a los beneficios
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
 
@@ -313,22 +540,21 @@ export default function PaywallModal({
                     { color: textColor, textAlign: "center" },
                   ]}
                 >
-                  ¡Solicitud Registrada!
+                  ¡Suscripción Pro Activada!
                 </Text>
                 <Text style={[styles.subtitle, { textAlign: "center" }]}>
-                  Tu código de operación{" "}
-                  <Text style={{ fontWeight: "bold", color: "#059669" }}>
-                    {nroOperacion}
-                  </Text>{" "}
-                  fue recibido. Verificaremos la transferencia y activaremos el
-                  plan Pro en tu cuenta de inmediato.
+                  Tu cuenta ha sido actualizada con éxito a{" "}
+                  <Text style={{ fontWeight: "bold", color: "#10B981" }}>
+                    FinanceFlow Pro
+                  </Text>
+                  .
                 </Text>
 
                 <TouchableOpacity
                   style={[styles.mainBtn, { marginTop: 20 }]}
                   onPress={onClose}
                 >
-                  <Text style={styles.mainBtnText}>Entendido, Gracias</Text>
+                  <Text style={styles.mainBtnText}>¡Comenzar a usar Pro!</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -342,17 +568,17 @@ export default function PaywallModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.85)",
+    justify: "flex-end",
   },
   container: {
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    maxHeight: "90%",
+    maxHeight: "92%",
     paddingBottom: 20,
   },
   header: {
-    backgroundColor: "#064E3B",
+    backgroundColor: "#1F2937",
     padding: 16,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
@@ -362,11 +588,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
   closeBtn: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "rgba(255,255,255,0.1)",
     width: 30,
     height: 30,
     borderRadius: 15,
@@ -389,13 +615,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   subtitle: {
-    fontSize: 13,
-    color: "#6B7280",
-    lineHeight: 18,
+    fontSize: 12,
+    color: "#9CA3AF",
+    lineHeight: 16,
   },
   benefitsGrid: {
     gap: 10,
-    marginVertical: 6,
+    marginVertical: 4,
   },
   benefitCard: {
     flexDirection: "row",
@@ -405,18 +631,18 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   benefitIcon: {
-    fontSize: 24,
+    fontSize: 22,
   },
   benefitTextCol: {
     flex: 1,
   },
   benefitTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
   },
   benefitSub: {
     fontSize: 11,
-    color: "#6B7280",
+    color: "#9CA3AF",
   },
   offerCard: {
     backgroundColor: "#064E3B",
@@ -427,7 +653,7 @@ const styles = StyleSheet.create({
   offerBadge: {
     backgroundColor: "#F59E0B",
     color: "#111827",
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "bold",
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -436,7 +662,7 @@ const styles = StyleSheet.create({
   },
   offerPrice: {
     color: "#FFF",
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
   },
   offerDetail: {
@@ -444,19 +670,19 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   mainBtn: {
-    backgroundColor: "#059669",
+    backgroundColor: "#10B981",
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: "center",
   },
   mainBtnText: {
-    color: "#FFF",
+    color: "#000",
     fontSize: 16,
     fontWeight: "bold",
   },
   tabSelector: {
     flexDirection: "row",
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#030712",
     borderRadius: 14,
     padding: 4,
     gap: 4,
@@ -467,6 +693,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
   },
+  tabBtnActiveCard: {
+    backgroundColor: "#2563EB",
+  },
+  tabBtnActiveGpay: {
+    backgroundColor: "#FFFFFF",
+  },
   tabBtnActiveYape: {
     backgroundColor: "#7C3AED",
   },
@@ -474,116 +706,94 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563EB",
   },
   tabBtnText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "bold",
-    color: "#4B5563",
+    color: "#9CA3AF",
   },
   tabBtnTextActive: {
     color: "#FFF",
   },
-  qrCard: {
-    backgroundColor: "#F3E8FF",
+  formCard: {
+    backgroundColor: "#1F2937",
     padding: 16,
-    borderRadius: 18,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#DDD6FE",
-  },
-  qrInstruction: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#5B21B6",
-    marginBottom: 10,
-  },
-  qrImage: {
-    width: 200,
-    height: 200,
-    resizeMode: "contain",
-    borderRadius: 12,
-  },
-  qrHolder: {
-    fontSize: 12,
-    color: "#4C1D95",
-    marginTop: 10,
-  },
-  bcpCard: {
-    backgroundColor: "#EFF6FF",
-    padding: 16,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "#BFDBFE",
-    gap: 8,
-  },
-  bcpHeader: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: "#1E40AF",
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  bcpBox: {
-    backgroundColor: "#FFF",
-    padding: 10,
-    borderRadius: 12,
-  },
-  bcpLabel: {
-    fontSize: 10,
-    color: "#6B7280",
-  },
-  bcpValue: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#111827",
-    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
-  },
-  bcpHolder: {
-    fontSize: 12,
-    textAlign: "center",
-    marginTop: 4,
-    color: "#1E3A8A",
-  },
-  inputGroup: {
-    gap: 6,
+    borderRadius: 20,
+    gap: 10,
   },
   inputLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "bold",
+    color: "#9CA3AF",
   },
   input: {
+    backgroundColor: "#030712",
     borderWidth: 1,
+    borderColor: "#374151",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  actionRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 6,
-  },
-  backBtn: {
-    flex: 1,
-    backgroundColor: "#E5E7EB",
-    paddingVertical: 12,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  backBtnText: {
-    color: "#374151",
-    fontWeight: "bold",
     fontSize: 14,
+    fontWeight: "bold",
+    color: "#FFF",
   },
   confirmBtn: {
-    flex: 1,
-    backgroundColor: "#059669",
-    paddingVertical: 12,
+    backgroundColor: "#2563EB",
+    paddingVertical: 13,
     borderRadius: 14,
     alignItems: "center",
+    marginTop: 6,
   },
   confirmBtnText: {
     color: "#FFF",
     fontWeight: "bold",
     fontSize: 14,
+  },
+  tabSelectorSub: {
+    flexDirection: "row",
+    backgroundColor: "#030712",
+    borderRadius: 12,
+    padding: 3,
+    gap: 4,
+  },
+  tabBtnSub: {
+    flex: 1,
+    paddingVertical: 6,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  qrCard: {
+    backgroundColor: "#2E1065",
+    padding: 12,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  qrInstruction: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: "#DDD6FE",
+    marginBottom: 6,
+  },
+  qrImage: {
+    width: 180,
+    height: 180,
+    resizeMode: "contain",
+    borderRadius: 12,
+  },
+  bcpCard: {
+    backgroundColor: "#1E3A8A",
+    padding: 14,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  bcpHeader: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: "#BFDBFE",
+  },
+  bcpValue: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#FFF",
+    marginTop: 4,
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
 });
