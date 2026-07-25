@@ -6,13 +6,11 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
-  Image,
   TextInput,
   Alert,
   ActivityIndicator,
-  Platform,
 } from "react-native";
-import { solicitarPlanPro, checkoutDirectoPro } from "../services/api";
+import { checkoutDirectoPro } from "../services/api";
 
 const LISTA_PAISES = [
   {
@@ -80,7 +78,7 @@ export default function PaywallModal({
   userEmail,
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape'
+  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
 
   // Formulario tarjeta
@@ -88,7 +86,6 @@ export default function PaywallModal({
   const [caducidad, setCaducidad] = useState("");
   const [cvc, setCvc] = useState("");
   const [nombreTitular, setNombreTitular] = useState("");
-  const [nroOperacionYape, setNroOperacionYape] = useState("");
 
   const [enviando, setEnviando] = useState(false);
 
@@ -115,8 +112,6 @@ export default function PaywallModal({
 
   if (!visible) return null;
 
-  const yapeQrMontoUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent("https://yape.pe/pay?amount=19.90&ref=FinanceFlowPro")}&color=7C3AED`;
-
   const handleCheckoutDirecto = async () => {
     try {
       setEnviando(true);
@@ -130,7 +125,7 @@ export default function PaywallModal({
       }
 
       await checkoutDirectoPro(
-        userEmail || "usuario@financeflow.com",
+        userEmail || "admin@empresa.com",
         metodo,
         paisSeleccionado.nombre,
         paisSeleccionado.monto,
@@ -143,31 +138,6 @@ export default function PaywallModal({
         "Error",
         err.message || "No se pudo procesar la suscripción.",
       );
-    } finally {
-      setEnviando(false);
-    }
-  };
-
-  const handleEnviarYape = async () => {
-    if (!nroOperacionYape.trim()) {
-      Alert.alert(
-        "Código Requerido",
-        "Por favor ingresa tu número de operación de Yape.",
-      );
-      return;
-    }
-
-    try {
-      setEnviando(true);
-      await solicitarPlanPro(
-        userEmail || "usuario@financeflow.com",
-        "yape",
-        nroOperacionYape.trim(),
-        19.9,
-      );
-      setPaso("exito");
-    } catch (err) {
-      Alert.alert("Error", err.message || "No se pudo enviar el comprobante.");
     } finally {
       setEnviando(false);
     }
@@ -277,7 +247,7 @@ export default function PaywallModal({
 
             {paso === "pago" && (
               <View style={styles.stepContainer}>
-                {/* Selector de Método Estilo Vercel */}
+                {/* Únicamente 2 Métodos de Pago: Tarjeta y Google Pay */}
                 <View style={styles.tabSelector}>
                   <TouchableOpacity
                     style={[
@@ -309,24 +279,7 @@ export default function PaywallModal({
                         metodo === "gpay" && { color: "#000" },
                       ]}
                     >
-                      GPay
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.tabBtn,
-                      metodo === "yape" && styles.tabBtnActiveYape,
-                    ]}
-                    onPress={() => setMetodo("yape")}
-                  >
-                    <Text
-                      style={[
-                        styles.tabBtnText,
-                        metodo === "yape" && styles.tabBtnTextActive,
-                      ]}
-                    >
-                      📱 Yape (QR)
+                      GPay Google Play
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -408,7 +361,7 @@ export default function PaywallModal({
                         color: "#FFF",
                       }}
                     >
-                      GPay Google Pay
+                      GPay / Google Play
                     </Text>
                     <Text
                       style={{
@@ -418,8 +371,8 @@ export default function PaywallModal({
                         marginVertical: 8,
                       }}
                     >
-                      Paga rápido utilizando tus tarjetas guardadas en tu cuenta
-                      de Google.
+                      Paga de forma segura utilizando Google Play o tus tarjetas
+                      guardadas en Google.
                     </Text>
                     <Text
                       style={{
@@ -447,51 +400,7 @@ export default function PaywallModal({
                         <Text
                           style={[styles.confirmBtnText, { color: "#000" }]}
                         >
-                          Pagar ahora con Google Pay 🚀
-                        </Text>
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {metodo === "yape" && (
-                  <View style={styles.formCard}>
-                    <View style={styles.qrCard}>
-                      <Text style={styles.qrInstruction}>
-                        QR de Yape con Monto Automático (S/ 19.90):
-                      </Text>
-                      <Image
-                        source={{ uri: yapeQrMontoUrl }}
-                        style={styles.qrImage}
-                      />
-                    </View>
-
-                    <Text style={styles.inputLabel}>
-                      Número de Operación / Código de Yape
-                    </Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Ej: 0491820"
-                      placeholderTextColor="#6B7280"
-                      keyboardType="number-pad"
-                      value={nroOperacionYape}
-                      onChangeText={setNroOperacionYape}
-                    />
-
-                    <TouchableOpacity
-                      style={[
-                        styles.confirmBtn,
-                        { backgroundColor: "#7C3AED" },
-                        enviando && { opacity: 0.6 },
-                      ]}
-                      onPress={handleEnviarYape}
-                      disabled={enviando}
-                    >
-                      {enviando ? (
-                        <ActivityIndicator color="#FFF" size="small" />
-                      ) : (
-                        <Text style={styles.confirmBtnText}>
-                          Confirmar Yape
+                          Pagar con Google Play 🚀
                         </Text>
                       )}
                     </TouchableOpacity>
@@ -558,7 +467,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.85)",
-    justifyContent: "flex-end",
+    justify: "flex-end",
   },
   container: {
     borderTopLeftRadius: 28,
@@ -586,7 +495,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     alignItems: "center",
-    justifyContent: "center",
+    justify: "center",
   },
   closeBtnText: {
     color: "#FFF",
@@ -674,11 +583,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#030712",
     borderRadius: 14,
     padding: 4,
-    gap: 4,
+    gap: 6,
   },
   tabBtn: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: "center",
     borderRadius: 10,
   },
@@ -687,9 +596,6 @@ const styles = StyleSheet.create({
   },
   tabBtnActiveGpay: {
     backgroundColor: "#FFFFFF",
-  },
-  tabBtnActiveYape: {
-    backgroundColor: "#7C3AED",
   },
   tabBtnText: {
     fontSize: 12,
@@ -732,24 +638,5 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontWeight: "bold",
     fontSize: 14,
-  },
-  qrCard: {
-    backgroundColor: "#2E1065",
-    padding: 12,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  qrInstruction: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: "#DDD6FE",
-    marginBottom: 6,
-  },
-  qrImage: {
-    width: 200,
-    height: 200,
-    resizeMode: "contain",
-    borderRadius: 12,
-    backgroundColor: "#FFF",
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { solicitarPlanPro, checkoutDirectoPro } from "../services/pagosService";
+import { checkoutDirectoPro } from "../services/pagosService";
 
 const LISTA_PAISES = [
   {
@@ -68,7 +68,7 @@ export default function PaywallModal({
   title = "⭐ FinanceFlow Pro Checkout",
 }) {
   const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'exito'
-  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay' | 'yape'
+  const [metodo, setMetodo] = useState("card"); // 'card' | 'gpay'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
 
   // Campos de tarjeta
@@ -76,7 +76,6 @@ export default function PaywallModal({
   const [caducidad, setCaducidad] = useState("");
   const [cvc, setCvc] = useState("");
   const [nombreTitular, setNombreTitular] = useState(userNombre || "");
-  const [nroOperacionYape, setNroOperacionYape] = useState("");
 
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState("");
@@ -109,10 +108,7 @@ export default function PaywallModal({
 
   if (!isOpen) return null;
 
-  // URL del QR dinámico de Yape con monto de S/ 19.90 pre-cargado
-  const yapeQrMontoUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent("https://yape.pe/pay?amount=19.90&ref=FinanceFlowPro")}&color=7C3AED`;
-
-  // Procesar pago automático con Tarjeta o Google Pay (Opción B)
+  // Procesar pago automático con Tarjeta o Google Pay
   const handlePagarCheckoutDirecto = async (e) => {
     if (e) e.preventDefault();
     try {
@@ -124,7 +120,7 @@ export default function PaywallModal({
       }
 
       await checkoutDirectoPro(
-        userEmail || "usuario@financeflow.com",
+        userEmail || localStorage.getItem("userEmail") || "admin@empresa.com",
         metodo,
         paisSeleccionado.nombre,
         paisSeleccionado.monto,
@@ -134,31 +130,6 @@ export default function PaywallModal({
       setPaso("exito");
     } catch (err) {
       setError(err.message || "Error procesando el pago.");
-    } finally {
-      setProcesando(false);
-    }
-  };
-
-  // Procesar constancia Yape con monto
-  const handleEnviarYape = async (e) => {
-    e.preventDefault();
-    if (!nroOperacionYape.trim()) {
-      setError("Por favor ingresa el número de operación.");
-      return;
-    }
-
-    try {
-      setProcesando(true);
-      setError("");
-      await solicitarPlanPro(
-        userEmail || "usuario@financeflow.com",
-        "yape",
-        nroOperacionYape.trim(),
-        19.9,
-      );
-      setPaso("exito");
-    } catch (err) {
-      setError(err.message || "Error al enviar comprobante.");
     } finally {
       setProcesando(false);
     }
@@ -302,48 +273,36 @@ export default function PaywallModal({
 
           {paso === "pago" && (
             <div className="space-y-5 animate-fade-in">
-              {/* Vercel/Stripe Checkout Tab Bar */}
-              <div className="grid grid-cols-3 gap-2 bg-gray-950 p-1.5 rounded-2xl border border-gray-800">
+              {/* Selector de ÚNICAMENTE 2 Métodos de Pago: Tarjeta y Google Pay */}
+              <div className="grid grid-cols-2 gap-3 bg-gray-950 p-2 rounded-2xl border border-gray-800">
                 <button
                   onClick={() => setMetodo("card")}
-                  className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
+                  className={`py-3.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
                     metodo === "card"
                       ? "bg-blue-600/20 border border-blue-500 text-white shadow-md"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
-                  <span className="text-lg">💳</span>
-                  <span>Tarjeta</span>
+                  <span className="text-2xl">💳</span>
+                  <span className="font-extrabold text-sm">Tarjeta</span>
                 </button>
 
                 <button
                   onClick={() => setMetodo("gpay")}
-                  className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
+                  className={`py-3.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
                     metodo === "gpay"
                       ? "bg-white text-gray-950 shadow-md font-black"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
-                  <span className="text-base font-black tracking-tighter">
+                  <span className="text-xl font-black tracking-tighter">
                     GPay
                   </span>
-                  <span>Google Pay</span>
-                </button>
-
-                <button
-                  onClick={() => setMetodo("yape")}
-                  className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
-                    metodo === "yape"
-                      ? "bg-purple-600/20 border border-purple-500 text-white shadow-md"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  <span className="text-lg">📱</span>
-                  <span>Yape (QR)</span>
+                  <span className="font-extrabold text-sm">Google Pay</span>
                 </button>
               </div>
 
-              {/* Formulario Estilo Vercel Checkout (Image 1) */}
+              {/* Formulario Tarjeta */}
               {metodo === "card" && (
                 <form
                   onSubmit={handlePagarCheckoutDirecto}
@@ -490,62 +449,6 @@ export default function PaywallModal({
                         : "Pagar ahora con Google Pay 🚀"}
                     </span>
                   </button>
-                </div>
-              )}
-
-              {/* Pestaña Yape con QR de Monto Automático (SIN BCP) */}
-              {metodo === "yape" && (
-                <div className="space-y-4 bg-purple-950/20 p-5 rounded-2xl border border-purple-800/50 text-center">
-                  <span className="inline-block px-3 py-1 bg-purple-500/20 text-purple-300 font-bold text-xs rounded-full">
-                    QR de Yape con Monto Automático (S/ 19.90)
-                  </span>
-
-                  <p className="text-xs text-purple-200">
-                    Al escanear el QR desde tu Yape,{" "}
-                    <b>
-                      el monto de S/ 19.90 aparecerá precargado automáticamente
-                    </b>{" "}
-                    en tu pantalla.
-                  </p>
-
-                  <div className="flex justify-center py-2">
-                    <img
-                      src={yapeQrMontoUrl}
-                      alt="QR Yape con Monto"
-                      className="h-56 w-56 object-contain rounded-2xl border-2 border-purple-500/50 shadow-2xl bg-white p-2"
-                    />
-                  </div>
-
-                  <form
-                    onSubmit={handleEnviarYape}
-                    className="space-y-3 pt-2 text-left"
-                  >
-                    <label className="block text-xs font-bold text-gray-300">
-                      Ingresa tu Número de Operación de Yape:
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Ej: 0491820"
-                      value={nroOperacionYape}
-                      onChange={(e) => setNroOperacionYape(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-mono font-bold text-sm focus:border-purple-500"
-                      required
-                    />
-
-                    {error && (
-                      <p className="text-xs text-red-400 font-bold">{error}</p>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={procesando}
-                      className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl shadow-lg transition-all text-sm disabled:opacity-50"
-                    >
-                      {procesando
-                        ? "Enviando Comprobante..."
-                        : "Confirmar Comprobante Yape"}
-                    </button>
-                  </form>
                 </div>
               )}
 
