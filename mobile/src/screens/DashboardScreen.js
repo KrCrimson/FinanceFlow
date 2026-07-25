@@ -19,6 +19,7 @@ import {
   createMovimiento,
   crearCierre,
   updateMovimiento,
+  toggleMovimientoEstado,
   fetchCierresPendientes,
   fetchResumenPeriodo,
 } from "../services/api";
@@ -801,28 +802,63 @@ export default function DashboardScreen({
             No hay transacciones registradas para este periodo.
           </Text>
         ) : (
-          filteredActivos.slice(0, 15).map((item) => (
-            <View key={item._id} style={theme.txCard}>
-              <View style={{ flex: 1, paddingRight: 10 }}>
-                <Text style={theme.txName} numberOfLines={1}>
-                  {item.nombre}
-                </Text>
-                <Text style={theme.txMeta} numberOfLines={1}>
-                  {item.categoria} • {new Date(item.fecha).toLocaleDateString()}
-                </Text>
+          filteredActivos.slice(0, 15).map((item) => {
+            const fechaTxt = item.fecha && !isNaN(new Date(item.fecha).getTime())
+              ? new Date(item.fecha).toLocaleDateString()
+              : "";
+            return (
+              <View key={item._id} style={theme.txCard}>
+                <View style={{ flex: 1, paddingRight: 10 }}>
+                  <Text style={theme.txName} numberOfLines={1}>
+                    {item.nombre}
+                  </Text>
+                  <Text style={theme.txMeta} numberOfLines={1}>
+                    {item.categoria} {fechaTxt ? `• ${fechaTxt}` : ""}
+                  </Text>
+                </View>
+                <View style={{ alignItems: "flex-end" }}>
+                  <Text
+                    style={[
+                      theme.txAmount,
+                      { color: item.tipo === "ingreso" ? "#10B981" : "#EF4444" },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {item.tipo === "ingreso" ? "+" : "-"}{" "}
+                    {currency || getMobileCurrencySymbol()} {(item.monto || 0).toFixed(2)}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert(
+                        "Desactivar Movimiento",
+                        `¿Deseas inactivar "${item.nombre}"?`,
+                        [
+                          { text: "Cancelar", style: "cancel" },
+                          {
+                            text: "Desactivar",
+                            style: "destructive",
+                            onPress: async () => {
+                              try {
+                                await toggleMovimientoEstado(item._id);
+                                Alert.alert("Éxito", "Movimiento desactivado.");
+                                const movs = await fetchMovimientos();
+                                setMovimientos(movs || []);
+                              } catch (e) {
+                                Alert.alert("Error", e.message || "Error al desactivar");
+                              }
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                    style={{ marginTop: 4, paddingHorizontal: 6, paddingVertical: 2, backgroundColor: "#FEF3C7", borderRadius: 4 }}
+                  >
+                    <Text style={{ fontSize: 10, color: "#D97706", fontWeight: "bold" }}>⏸️ Desactivar</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <Text
-                style={[
-                  theme.txAmount,
-                  { color: item.tipo === "ingreso" ? "#10B981" : "#EF4444" },
-                ]}
-                numberOfLines={1}
-              >
-                {item.tipo === "ingreso" ? "+" : "-"}{" "}
-                {currency || getMobileCurrencySymbol()} {item.monto.toFixed(2)}
-              </Text>
-            </View>
-          ))
+            );
+          })
         )}
 
         {/* Sección de Ingresos Constantes */}

@@ -235,16 +235,12 @@ function ReportesPage() {
               {/* Botones de Exportación Contable */}
               <button
                 onClick={() => {
-                  if (userPlan?.esPremium) {
-                    exportToExcel(
-                      movimientosFiltrados,
-                      `Reportes-FinanceFlow-${new Date().toISOString().slice(0, 10)}.csv`,
-                    );
-                  } else {
-                    setShowPaywall(true);
-                  }
+                  exportToExcel(
+                    movimientosFiltrados,
+                    `Reportes-FinanceFlow-${new Date().toISOString().slice(0, 10)}.csv`,
+                  );
                 }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl transition-all duration-200 text-sm font-bold shadow-sm flex items-center gap-1.5"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl transition-all duration-200 text-sm font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
                 title="Exportar movimientos a Microsoft Excel"
               >
                 <span>📥 Exportar Excel</span>
@@ -252,17 +248,13 @@ function ReportesPage() {
 
               <button
                 onClick={() => {
-                  if (userPlan?.esPremium) {
-                    exportToPDF(
-                      movimientosFiltrados,
-                      { totalIngresos, totalEgresos },
-                      "Reporte Financiero Contable",
-                    );
-                  } else {
-                    setShowPaywall(true);
-                  }
+                  exportToPDF(
+                    movimientosFiltrados,
+                    { totalIngresos, totalEgresos },
+                    "Reporte Financiero Contable",
+                  );
                 }}
-                className="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl transition-all duration-200 text-sm font-bold shadow-sm flex items-center gap-1.5"
+                className="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl transition-all duration-200 text-sm font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
                 title="Imprimir o guardar reporte en PDF"
               >
                 <span>📄 Exportar PDF</span>

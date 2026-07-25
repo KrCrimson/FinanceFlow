@@ -257,7 +257,7 @@ export default function NewMovementScreen({
         categoria: finalCategoria,
         esRecurrente: tipo === "ingreso" ? esRecurrente : false,
         descripcion: descripcion.trim(),
-        fecha: fecha.toISOString(),
+        fecha: (fecha instanceof Date ? fecha : new Date(fecha || Date.now())).toISOString(),
       });
 
       Alert.alert("¡Registrado!", "El movimiento se ha guardado con éxito.");
