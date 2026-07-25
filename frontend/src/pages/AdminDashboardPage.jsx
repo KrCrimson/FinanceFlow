@@ -248,38 +248,40 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             {/* Barras de porcentaje */}
             <div className="space-y-3">
-              {metrics?.mapaCalor?.map((item) => (
-                <div key={item.pais} className="space-y-1">
-                  <div className="flex justify-between text-xs font-bold">
-                    <span className="text-gray-300">
-                      {item.pais} ({item.codigo})
-                    </span>
-                    <span style={{ color: item.color }}>
-                      {item.porcentaje}% ({item.cantidad} usuarios)
-                    </span>
+              {metrics?.mapaCalor
+                ?.filter((item) => item.cantidad > 0)
+                .map((item) => (
+                  <div key={item.pais} className="space-y-1">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-gray-300">
+                        {item.pais} ({item.codigo})
+                      </span>
+                      <span style={{ color: item.color }}>
+                        {item.porcentaje}% ({item.cantidad} usuarios)
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-950 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${item.porcentaje}%`,
+                          backgroundColor: item.color,
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-950 rounded-full h-2.5 overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${item.porcentaje}%`,
-                        backgroundColor: item.color,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {/* Representación Visual de Mapa */}
             <div className="bg-gray-950 p-5 rounded-2xl border border-gray-800 text-center space-y-3">
               <span className="text-5xl">🇵🇪</span>
               <h4 className="font-bold text-sm text-emerald-400">
-                Mayor Concentración: Perú (65%)
+                100% Usuarios de Perú (PE)
               </h4>
               <p className="text-xs text-gray-400 max-w-xs mx-auto">
-                La mayoría del tráfico proviene de Lima, Arequipa, Trujillo y
-                Chiclayo. El 35% restante proviene de LATAM y EE.UU.
+                El 100% de la comunidad registrada es de Perú. No hay usuarios
+                de Colombia ni otros países.
               </p>
             </div>
           </div>
