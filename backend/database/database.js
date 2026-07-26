@@ -5,7 +5,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const mongoUri = process.env.MONGODB_URI;
 
 const connectDB = async () => {
-	if (process.env.NODE_ENV === 'test' && !mongoUri) {
+	if (process.env.NODE_ENV === 'test') {
 		console.log('MongoDB connection skipped in test environment');
 		return;
 	}

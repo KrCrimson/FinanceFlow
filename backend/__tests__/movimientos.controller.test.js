@@ -1,27 +1,46 @@
-
 const request = require('supertest');
 const app = require('../app');
+const jwt = require('jsonwebtoken');
+const movimientosService = require('../services/movimientos.service');
 
-let token;
+describe('MovimientosController Unit Tests', () => {
+  let token;
+  const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto';
 
-describe('MovimientosController', () => {
-  beforeAll(async () => {
-    const email = `mov${Date.now()}@mail.com`;
-    await request(app).post('/api/usuarios/register').send({ nombre: 'Mov', email, password: '123456' });
-    const login = await request(app).post('/api/usuarios/login').send({ email, password: '123456' });
-    token = login.body.token;
+  beforeAll(() => {
+    token = jwt.sign({ id: 'mockuser123', email: 'mov@mail.com' }, JWT_SECRET);
   });
-  it('crea movimiento', async () => {
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('crea movimiento exitosamente', async () => {
+    jest.spyOn(movimientosService, 'crearMovimiento').mockResolvedValue({
+      _id: 'mov123',
+      nombre: 'Test',
+      monto: 100,
+      tipo: 'ingreso',
+      categoria: 'prueba'
+    });
+
     const res = await request(app)
       .post('/api/movimientos')
       .set('Authorization', `Bearer ${token}`)
       .send({ nombre: 'Test', monto: 100, tipo: 'ingreso', categoria: 'prueba' });
+
     expect(res.statusCode).toBe(201);
   });
-  it('lista movimientos', async () => {
+
+  it('lista movimientos exitosamente', async () => {
+    jest.spyOn(movimientosService, 'listarMovimientos').mockResolvedValue([
+      { _id: 'mov123', nombre: 'Test', monto: 100, tipo: 'ingreso', categoria: 'prueba' }
+    ]);
+
     const res = await request(app)
       .get('/api/movimientos')
       .set('Authorization', `Bearer ${token}`);
+
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });

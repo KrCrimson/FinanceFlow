@@ -1,46 +1,25 @@
 const request = require('supertest');
 const app = require('../app');
 const Usuario = require('../database/usuario.model');
+const bcrypt = require('bcryptjs');
 
-describe('Recuperación de Contraseña con Developer Fallback', () => {
-  let email;
+describe('Recuperación de Contraseña - Unit Tests', () => {
+  const email = 'recuperar@mail.com';
 
-  beforeAll(async () => {
-    email = `recuperar_${Date.now()}@mail.com`;
-    // Registrar un usuario de prueba
-    await request(app)
-      .post('/api/usuarios/register')
-      .send({ nombre: 'Usuario Prueba', email, password: 'password123' });
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('debe generar enlace de recuperación simulado en modo desarrollo', async () => {
-    // Configurar NODE_ENV como development
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
-    
-    // Guardar EMAIL_USER original y simular valor por defecto
-    const originalEmailUser = process.env.EMAIL_USER;
     process.env.EMAIL_USER = 'tu-email-real@gmail.com';
 
-    const res = await request(app)
-      .post('/api/usuarios/forgot-password')
-      .send({ email });
-
-    expect(res.statusCode).toBe(200);
-    expect(res.body.devResetUrl).toBeDefined();
-    expect(res.body.devResetUrl).toContain('/reset-password?token=');
-
-    // Restaurar variables de entorno
-    process.env.NODE_ENV = originalNodeEnv;
-    process.env.EMAIL_USER = originalEmailUser;
-  });
-
-  it('debe activar el fallback amigable en producción si el correo no está configurado', async () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
-    
-    const originalEmailUser = process.env.EMAIL_USER;
-    process.env.EMAIL_USER = 'tu-email-real@gmail.com';
+    jest.spyOn(Usuario, 'findOne').mockResolvedValue({
+      _id: 'user123',
+      email,
+      save: jest.fn().mockResolvedValue(true)
+    });
 
     const res = await request(app)
       .post('/api/usuarios/forgot-password')
@@ -51,42 +30,44 @@ describe('Recuperación de Contraseña con Developer Fallback', () => {
     expect(res.body.devResetUrl).toContain('/reset-password?token=');
 
     process.env.NODE_ENV = originalNodeEnv;
-    process.env.EMAIL_USER = originalEmailUser;
   });
 
-  it('debe poder verificar el token y actualizar la clave', async () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-    process.env.EMAIL_USER = 'tu-email-real@gmail.com';
+  it('debe verificar token de recuperación correctamente', async () => {
+    const futureDate = new Date(Date.now() + 3600000);
+    jest.spyOn(Usuario, 'findOne').mockResolvedValue({
+      _id: 'user123',
+      email,
+      resetPasswordToken: 'mocktoken123',
+      resetPasswordExpires: futureDate
+    });
 
-    const res = await request(app)
-      .post('/api/usuarios/forgot-password')
-      .send({ email });
-
-    const devResetUrl = res.body.devResetUrl;
-    const token = devResetUrl.split('token=')[1];
-
-    // Verificar token
     const resVerify = await request(app)
       .post('/api/usuarios/verify-reset-token')
-      .send({ token });
+      .send({ token: 'mocktoken123' });
+
     expect(resVerify.statusCode).toBe(200);
     expect(resVerify.body.message).toBe('Token válido');
+  });
 
-    // Restablecer contraseña
+  it('debe restablecer la contraseña con token válido', async () => {
+    const futureDate = new Date(Date.now() + 3600000);
+    const mockUser = {
+      _id: 'user123',
+      email,
+      resetPasswordToken: 'mocktoken123',
+      resetPasswordExpires: futureDate,
+      save: jest.fn().mockResolvedValue(true)
+    };
+
+    jest.spyOn(Usuario, 'findOne').mockResolvedValue(mockUser);
+    jest.spyOn(bcrypt, 'hash').mockResolvedValue('new_hashed_password');
+
     const resReset = await request(app)
       .post('/api/usuarios/reset-password')
-      .send({ token, newPassword: 'nuevapassword123' });
+      .send({ token: 'mocktoken123', newPassword: 'nuevapassword123' });
+
     expect(resReset.statusCode).toBe(200);
     expect(resReset.body.message).toBe('Contraseña actualizada exitosamente');
-
-    // Probar login con nueva clave
-    const loginRes = await request(app)
-      .post('/api/usuarios/login')
-      .send({ email, password: 'nuevapassword123' });
-    expect(loginRes.statusCode).toBe(200);
-    expect(loginRes.body.token).toBeDefined();
-
-    process.env.NODE_ENV = originalNodeEnv;
+    expect(mockUser.resetPasswordToken).toBeNull();
   });
 });

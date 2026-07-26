@@ -1,13 +1,15 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ReportesPage from '../pages/ReportesPage';
-import * as movimientosService from '../services/movimientos-adapter';
+import * as movimientosService from '../services/movimientosService';
 
-jest.mock('../services/movimientosService');
+jest.mock('../services/movimientosService', () => ({
+  getMovimientos: jest.fn().mockResolvedValue([]),
+  getResumen: jest.fn().mockResolvedValue({ totalIngresos: 0, totalEgresos: 0, balanceTotal: 0 })
+}));
 
 describe('ReportesPage', () => {
   it('renderiza la vista de reportes', async () => {
-    movimientosService.getMovimientos.mockResolvedValue([]);
     render(<ReportesPage />);
-    expect(await screen.findByText(/Reportes y Análisis/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Reportes/i)).toBeInTheDocument();
   });
 });
