@@ -1,6 +1,17 @@
 import { API_URL } from "../config/env";
 
 let userToken = null;
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+const subscribeTokenRefresh = (cb) => {
+  refreshSubscribers.push(cb);
+};
+
+const onRefreshed = (token) => {
+  refreshSubscribers.map((cb) => cb(token));
+  refreshSubscribers = [];
+};
 
 export const setAuthToken = (token) => {
   userToken = token;
@@ -28,6 +39,20 @@ export const apiFetch = async (endpoint, options = {}) => {
   const data = await response.json();
 
   if (!response.ok) {
+    if (response.status === 401 && !options._isRetry) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((newToken) => {
+            options.headers = {
+              ...options.headers,
+              Authorization: `Bearer ${newToken}`,
+            };
+            options._isRetry = true;
+            resolve(apiFetch(endpoint, options));
+          });
+        });
+      }
+    }
     throw new Error(data.error || data.message || "Algo salió mal");
   }
 
