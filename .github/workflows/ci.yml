@@ -1,0 +1,51 @@
+name: FinanceFlow DevSecOps Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  audit-and-test:
+    name: 🛡️ Audit, Lint & Test (Backend & Frontend)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # --- FASE 1: DEVSECOPS AUDIT & SECURITY SCAN ---
+      - name: 🔍 Security Audit - Backend Dependencies
+        working-directory: ./backend
+        run: npm audit --audit-level=high || echo "Vulnerabilidades encontradas, revisar reporte"
+
+      - name: 🔍 Security Audit - Frontend Dependencies
+        working-directory: ./frontend
+        run: npm audit --audit-level=high || echo "Vulnerabilidades encontradas, revisar reporte"
+
+      # --- FASE 2: BACKEND LINT, BUILD & TEST ---
+      - name: ⚙️ Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: 🧪 Run Backend Unit & Integration Tests
+        working-directory: ./backend
+        run: npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: testsecretkey1234567890
+
+      # --- FASE 3: FRONTEND LINT, BUILD & TEST ---
+      - name: ⚙️ Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: 🧪 Run Frontend Unit Tests
+        working-directory: ./frontend
+        run: npm run test:ci
