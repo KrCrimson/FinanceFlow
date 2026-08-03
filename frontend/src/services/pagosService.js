@@ -36,6 +36,72 @@ export async function checkoutDirectoPro(email, metodo, pais, monto, moneda) {
   }
 }
 
+export async function crearCheckoutStripe(email) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-checkout-stripe`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Error al iniciar Stripe Checkout");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error en crearCheckoutStripe:", error);
+    throw error;
+  }
+}
+
+export async function crearPreferenciaMercadoPago(email) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-preferencia-mp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Error al iniciar Mercado Pago");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error en crearPreferenciaMercadoPago:", error);
+    throw error;
+  }
+}
+
+export async function crearOrdenFlow(email) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-orden-flow`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Error al iniciar Flow.cl");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error en crearOrdenFlow:", error);
+    throw error;
+  }
+}
+
 export async function getEstadoPlan(email) {
   try {
     const res = await fetch(

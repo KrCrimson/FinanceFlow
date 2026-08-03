@@ -59,6 +59,10 @@ const usuarioSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+	lastPaymentId: {
+		type: String,
+		default: null,
+	},
 });
 
 usuarioSchema.pre('save', function () {
