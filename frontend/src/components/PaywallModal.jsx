@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  solicitarPlanPro,
-  crearCheckoutStripe,
-  crearPreferenciaMercadoPago,
   crearOrdenFlow,
   checkoutDirectoPro,
 } from "../services/pagosService";
@@ -71,16 +68,12 @@ export default function PaywallModal({
   onClose,
   userEmail,
   userNombre,
-  title = "⭐ FinanceFlow Pro Checkout",
+  title = "⭐ Desbloquea Exportaciones y FinanceFlow Pro",
 }) {
-  const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'pago' | 'yape' | 'exito'
   const [paisSeleccionado, setPaisSeleccionado] = useState(LISTA_PAISES[0]);
-
-  // Yape / Manual
-  const [nroOperacion, setNroOperacion] = useState("");
-
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState("");
+  const [paso, setPaso] = useState("beneficios"); // 'beneficios' | 'exito'
 
   useEffect(() => {
     try {
@@ -111,7 +104,7 @@ export default function PaywallModal({
 
   const emailDestino = userEmail || localStorage.getItem("userEmail") || "usuario@financeflow.com";
 
-  // 1. Pagar con Flow.cl / Flow Perú
+  // Pagar con Flow.cl (Pasarela única oficial)
   const handlePagarFlow = async () => {
     try {
       setProcesando(true);
@@ -123,52 +116,14 @@ export default function PaywallModal({
         throw new Error("No se pudo iniciar la sesión en Flow.cl.");
       }
     } catch (err) {
-      console.warn("Flow.cl no configurado en servidor, usando checkout directo:", err);
+      console.warn("Flow.cl error, intentando activación directa de respaldo:", err);
       handleCheckoutDirecto();
     } finally {
       setProcesando(false);
     }
   };
 
-  // 2. Pagar con Mercado Pago
-  const handlePagarMercadoPago = async () => {
-    try {
-      setProcesando(true);
-      setError("");
-      const res = await crearPreferenciaMercadoPago(emailDestino);
-      if (res.url) {
-        window.location.href = res.url;
-      } else {
-        throw new Error("No se pudo obtener el checkout de Mercado Pago.");
-      }
-    } catch (err) {
-      console.warn("Mercado Pago no disponible, usando checkout directo:", err);
-      handleCheckoutDirecto();
-    } finally {
-      setProcesando(false);
-    }
-  };
-
-  // 3. Pagar con Stripe
-  const handlePagarStripe = async () => {
-    try {
-      setProcesando(true);
-      setError("");
-      const res = await crearCheckoutStripe(emailDestino);
-      if (res.url) {
-        window.location.href = res.url;
-      } else {
-        throw new Error("No se pudo obtener el checkout de Stripe.");
-      }
-    } catch (err) {
-      console.warn("Stripe no disponible, usando checkout directo:", err);
-      handleCheckoutDirecto();
-    } finally {
-      setProcesando(false);
-    }
-  };
-
-  // 4. Checkout Directo Instantáneo (Activación inmediata para demos y pruebas)
+  // Activación directa para desarrolladores/pruebas rápidas
   const handleCheckoutDirecto = async () => {
     try {
       setProcesando(true);
@@ -180,24 +135,6 @@ export default function PaywallModal({
       }, 1500);
     } catch (err) {
       setError(err.message || "Error procesando el pago instantáneo.");
-    } finally {
-      setProcesando(false);
-    }
-  };
-
-  // 5. Solicitar por Yape / BCP
-  const handlePagarYape = async (e) => {
-    if (e) e.preventDefault();
-    try {
-      setProcesando(true);
-      setError("");
-      if (!nroOperacion.trim()) {
-        throw new Error("Ingresa el número de operación de Yape o BCP.");
-      }
-      await solicitarPlanPro(emailDestino, "yape", nroOperacion, paisSeleccionado.monto);
-      setPaso("exito");
-    } catch (err) {
-      setError(err.message || "Error al enviar la solicitud.");
     } finally {
       setProcesando(false);
     }
@@ -228,7 +165,7 @@ export default function PaywallModal({
             <div className="space-y-6 animate-fade-in">
               <div className="text-center space-y-2">
                 <span className="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/20">
-                  ⚡ Licencia Profesional Multidispositivo (Acceso Vitalicio)
+                  ⚡ Licencia Profesional Multidispositivo
                 </span>
                 <h3 className="text-2xl font-extrabold tracking-tight text-white">
                   FinanceFlow Pro
@@ -316,7 +253,7 @@ export default function PaywallModal({
 
                 <div className="flex items-baseline justify-between pt-2 border-t border-gray-800">
                   <span className="text-xs text-gray-400">
-                    Precio Total (Pago Único Vitalicio):
+                    Precio Total:
                   </span>
                   <div className="text-right">
                     <span className="text-2xl font-black text-emerald-400">
@@ -326,183 +263,27 @@ export default function PaywallModal({
                 </div>
               </div>
 
-              <button
-                onClick={() => setPaso("pago")}
-                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all text-base flex items-center justify-center space-x-2"
-              >
-                <span>Seleccionar Método de Pago →</span>
-              </button>
-            </div>
-          )}
-
-          {paso === "pago" && (
-            <div className="space-y-4 animate-fade-in">
-              <h3 className="text-lg font-bold text-white text-center">
-                Elige tu pasarela de pago preferida
-              </h3>
-
               {error && (
                 <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs font-bold text-center">
                   {error}
                 </div>
               )}
 
-              {/* Botón Flow.cl / Flow Perú */}
+              {/* Único Botón Oficial Principal: Flow.cl */}
               <button
                 onClick={handlePagarFlow}
                 disabled={procesando}
-                className="w-full p-4 bg-lime-500/10 hover:bg-lime-500/20 border border-lime-500/40 rounded-2xl flex items-center justify-between text-left transition-all group"
+                className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all text-base flex items-center justify-center space-x-2 group"
               >
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">🟢</span>
-                  <div>
-                    <h4 className="font-extrabold text-sm text-lime-400 flex items-center space-x-1.5">
-                      <span>Flow.cl / Flow Perú</span>
-                      <span className="text-[10px] bg-lime-500/20 text-lime-300 font-bold px-1.5 py-0.5 rounded">Recomendado</span>
-                    </h4>
-                    <p className="text-xs text-gray-300">
-                      Yape, Plin, Tarjetas Débito/Crédito, Mach, PagoEfectivo ({paisSeleccionado.desc})
-                    </p>
-                  </div>
-                </div>
-                <span className="text-lime-400 font-bold group-hover:translate-x-1 transition-transform">
-                  ➔
-                </span>
+                <span>{procesando ? "Iniciando Pago Seguro..." : `Pagar ${paisSeleccionado.desc} con Flow (Yape, Plin, Tarjeta)`}</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
               </button>
 
-              {/* Botón Mercado Pago */}
-              <button
-                onClick={handlePagarMercadoPago}
-                disabled={procesando}
-                className="w-full p-4 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 rounded-2xl flex items-center justify-between text-left transition-all group"
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">💙</span>
-                  <div>
-                    <h4 className="font-extrabold text-sm text-sky-400">
-                      Mercado Pago (América Latina)
-                    </h4>
-                    <p className="text-xs text-gray-300">
-                      Tarjetas de débito/crédito, Yape, PagoEfectivo ({paisSeleccionado.desc})
-                    </p>
-                  </div>
-                </div>
-                <span className="text-sky-400 font-bold group-hover:translate-x-1 transition-transform">
-                  ➔
-                </span>
-              </button>
-
-              {/* Botón Stripe */}
-              <button
-                onClick={handlePagarStripe}
-                disabled={procesando}
-                className="w-full p-4 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/40 rounded-2xl flex items-center justify-between text-left transition-all group"
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">💳</span>
-                  <div>
-                    <h4 className="font-extrabold text-sm text-indigo-400">
-                      Stripe (Internacional / Apple Pay)
-                    </h4>
-                    <p className="text-xs text-gray-300">
-                      Visa, MasterCard, Amex en USD ($5.99 USD)
-                    </p>
-                  </div>
-                </div>
-                <span className="text-indigo-400 font-bold group-hover:translate-x-1 transition-transform">
-                  ➔
-                </span>
-              </button>
-
-              {/* Botón Yape / BCP Manual */}
-              <button
-                onClick={() => setPaso("yape")}
-                className="w-full p-4 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 rounded-2xl flex items-center justify-between text-left transition-all group"
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">📱</span>
-                  <div>
-                    <h4 className="font-extrabold text-sm text-purple-400">
-                      Yape / BCP (Transferencia Manual Perú)
-                    </h4>
-                    <p className="text-xs text-gray-300">
-                      Envía constancia de operación Yape o BCP (S/. 19.90 PEN)
-                    </p>
-                  </div>
-                </div>
-                <span className="text-purple-400 font-bold group-hover:translate-x-1 transition-transform">
-                  ➔
-                </span>
-              </button>
-
-              {/* Acceso Directo Instantáneo */}
-              <div className="pt-2">
-                <button
-                  onClick={handleCheckoutDirecto}
-                  disabled={procesando}
-                  className="w-full py-3 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-400 font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors"
-                >
-                  <span>⚡ Activar Modo Pro Instantáneo (Acceso Rápido)</span>
-                </button>
+              <div className="text-center text-[11px] text-gray-500 flex items-center justify-center space-x-1">
+                <span>🔒 Procesamiento 100% seguro por</span>
+                <strong className="text-gray-300">Flow.cl</strong>
+                <span>(Yape, Plin, PagoEfectivo y Tarjetas)</span>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setPaso("beneficios")}
-                className="w-full py-2 text-xs text-gray-400 hover:text-white font-bold"
-              >
-                ← Volver a beneficios
-              </button>
-            </div>
-          )}
-
-          {paso === "yape" && (
-            <div className="space-y-4 animate-fade-in">
-              <div className="bg-purple-950/40 border border-purple-500/30 p-4 rounded-2xl text-center space-y-2">
-                <span className="text-4xl inline-block">📱</span>
-                <h4 className="font-bold text-sm text-purple-300">
-                  Transferencia Directa Yape / BCP
-                </h4>
-                <p className="text-xs text-gray-300">
-                  Transfiere <strong className="text-emerald-400">S/. 19.90 PEN</strong> e ingresa el número de operación a continuación.
-                </p>
-              </div>
-
-              <form onSubmit={handlePagarYape} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 mb-1">
-                    Número de Operación Yape / BCP
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ej. 12345678"
-                    value={nroOperacion}
-                    onChange={(e) => setNroOperacion(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-white font-bold text-sm focus:border-purple-500"
-                    required
-                  />
-                </div>
-
-                {error && (
-                  <p className="text-xs text-red-400 font-bold">{error}</p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={procesando}
-                  className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl shadow-lg transition-all text-sm disabled:opacity-50"
-                >
-                  {procesando ? "Enviando..." : "Confirmar y Enviar Solicitud"}
-                </button>
-              </form>
-
-              <button
-                type="button"
-                onClick={() => setPaso("pago")}
-                className="w-full py-2 text-xs text-gray-400 hover:text-white font-bold"
-              >
-                ← Cambiar método de pago
-              </button>
             </div>
           )}
 
