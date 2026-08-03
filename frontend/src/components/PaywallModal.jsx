@@ -44,22 +44,22 @@ const LISTA_PAISES = [
     nombre: "Estados Unidos",
     moneda: "USD",
     simbolo: "$",
-    monto: 5.99,
-    desc: "$5.99 USD",
+    monto: 19.99,
+    desc: "$19.99 USD",
   },
   {
     nombre: "España / Europa",
     moneda: "EUR",
     simbolo: "€",
-    monto: 5.99,
-    desc: "€5.99 EUR",
+    monto: 19.99,
+    desc: "€19.99 EUR",
   },
   {
     nombre: "Otro País",
     moneda: "USD",
     simbolo: "$",
-    monto: 5.99,
-    desc: "$5.99 USD",
+    monto: 19.99,
+    desc: "$19.99 USD",
   },
 ];
 
@@ -104,12 +104,12 @@ export default function PaywallModal({
 
   const emailDestino = userEmail || localStorage.getItem("userEmail") || "usuario@financeflow.com";
 
-  // Pagar con Flow.cl (Pasarela única oficial)
+  // Pagar con Flow.cl (con el monto y moneda del país seleccionado)
   const handlePagarFlow = async () => {
     try {
       setProcesando(true);
       setError("");
-      const res = await crearOrdenFlow(emailDestino);
+      const res = await crearOrdenFlow(emailDestino, paisSeleccionado.monto, paisSeleccionado.moneda);
       if (res.url) {
         window.location.href = res.url;
       } else {

@@ -80,7 +80,7 @@ export async function crearPreferenciaMercadoPago(email) {
   }
 }
 
-export async function crearOrdenFlow(email) {
+export async function crearOrdenFlow(email, monto, moneda) {
   try {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_BASE_URL}/api/pagos/crear-orden-flow`, {
@@ -89,7 +89,7 @@ export async function crearOrdenFlow(email) {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, monto, moneda }),
     });
     const data = await res.json();
     if (!res.ok || !data.success) {

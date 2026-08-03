@@ -248,7 +248,7 @@ router.post("/crear-preferencia-mp", async (req, res) => {
 // 4. Flow.cl / Flow Perú (Pago mediante Yape, Plin, Tarjetas, PagoEfectivo en Soles/PEN o CLP)
 router.post("/crear-orden-flow", async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, monto, moneda } = req.body;
     const apiKey = process.env.FLOW_API_KEY;
     const secretKey = process.env.FLOW_SECRET_KEY;
     const flowApiUrl = process.env.FLOW_API_URL || "https://sandbox.flow.cl/api";
@@ -279,8 +279,8 @@ router.post("/crear-orden-flow", async (req, res) => {
       apiKey,
       commerceOrder,
       subject: "FinanceFlow Pro - Acceso Vitalicio",
-      currency: "PEN",
-      amount: "19.90",
+      currency: moneda || "PEN",
+      amount: monto ? Number(monto).toFixed(2) : "19.90",
       email: usuario.email,
       urlConfirmation: `${backendUrl}/api/pagos/webhook-flow`,
       urlReturn: `${frontendUrl}/dashboard?payment=success`,
