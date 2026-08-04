@@ -12,6 +12,7 @@ import DashboardPage from "./pages/DashboardPage";
 import MovimientoFormPage from "./pages/MovimientoFormPage";
 import ReportesPage from "./pages/ReportesPage";
 import PlanificadorPage from "./pages/PlanificadorPage";
+import RecordatoriosPage from "./pages/RecordatoriosPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -75,6 +76,14 @@ function MainRoutes() {
             element={
               <ProtectedRoute>
                 <PlanificadorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recordatorios"
+            element={
+              <ProtectedRoute>
+                <RecordatoriosPage />
               </ProtectedRoute>
             }
           />

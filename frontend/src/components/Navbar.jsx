@@ -23,6 +23,7 @@ function Navbar() {
   const navLinks = [
     { path: "/", label: "Dashboard", icon: "🏠" },
     { path: "/movimiento", label: "Nuevo Movimiento", icon: "➕" },
+    { path: "/recordatorios", label: "Recordatorios", icon: "🔔" },
     { path: "/reportes", label: "Reportes", icon: "📊" },
     { path: "/perfil", label: "Perfil", icon: "👤" },
   ];
