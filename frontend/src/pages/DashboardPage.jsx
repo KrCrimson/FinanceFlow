@@ -117,12 +117,12 @@ function DashboardPage() {
     setFeedback('');
     try {
       await updateMovimiento(id, { esRecurrente: false });
-      setFeedback('Constancia de ingreso cancelada con éxito');
+      setFeedback('✅ Constancia de ingreso cancelada con éxito');
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (e) {
-      setFeedback('Error al cancelar la constancia del ingreso');
+      setFeedback(`❌ Error al cancelar constancia: ${e.message || 'Ocurrió un error inesperado'}`);
     } finally {
       setActualizando(null);
     }
@@ -133,11 +133,11 @@ function DashboardPage() {
     setFeedback('');
     try {
       await inhabilitarMovimiento(id);
-      setFeedback('Movimiento desactivado correctamente');
+      setFeedback('✅ Movimiento desactivado correctamente');
       // Actualizar la lista sin recargar la página
       window.location.reload();
     } catch (e) {
-      setFeedback('Error al desactivar el movimiento');
+      setFeedback(`❌ Error al desactivar movimiento: ${e.message || 'Ocurrió un error inesperado'}`);
     } finally {
       setActualizando(null);
     }

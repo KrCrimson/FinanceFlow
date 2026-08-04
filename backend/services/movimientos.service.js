@@ -114,9 +114,14 @@ module.exports = {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
 
-    const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
-    if (isClosed) {
-      throw new Error('No se puede modificar un movimiento perteneciente a un período cerrado');
+    // Si solo se modifica el flag de recurrencia (esRecurrente), permitimos desarmar la recurrencia futura
+    const isOnlyTogglingRecurrence = Object.keys(data).every((k) => k === 'esRecurrente');
+
+    if (!isOnlyTogglingRecurrence) {
+      const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
+      if (isClosed) {
+        throw new Error('No se puede modificar un movimiento perteneciente a un período cerrado');
+      }
     }
 
     if (data.fecha !== undefined) {
