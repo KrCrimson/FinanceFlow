@@ -13,10 +13,14 @@ import MovimientoFormPage from "./pages/MovimientoFormPage";
 import ReportesPage from "./pages/ReportesPage";
 import PlanificadorPage from "./pages/PlanificadorPage";
 import RecordatoriosPage from "./pages/RecordatoriosPage";
+import TerminosPage from "./pages/TerminosPage";
+import PrivacidadPage from "./pages/PrivacidadPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import CookieBanner from "./components/CookieBanner";
 import DevLogger from "./components/DevLogger";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -87,10 +91,14 @@ function MainRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route path="/terminos" element={<TerminosPage />} />
+          <Route path="/privacidad" element={<PrivacidadPage />} />
           <Route path="/admin-portal-privado" element={<AdminDashboardPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </ErrorBoundary>
+      <Footer />
+      <CookieBanner />
     </>
   );
 }
