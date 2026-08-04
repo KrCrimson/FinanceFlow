@@ -19,63 +19,75 @@ export default function TerminosPage() {
         <div className="space-y-6 text-sm text-gray-300 leading-relaxed">
           
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">1. Aceptación de los Términos</h2>
+            <h2 className="text-lg font-bold text-emerald-400">1. Aceptación de los Términos y Edad Mínima</h2>
             <p>
-              Al acceder, registrarse o utilizar la plataforma <strong>FinanceFlow</strong> (en adelante, "la Aplicación" o "el Servicio"), usted acepta expresamente quedar vinculado por estos Términos y Condiciones de Uso. Si no está de acuerdo con alguna parte de estos términos, no deberá utilizar nuestros servicios.
+              Al registrarse, acceder o utilizar la plataforma <strong>FinanceFlow</strong> (en adelante, "la Aplicación" o "el Servicio"), usted declara tener al menos <strong>18 años de edad</strong> (o la mayoría de edad legal aplicable en su jurisdicción) y acepta de forma libre, expresa e informada quedar vinculado por estos Términos y Condiciones. Si no está de acuerdo con estos términos, deberá abstenerse de utilizar el Servicio.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">2. Naturaleza Informativa y Herramienta Organizacional (Descargo de Responsabilidad)</h2>
+            <h2 className="text-lg font-bold text-emerald-400">2. Naturaleza del Servicio y Deslinde Fiscal/Contable</h2>
             <p>
-              FinanceFlow es una herramienta tecnológica diseñada exclusivamente para la organización personal, registro de movimientos financieros, cálculo de balances y escaneo automatizado de comprobantes.
+              FinanceFlow es una herramienta tecnológica de software como servicio (SaaS) destinada exclusivamente a la organización personal, gestión presupuestaria de caja chica y escaneo automatizado de comprobantes.
             </p>
             <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs text-emerald-300 space-y-1">
-              <strong>⚠️ AVISO IMPORTANTE DE EXENCIÓN DE RESPONSABILIDAD FINANCIERA Y FISCAL:</strong>
+              <strong>⚠️ AVISO SOBRE REGULACIÓN Y ASESORÍA FISCAL:</strong>
               <p>
-                FinanceFlow <strong>NO es una entidad bancaria, ni asesora financiera, ni firma contable legalmente acreditada</strong>. La Aplicación no proporciona asesoramiento fiscal, tributario ni de inversiones. El usuario es el único responsable de la exactitud de los datos ingresados y del cumplimiento de sus obligaciones tributarias ante las autoridades fiscales de su respectivo país (como SUNAT u organismos equivalentes).
+                FinanceFlow <strong>NO es una entidad financiera supervisada por la SBS (Superintendencia de Banca, Seguros y AFP), ni una firma de auditoría o asesoría tributaria autorizada ante la SUNAT</strong> u organismos equivalentes. La Aplicación no emite dictámenes fiscales ni declaraciones juradas oficiales. El usuario es el único responsable de verificar la exactitud de sus registros y de cumplir sus obligaciones tributarias vigentes.
               </p>
             </div>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">3. Limitación de Responsabilidad</h2>
+            <h2 className="text-lg font-bold text-emerald-400">3. Limitación de Responsabilidad (Conformidad con el Código Civil Peruano)</h2>
             <p>
-              En la máxima medida permitida por la ley aplicable, FinanceFlow, sus desarrolladores, propietarios y colaboradores <strong>no serán responsables</strong> bajo ninguna circunstancia por:
+              En cumplimiento del Código Civil del Perú (Arts. 1328 y 1986) y del Código de Protección y Defensa del Consumidor (Ley N° 29571):
             </p>
             <ul className="list-disc pl-5 space-y-1 text-xs text-gray-400">
-              <li>Pérdidas de ingresos, ganancias simuladas, datos o interrupción del negocio.</li>
-              <li>Errores de cálculo u omisiones derivadas de información mal ingresada por el usuario.</li>
-              <li>Fallos, retrasos o errores de procesamiento de pagos gestionados por pasarelas externas (como Flow.cl, Mercado Pago o Stripe).</li>
-              <li>Interrupciones temporales del servicio derivadas de mantenimientos o fallas imprevistas en los proveedores de infraestructura en la nube.</li>
+              <li>
+                La Aplicación responde conforme a ley por daños directos probados provenientes de dolo o culpa grave imputable a sus desarrolladores o titulares.
+              </li>
+              <li>
+                La Aplicación <strong>no se hace responsable por daños indirectos, lucro cesante o pérdidas derivadas de culpa leve, error de digitación del usuario o eventos de caso fortuito o fuerza mayor</strong>.
+              </li>
+              <li>
+                Tampoco responde por interrupciones temporales causadas por fallas de terceros proveedores de pasarelas de pago (Flow.cl, Mercado Pago, Stripe) o caídas fortuitas de servidores en la nube.
+              </li>
             </ul>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">4. Uso Aceptable y Cuenta de Usuario</h2>
+            <h2 className="text-lg font-bold text-emerald-400">4. Pasarelas de Pago y Contratación de Licencias</h2>
             <p>
-              El usuario se compromete a utilizar el Servicio de manera legal y ética. Queda estrictamente prohibido intentar acceder de forma no autorizada al código fuente, realizar ingeniería inversa, inyectar código malicioso o vulnerar la seguridad de la plataforma.
+              Los pagos para la activación del plan Pro se procesan mediante pasarelas externas seguras (Flow.cl, Mercado Pago o Stripe). FinanceFlow <strong>nunca almacena ni procesa directamente datos de tarjetas bancarias</strong>. Cualquier reclamación sobre procesamiento o devoluciones derivadas del proveedor de pago se sujetará a las políticas vigentes de la pasarela correspondiente.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">5. Planes, Cobros y Pasarelas de Pago</h2>
+            <h2 className="text-lg font-bold text-emerald-400">5. Uso Aceptable y Suspensión de Cuenta</h2>
             <p>
-              Los cobros por suscripciones o licencias de FinanceFlow Pro son procesados por pasarelas externas seguras (Flow.cl, Mercado Pago o Stripe). FinanceFlow <strong>nunca almacena ni procesa números de tarjetas de crédito o débito</strong> en sus propios servidores.
+              El usuario acepta no utilizar el Servicio para fines ilícitos, lavado de activos o vulneración de derechos de terceros. Nos reservamos el derecho de suspender o cancelar cuentas de usuario ante violaciones graves a la ley o intentos de hacking e ingeniería inversa del código.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">6. Modificaciones de los Términos</h2>
+            <h2 className="text-lg font-bold text-emerald-400">6. Propiedad Intelectual</h2>
             <p>
-              Nos reservamos el derecho de modificar o actualizar estos Términos en cualquier momento. El uso continuado del Servicio tras la publicación de los cambios constituirá la aceptación implícita de los mismos.
+              Todos los derechos de propiedad intelectual sobre el código fuente, diseño de interfaz, marcas, logotipos y algoritmos de FinanceFlow pertenecen exclusivamente a sus titulares. Se otorga una licencia de uso personal, no exclusiva e intransferible.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-emerald-400">7. Contacto</h2>
+            <h2 className="text-lg font-bold text-emerald-400">7. Modificaciones de los Términos</h2>
             <p>
-              Para cualquier consulta sobre estos Términos, puede comunicarse a través del correo oficial de soporte: <span className="text-emerald-400 font-semibold">soporte@financeflow.com</span>.
+              Nos reservamos la facultad de modificar estos Términos. Notificaremos cambios significativos a través de correo electrónico o alertas dentro de la Aplicación con al menos 7 días de anticipación antes de su entrada en vigor.
+            </p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-lg font-bold text-emerald-400">8. Ley Aplicable y Jurisdicción (Perú)</h2>
+            <p>
+              Estos Términos se rigen por las leyes de la República del Perú. Para cualquier controversia no resuelta por conciliación directa, las partes se someten a la competencia territorial de los jueces y tribunales del Distrito Judicial de <strong>Tacna, Perú</strong>.
             </p>
           </section>
 
