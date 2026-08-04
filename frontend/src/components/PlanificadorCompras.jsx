@@ -39,21 +39,29 @@ function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrea
 
   const handleMarcarComprado = async (compra) => {
     if (window.confirm(`¿Deseas cerrar "${compra.item}" y registrar el egreso por S/${compra.montoObjetivo}?`)) {
-      if (onUpdateEgreso) {
-        await onUpdateEgreso(compra.id, {
-          estado: 'activo',
-          fecha: new Date().toISOString()
-        });
+      try {
+        if (onUpdateEgreso) {
+          await onUpdateEgreso(compra.id, {
+            estado: 'activo',
+            fecha: new Date().toISOString()
+          });
+        }
+      } catch (err) {
+        alert(`Error al registrar compra: ${err.message || 'Ocurrió un error inesperado'}`);
       }
     }
   };
 
   const handleCancelarCompra = async (id, nombre) => {
-    if (window.confirm(`¿Estás seguro de cancelar la planificación de "${nombre}"?`)) {
-      if (onUpdateEgreso) {
-        await onUpdateEgreso(id, {
-          estado: 'inactivo'
-        });
+    if (window.confirm(`¿Estás seguro de borrar o cancelar la planificación de "${nombre}"?`)) {
+      try {
+        if (onUpdateEgreso) {
+          await onUpdateEgreso(id, {
+            estado: 'inactivo'
+          });
+        }
+      } catch (err) {
+        alert(`Error al cancelar meta: ${err.message || 'Ocurrió un error inesperado'}`);
       }
     }
   };

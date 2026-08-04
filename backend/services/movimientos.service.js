@@ -114,10 +114,11 @@ module.exports = {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
 
-    // Si solo se modifica el flag de recurrencia (esRecurrente), permitimos desarmar la recurrencia futura
+    // Si es un movimiento planificado o se modifica solo la recurrencia, no afecta periodos cerrados históricos
+    const isPlanificado = existingMovimiento.estado === 'planificado';
     const isOnlyTogglingRecurrence = Object.keys(data).every((k) => k === 'esRecurrente');
 
-    if (!isOnlyTogglingRecurrence) {
+    if (!isOnlyTogglingRecurrence && !isPlanificado) {
       const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
       if (isClosed) {
         throw new Error('No se puede modificar un movimiento perteneciente a un período cerrado');
@@ -126,13 +127,13 @@ module.exports = {
 
     if (data.fecha !== undefined) {
       const isNewPeriodClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, data.fecha);
-      if (isNewPeriodClosed) {
+      if (isNewPeriodClosed && !isPlanificado) {
         throw new Error('No se puede trasladar un movimiento a un período cerrado');
       }
       
       const todayStr = new Date().toISOString().slice(0, 10);
       const newFechaStr = new Date(data.fecha).toISOString().slice(0, 10);
-      if (newFechaStr > todayStr) {
+      if (newFechaStr > todayStr && !isPlanificado) {
         throw new Error('No se pueden trasladar movimientos a fechas futuras');
       }
     }
@@ -160,9 +161,12 @@ module.exports = {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
 
-    const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
-    if (isClosed) {
-      throw new Error('No se puede desactivar un movimiento perteneciente a un período cerrado');
+    const isPlanificado = existingMovimiento.estado === 'planificado';
+    if (!isPlanificado) {
+      const isClosed = await cierresService.esPeriodoCerrado(existingMovimiento.userId, existingMovimiento.fecha);
+      if (isClosed) {
+        throw new Error('No se puede desactivar un movimiento perteneciente a un período cerrado');
+      }
     }
 
     const movimiento = await Movimiento.findByIdAndUpdate(

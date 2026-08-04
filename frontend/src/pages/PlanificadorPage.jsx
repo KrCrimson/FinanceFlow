@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useAnalisisGastos } from '../hooks/useAnalisisGastos';
+import { createMovimiento, updateMovimiento } from '../services/movimientos-adapter';
 import PlanificadorCompras from '../components/PlanificadorCompras';
 
 function PlanificadorPage() {
@@ -19,6 +20,14 @@ function PlanificadorPage() {
           calcularTiempoParaCompra={calcularTiempoParaCompra}
           obtenerSugerenciasAhorro={obtenerSugerenciasAhorro}
           movimientos={movimientos}
+          onCrearEgreso={async (data) => {
+            await createMovimiento(data);
+            window.location.reload();
+          }}
+          onUpdateEgreso={async (id, data) => {
+            await updateMovimiento(id, data);
+            window.location.reload();
+          }}
         />
       </div>
     </div>
