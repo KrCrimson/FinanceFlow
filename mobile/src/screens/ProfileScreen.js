@@ -10,6 +10,7 @@ import {
   Platform,
   StatusBar,
   Modal,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -421,6 +422,50 @@ export default function ProfileScreen({
             >
               <Text style={styles.actionBtnTextWarning}>Configurado</Text>
             </TouchableOpacity>
+          </View>
+
+          {/* Sección de Términos y Privacidad Legal */}
+          <View style={[styles.card, { marginTop: 12 }]}>
+            <Text style={styles.cardSectionTitle}>
+              🛡️ Protección Legal y Privacidad
+            </Text>
+            <Text style={{ color: "#6B7280", fontSize: 12, marginBottom: 10 }}>
+              Consulta las políticas de protección de datos personales (Ley 29733) y los términos de uso.
+            </Text>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#F3F4F6",
+                  borderWidth: 1,
+                  borderColor: "#D1D5DB",
+                  paddingVertical: 10,
+                  borderRadius: 12,
+                  alignItems: "center",
+                }}
+                onPress={() => Linking.openURL("https://financeflow-swart.vercel.app/terminos")}
+              >
+                <Text style={{ color: "#374151", fontWeight: "bold", fontSize: 12 }}>
+                  📄 Términos de Uso
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#F3F4F6",
+                  borderWidth: 1,
+                  borderColor: "#D1D5DB",
+                  paddingVertical: 10,
+                  borderRadius: 12,
+                  alignItems: "center",
+                }}
+                onPress={() => Linking.openURL("https://financeflow-swart.vercel.app/privacidad")}
+              >
+                <Text style={{ color: "#374151", fontWeight: "bold", fontSize: 12 }}>
+                  🔒 Privacidad (ARCO)
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Cerrar Sesión Box */}

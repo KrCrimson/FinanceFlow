@@ -18,6 +18,7 @@ import NewMovementScreen from "./src/screens/NewMovementScreen";
 import ReportsScreen from "./src/screens/ReportsScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import RemindersScreen from "./src/screens/RemindersScreen";
+import PlannerScreen from "./src/screens/PlannerScreen";
 import { setAuthToken } from "./src/services/api";
 import { getMobileCurrencySymbol } from "./src/utils/currency";
 
@@ -181,6 +182,23 @@ export default function App() {
           <TouchableOpacity
             style={[
               themeNav.navItem,
+              activeTab === "planner" && themeNav.navItemActive,
+            ]}
+            onPress={() => setActiveTab("planner")}
+          >
+            <Text
+              style={[
+                themeNav.navItemText,
+                activeTab === "planner" && themeNav.navItemTextActive,
+              ]}
+            >
+              🎯 Metas
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              themeNav.navItem,
               activeTab === "profile" && themeNav.navItemActive,
             ]}
             onPress={() => setActiveTab("profile")}
@@ -225,6 +243,13 @@ export default function App() {
         )}
         {activeTab === "reminders" && (
           <RemindersScreen
+            user={user}
+            isDarkMode={isDarkMode}
+            currency={currency}
+          />
+        )}
+        {activeTab === "planner" && (
+          <PlannerScreen
             user={user}
             isDarkMode={isDarkMode}
             currency={currency}
