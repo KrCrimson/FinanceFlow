@@ -176,3 +176,29 @@ export const getEstadoPlan = async (email) => {
     return { esPremium: false, planTipo: "free" };
   }
 };
+
+// Endpoints de Recordatorios / Préstamos
+export const fetchRecordatorios = async () => {
+  return await apiFetch("/recordatorios");
+};
+
+export const createRecordatorio = async (recordatorioData) => {
+  return await apiFetch("/recordatorios", {
+    method: "POST",
+    body: JSON.stringify(recordatorioData),
+  });
+};
+
+export const updateRecordatorio = async (id, recordatorioData) => {
+  return await apiFetch(`/recordatorios/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(recordatorioData),
+  });
+};
+
+export const deleteRecordatorio = async (id) => {
+  return await apiFetch(`/recordatorios/${id}`, {
+    method: "DELETE",
+  });
+};
+
