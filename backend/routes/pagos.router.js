@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require("crypto");
 const Pago = require("../database/pago.model");
 const Usuario = require("../database/usuario.model");
+const auth = require("../middlewares/auth");
 
 // Auxiliar para obtener clientes dinámicamente sin romper el arranque si faltan envs
 const getStripe = () => {
@@ -89,18 +90,17 @@ router.post("/solicitar-pro", async (req, res) => {
 
 // 1.5 Checkout Directo (Activación Automática Instantánea Opción B con Tarjeta / Google Pay)
 router.post("/checkout-directo", async (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ success: false, error: "Este endpoint no está disponible en producción" });
+  }
+
   try {
     let { email, metodo, pais, monto, moneda } = req.body;
-
-    let usuario = null;
-    if (email && email !== "usuario@financeflow.com") {
-      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
+    if (!email) {
+      return res.status(400).json({ success: false, error: "El email es requerido" });
     }
 
-    if (!usuario) {
-      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
-    }
-
+    const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     if (!usuario) {
       return res
         .status(404)
@@ -149,13 +149,7 @@ router.post("/crear-checkout-stripe", async (req, res) => {
       });
     }
 
-    let usuario = null;
-    if (email) {
-      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
-    }
-    if (!usuario) {
-      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
-    }
+    const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     if (!usuario) {
       return res.status(404).json({ success: false, error: "Usuario no encontrado" });
     }
@@ -203,13 +197,7 @@ router.post("/crear-preferencia-mp", async (req, res) => {
       });
     }
 
-    let usuario = null;
-    if (email) {
-      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
-    }
-    if (!usuario) {
-      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
-    }
+    const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     if (!usuario) {
       return res.status(404).json({ success: false, error: "Usuario no encontrado" });
     }
@@ -223,24 +211,31 @@ router.post("/crear-preferencia-mp", async (req, res) => {
           {
             title: "FinanceFlow Pro - Acceso Vitalicio",
             quantity: 1,
-            unit_price: 19.9,
+            unit_price: 19.9, // 19.90 PEN
             currency_id: "PEN",
           },
         ],
-        external_reference: usuario._id.toString(),
         back_urls: {
           success: `${frontendUrl}/dashboard?payment=success`,
-          failure: `${frontendUrl}/dashboard?payment=cancel`,
-          pending: `${frontendUrl}/dashboard`,
+          failure: `${frontendUrl}/dashboard?payment=failure`,
+          pending: `${frontendUrl}/dashboard?payment=pending`,
         },
         auto_return: "approved",
+        external_reference: usuario._id.toString(),
+        payer: {
+          email: usuario.email,
+        },
         notification_url: `${backendUrl}/api/pagos/webhook-mercadopago`,
       },
     });
 
-    res.json({ success: true, url: result.init_point });
+    res.json({
+      success: true,
+      init_point: result.init_point,
+      preferenceId: result.id,
+    });
   } catch (err) {
-    console.error("Error al crear preferencia de Mercado Pago:", err);
+    console.error("Error al crear preferencia en Mercado Pago:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -260,13 +255,7 @@ router.post("/crear-orden-flow", async (req, res) => {
       });
     }
 
-    let usuario = null;
-    if (email) {
-      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
-    }
-    if (!usuario) {
-      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
-    }
+    const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     if (!usuario) {
       return res.status(404).json({ success: false, error: "Usuario no encontrado" });
     }
@@ -322,23 +311,33 @@ router.post("/webhook-mercadopago", async (req, res) => {
       return res.json({ received: true });
     }
 
-    if (process.env.MERCADO_PAGO_WEBHOOK_SECRET && xSignature) {
-      const parts = xSignature.split(",");
-      const ts = parts.find((p) => p.startsWith("ts="))?.split("=")[1];
-      const v1 = parts.find((p) => p.startsWith("v1="))?.split("=")[1];
+    const webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      console.error("❌ MERCADO_PAGO_WEBHOOK_SECRET no configurado — rechazando webhook");
+      return res.status(503).json({ error: "Webhook no configurado" });
+    }
 
-      if (ts && v1) {
-        const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
-        const expectedSignature = crypto
-          .createHmac("sha256", process.env.MERCADO_PAGO_WEBHOOK_SECRET)
-          .update(manifest)
-          .digest("hex");
+    if (!xSignature) {
+      return res.status(401).json({ error: "Firma de webhook requerida" });
+    }
 
-        if (expectedSignature !== v1) {
-          console.warn("⚠️ Firma de Webhook Mercado Pago inválida");
-          return res.status(401).send("Signature mismatch");
-        }
-      }
+    const parts = xSignature.split(",");
+    const ts = parts.find((p) => p.startsWith("ts="))?.split("=")[1];
+    const v1 = parts.find((p) => p.startsWith("v1="))?.split("=")[1];
+
+    if (!ts || !v1) {
+      return res.status(401).json({ error: "Formato de firma inválido" });
+    }
+
+    const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+    const expectedSignature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(manifest)
+      .digest("hex");
+
+    if (expectedSignature !== v1) {
+      console.warn("⚠️ Firma de Webhook Mercado Pago inválida");
+      return res.status(401).json({ error: "Signature mismatch" });
     }
 
     const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
@@ -452,17 +451,17 @@ router.post("/webhook-stripe", express.raw({ type: "application/json" }), async 
 
 // 8. Alternar Modo Desarrollador (Free <-> Pro)
 router.post("/toggle-dev-plan", async (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ success: false, error: "Este endpoint no está disponible en producción" });
+  }
+
   try {
     let { email } = req.body;
-
-    let usuario = null;
-    if (email && email !== "usuario@financeflow.com") {
-      usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
-    }
-    if (!usuario) {
-      usuario = await Usuario.findOne().sort({ actualizadoEn: -1 });
+    if (!email) {
+      return res.status(400).json({ success: false, error: "El email es requerido" });
     }
 
+    const usuario = await Usuario.findOne({ email: email.toLowerCase().trim() });
     if (!usuario) {
       return res
         .status(404)
@@ -487,13 +486,10 @@ router.post("/toggle-dev-plan", async (req, res) => {
   }
 });
 
-// 9. Obtener estado de suscripción
-router.get("/estado-plan/:email", async (req, res) => {
+// 9. Obtener estado de suscripción (Protegido con auth)
+router.get("/estado-plan", auth, async (req, res) => {
   try {
-    const email = req.params.email;
-    const usuario = await Usuario.findOne({
-      email: email.toLowerCase().trim(),
-    });
+    const usuario = await Usuario.findById(req.user.id);
     if (!usuario) {
       return res
         .status(404)

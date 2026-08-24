@@ -1,6 +1,6 @@
 // Middleware de autenticación JWT
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-jwt-secret-32-chars-minimum-key' : undefined);
 const Usuario = require('../database/usuario.model');
 
 module.exports = async function (req, res, next) {

@@ -1,15 +1,29 @@
 const request = require('supertest');
 const app = require('../app');
+const jwt = require('jsonwebtoken');
 const Usuario = require('../database/usuario.model');
 const Pago = require('../database/pago.model');
 const Movimiento = require('../database/movimiento.model');
 
 describe('Admin Dashboard - Unit Tests', () => {
+  let adminToken;
+  const JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-32-chars-minimum-key';
+
+  beforeAll(() => {
+    adminToken = jwt.sign({ id: 'admin123', email: 'admin@financeflow.com', rol: 'admin' }, JWT_SECRET);
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
   it('GET /api/admin/metrics retorna métricas completas de usuarios, suscripciones y pagos', async () => {
+    jest.spyOn(Usuario, 'findById').mockResolvedValue({
+      _id: 'admin123',
+      email: 'admin@financeflow.com',
+      rol: 'admin'
+    });
+
     jest.spyOn(Usuario, 'countDocuments').mockImplementation((filter) => {
       if (!filter || Object.keys(filter).length === 0) return Promise.resolve(10);
       if (filter.esPremium === true) return Promise.resolve(4);
@@ -26,7 +40,9 @@ describe('Admin Dashboard - Unit Tests', () => {
 
     jest.spyOn(Pago, 'countDocuments').mockResolvedValue(1);
 
-    const res = await request(app).get('/api/admin/metrics');
+    const res = await request(app)
+      .get('/api/admin/metrics')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
@@ -36,7 +52,7 @@ describe('Admin Dashboard - Unit Tests', () => {
   });
 
   it('POST /api/admin/toggle-premium otorga o revoca Pro a usuario', async () => {
-    const mockUser = {
+    const mockTargetUser = {
       _id: 'user123',
       email: 'target@test.com',
       esPremium: false,
@@ -44,15 +60,25 @@ describe('Admin Dashboard - Unit Tests', () => {
       save: jest.fn().mockResolvedValue(true)
     };
 
-    jest.spyOn(Usuario, 'findById').mockResolvedValue(mockUser);
+    jest.spyOn(Usuario, 'findById').mockImplementation((id) => {
+      if (id === 'admin123') {
+        return Promise.resolve({
+          _id: 'admin123',
+          email: 'admin@financeflow.com',
+          rol: 'admin'
+        });
+      }
+      return Promise.resolve(mockTargetUser);
+    });
 
     const res = await request(app)
       .post('/api/admin/toggle-premium')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ userId: 'user123', esPremium: true });
 
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(mockUser.esPremium).toBe(true);
-    expect(mockUser.planTipo).toBe('pro');
+    expect(mockTargetUser.esPremium).toBe(true);
+    expect(mockTargetUser.planTipo).toBe('pro');
   });
 });

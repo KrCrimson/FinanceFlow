@@ -16,14 +16,16 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@sentry/node": "^10.70.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
-    "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.2",
-    "nodemailer": "^6.9.8"
+    "nodemailer": "^9.0.5",
+    "zod": "^4.4.3"
   }
 }

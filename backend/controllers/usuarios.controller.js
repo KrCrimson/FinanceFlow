@@ -2,7 +2,7 @@
 const usuariosService = require('../services/usuarios.service');
 
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-jwt-secret-32-chars-minimum-key' : undefined);
 
 module.exports = {
     // Registro de usuario

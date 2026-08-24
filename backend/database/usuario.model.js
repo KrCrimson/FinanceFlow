@@ -30,6 +30,11 @@ const usuarioSchema = new mongoose.Schema({
 		enum: ['activo', 'inactivo'],
 		default: 'activo',
 	},
+	rol: {
+		type: String,
+		enum: ['user', 'admin'],
+		default: 'user',
+	},
 	fondoFijo: {
 		type: Number,
 		default: 1000,

@@ -2,13 +2,22 @@
 const express = require("express");
 const router = express.Router();
 
-// Ejemplo:
+const auth = require("../middlewares/auth");
+const isAdmin = require("../middlewares/isAdmin");
+
+// Rutas públicas o protegidas individualmente
 router.use("/usuarios", require("./usuarios"));
 router.use("/movimientos", require("./movimientos"));
-router.use("/logs", require("./logs"));
-router.use("/cierres", require("./cierres"));
-router.use("/pagos", require("./pagos.router"));
-router.use("/admin", require("./admin.router"));
 router.use("/recordatorios", require("./recordatorios"));
+
+// Pagos (algunas rutas son webhooks públicos)
+router.use("/pagos", require("./pagos.router"));
+
+// Rutas estrictamente para administradores
+router.use("/admin", auth, isAdmin, require("./admin.router"));
+router.use("/logs", auth, isAdmin, require("./logs"));
+
+// Cierres es usado por los usuarios normales para cerrar sus propios periodos
+router.use("/cierres", require("./cierres"));
 
 module.exports = router;

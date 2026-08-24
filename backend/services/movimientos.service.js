@@ -110,9 +110,13 @@ module.exports = {
     return movimientos;
   },
 
-  editarMovimiento: async (id, data) => {
+  editarMovimiento: async (id, data, userId) => {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
+    
+    if (existingMovimiento.userId.toString() !== userId) {
+      throw new Error('No autorizado para modificar este movimiento');
+    }
 
     // Si es un movimiento planificado o se modifica solo la recurrencia, no afecta periodos cerrados históricos
     const isPlanificado = existingMovimiento.estado === 'planificado';
@@ -157,9 +161,13 @@ module.exports = {
     return movimiento;
   },
 
-  inhabilitarMovimiento: async (id) => {
+  inhabilitarMovimiento: async (id, userId) => {
     const existingMovimiento = await Movimiento.findById(id);
     if (!existingMovimiento) throw new Error('Movimiento no encontrado');
+
+    if (existingMovimiento.userId.toString() !== userId) {
+      throw new Error('No autorizado para modificar este movimiento');
+    }
 
     const isPlanificado = existingMovimiento.estado === 'planificado';
     if (!isPlanificado) {
