@@ -36,77 +36,34 @@ export async function checkoutDirectoPro(email, metodo, pais, monto, moneda) {
   }
 }
 
-export async function crearCheckoutStripe(email) {
+export async function crearCargoCulqi(token, monto, moneda) {
   try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-checkout-stripe`, {
+    const authToken = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-cargo-culqi`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ token, monto, moneda }),
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
-      throw new Error(data.error || "Error al iniciar Stripe Checkout");
+      throw new Error(data.error || "Error al procesar el pago con Culqi");
     }
     return data;
   } catch (error) {
-    console.error("Error en crearCheckoutStripe:", error);
+    console.error("Error en crearCargoCulqi:", error);
     throw error;
   }
 }
 
-export async function crearPreferenciaMercadoPago(email) {
+export async function getEstadoPlan() {
   try {
     const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-preferencia-mp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ email }),
+    const res = await fetch(`${API_BASE_URL}/api/pagos/estado-plan`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || "Error al iniciar Mercado Pago");
-    }
-    return data;
-  } catch (error) {
-    console.error("Error en crearPreferenciaMercadoPago:", error);
-    throw error;
-  }
-}
-
-export async function crearOrdenFlow(email, monto, moneda) {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE_URL}/api/pagos/crear-orden-flow`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ email, monto, moneda }),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || "Error al iniciar Flow.cl");
-    }
-    return data;
-  } catch (error) {
-    console.error("Error en crearOrdenFlow:", error);
-    throw error;
-  }
-}
-
-export async function getEstadoPlan(email) {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/api/pagos/estado-plan/${encodeURIComponent(email)}`,
-    );
     const data = await res.json();
     if (!res.ok) {
       throw new Error(data.error || "Error al consultar el estado del plan");

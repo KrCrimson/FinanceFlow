@@ -11,15 +11,22 @@ function PlanificadorPage() {
   if (loading) return <div className="flex justify-center items-center min-h-[60vh] text-lg animate-pulse">Cargando datos...</div>;
   if (error) return <div className="text-red-500 text-center mt-8 animate-fade-in">Error: {error.message}</div>;
 
+  const movimientosArray = Array.isArray(movimientos) ? movimientos : [];
+  const activos = movimientosArray.filter(m => m.estado !== 'planificado');
+  const ingresos = activos.filter(m => m.tipo === 'ingreso').reduce((acc, m) => acc + m.monto, 0);
+  const egresos = activos.filter(m => m.tipo === 'egreso').reduce((acc, m) => acc + m.monto, 0);
+  const balanceTotal = ingresos - egresos;
+
   return (
     <div className="min-h-[80vh] bg-background py-6 px-4">
       <div className="max-w-6xl mx-auto">
-        <PlanificadorCompras 
+        <PlanificadorCompras
           resumenMensual={resumenMensual}
           estadisticasPorCategoria={estadisticasPorCategoria}
           calcularTiempoParaCompra={calcularTiempoParaCompra}
           obtenerSugerenciasAhorro={obtenerSugerenciasAhorro}
           movimientos={movimientos}
+          balanceTotal={balanceTotal}
           onCrearEgreso={async (data) => {
             await createMovimiento(data);
             window.location.reload();

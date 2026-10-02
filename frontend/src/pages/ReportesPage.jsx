@@ -37,18 +37,11 @@ function ReportesPage() {
         const movimientosData = await getMovimientos();
         setMovimientos(Array.isArray(movimientosData) ? movimientosData : []);
 
-        // Obtener estado de plan del usuario desde JWT / localStorage
+        // Obtener estado de plan del usuario autenticado
         const token = localStorage.getItem("token");
         if (token) {
-          try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            if (payload && payload.email) {
-              const plan = await getEstadoPlan(payload.email);
-              setUserPlan(plan);
-            }
-          } catch (e) {
-            console.error("Error decodificando token en reportes:", e);
-          }
+          const plan = await getEstadoPlan();
+          setUserPlan(plan);
         }
 
         logger.info("Datos de reportes cargados exitosamente", {
@@ -232,22 +225,30 @@ function ReportesPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {/* Botones de Exportación Contable */}
+              {/* Botones de Exportación Contable (solo usuarios Pro) */}
               <button
                 onClick={() => {
+                  if (!userPlan?.esPremium) {
+                    setShowPaywall(true);
+                    return;
+                  }
                   exportToExcel(
                     movimientosFiltrados,
                     `Reportes-FinanceFlow-${new Date().toISOString().slice(0, 10)}.csv`,
                   );
                 }}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl transition-all duration-200 text-sm font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
-                title="Exportar movimientos a Microsoft Excel"
+                title={userPlan?.esPremium ? "Exportar movimientos a Microsoft Excel" : "Función Pro — haz clic para desbloquearla"}
               >
-                <span>📥 Exportar Excel</span>
+                <span>{userPlan?.esPremium ? "📥" : "🔒"} Exportar Excel</span>
               </button>
 
               <button
                 onClick={() => {
+                  if (!userPlan?.esPremium) {
+                    setShowPaywall(true);
+                    return;
+                  }
                   exportToPDF(
                     movimientosFiltrados,
                     { totalIngresos, totalEgresos },
@@ -255,9 +256,9 @@ function ReportesPage() {
                   );
                 }}
                 className="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl transition-all duration-200 text-sm font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
-                title="Imprimir o guardar reporte en PDF"
+                title={userPlan?.esPremium ? "Imprimir o guardar reporte en PDF" : "Función Pro — haz clic para desbloquearla"}
               >
-                <span>📄 Exportar PDF</span>
+                <span>{userPlan?.esPremium ? "📄" : "🔒"} Exportar PDF</span>
               </button>
 
               {!userPlan?.esPremium && (

@@ -5,12 +5,14 @@ import {
   deleteAccount as deleteProfile,
 } from "../services/usuarios-adapter";
 import { logout } from "../services/auth-adapter";
+import { getEstadoPlan } from "../services/pagosService";
 import { useNavigate } from "react-router-dom";
 import {
   CURRENCIES,
   getCurrencySymbol,
   setCurrencySymbol,
 } from "../utils/currency";
+import PaywallModal from "../components/PaywallModal";
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -23,7 +25,8 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showNovedades, setShowNovedades] = useState(false);
+  const [userPlan, setUserPlan] = useState({ esPremium: false, planTipo: "free" });
+  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     const cargarPerfil = async () => {
@@ -34,6 +37,8 @@ function ProfilePage() {
         setPerfil(data);
         setNombre(data.nombre || "");
         setEmail(data.email || "");
+        const plan = await getEstadoPlan();
+        setUserPlan(plan);
       } catch (err) {
         setError(err.message || "Error al cargar el perfil");
         console.error("Error al cargar perfil:", err);
@@ -314,51 +319,48 @@ function ProfilePage() {
           </div>
         </div>
 
-        {/* Modo Desarrollador (Dev Controls) & Novedades */}
-        <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-gray-900 rounded-2xl shadow-xl p-6 mb-6 text-white border border-emerald-500/30">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* Publicidad de FinanceFlow Pro */}
+        {userPlan?.esPremium ? (
+          <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-gray-900 rounded-2xl shadow-xl p-6 mb-6 text-white border border-emerald-500/30 flex items-center justify-between gap-4">
             <div>
-              <span className="inline-block px-2.5 py-0.5 bg-amber-400 text-gray-950 text-[10px] font-black rounded-full uppercase tracking-wider mb-2">
-                🛠️ Panel de Desarrollador
+              <span className="inline-block px-2.5 py-0.5 bg-emerald-400 text-gray-950 text-[10px] font-black rounded-full uppercase tracking-wider mb-2">
+                ⭐ Cuenta Pro Activa
               </span>
               <h2 className="text-xl font-bold text-white">
-                Controles Dev & Novedades
+                ¡Gracias por apoyar FinanceFlow!
               </h2>
               <p className="text-xs text-emerald-200">
-                Prueba instantánea de planes y consulta de actualizaciones del
-                sistema.
+                Tienes acceso ilimitado a OCR, exportaciones y metas de compra.
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    const { toggleDevPlan } =
-                      await import("../services/pagosService");
-                    const res = await toggleDevPlan(email);
-                    setSuccess(`✅ ${res.message}`);
-                    setTimeout(() => setSuccess(""), 3500);
-                  } catch (err) {
-                    setError("Error alternando modo desarrollador");
-                  }
-                }}
-                className="bg-amber-400 hover:bg-amber-300 text-gray-950 px-4 py-2.5 rounded-xl font-black text-xs shadow-lg transition-all"
-              >
-                ⚡ Alternar Plan (Free ↔ Pro)
-              </button>
+            <span className="text-4xl">💎</span>
+          </div>
+        ) : (
+          <div className="bg-gradient-to-r from-amber-500 via-emerald-700 to-gray-900 rounded-2xl shadow-xl p-6 mb-6 text-white border border-amber-400/30">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <span className="inline-block px-2.5 py-0.5 bg-amber-400 text-gray-950 text-[10px] font-black rounded-full uppercase tracking-wider mb-2">
+                  ⭐ FinanceFlow Pro
+                </span>
+                <h2 className="text-xl font-bold text-white">
+                  Desbloquea OCR ilimitado y reportes en Excel/PDF
+                </h2>
+                <p className="text-xs text-amber-100">
+                  Por solo S/ 19.90, accede a escaneo de comprobantes sin límites,
+                  exportaciones contables y metas de compra ilimitadas.
+                </p>
+              </div>
 
               <button
                 type="button"
-                onClick={() => setShowNovedades(true)}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl font-extrabold text-xs shadow-lg transition-all"
+                onClick={() => setShowPaywall(true)}
+                className="bg-amber-400 hover:bg-amber-300 text-gray-950 px-5 py-2.5 rounded-xl font-black text-xs shadow-lg transition-all whitespace-nowrap"
               >
-                📢 Ver Novedades
+                ⭐ Hazte Pro
               </button>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Acciones de Cuenta */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -435,86 +437,12 @@ function ProfilePage() {
           </div>
         )}
 
-        {/* Modal de Novedades del Sistema */}
-        {showNovedades && (
-          <div className="fixed inset-0 bg-gray-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-gray-900 text-white rounded-3xl p-6 max-w-lg w-full border border-gray-800 shadow-2xl space-y-5 animate-fade-in max-h-[85vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b border-gray-800 pb-3">
-                <div className="flex items-center space-x-2">
-                  <span className="text-2xl">📢</span>
-                  <h3 className="font-extrabold text-lg">
-                    Novedades y Actualizaciones
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowNovedades(false)}
-                  className="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-gray-800/60 p-4 rounded-2xl border border-gray-700/60 space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-emerald-400">
-                      v2.5.0 • Julio 2026
-                    </span>
-                    <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      NUEVO
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm text-white">
-                    💳 Pasarela Vercel Checkout + QR Yape con Monto
-                  </h4>
-                  <p className="text-xs text-gray-300">
-                    Nueva experiencia de pago estilo Vercel Checkout con
-                    auto-detección de país (LATAM/USD) y QR de Yape con el monto
-                    S/ 19.90 precargado automáticamente.
-                  </p>
-                </div>
-
-                <div className="bg-gray-800/60 p-4 rounded-2xl border border-gray-700/60 space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-blue-400">
-                      v2.4.0 • Julio 2026
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm text-white">
-                    📸 Escaneo OCR de Recibos con IA Gemini
-                  </h4>
-                  <p className="text-xs text-gray-300">
-                    Escaneo inteligente de comprobantes físicos utilizando IA
-                    multimodal para extraer monto, fecha y categoría
-                    automáticamente.
-                  </p>
-                </div>
-
-                <div className="bg-gray-800/60 p-4 rounded-2xl border border-gray-700/60 space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-purple-400">
-                      v2.3.0 • Julio 2026
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm text-white">
-                    📥 Exportaciones PDF / Excel & Cierres de Caja
-                  </h4>
-                  <p className="text-xs text-gray-300">
-                    Descarga reportes contables oficiales en PDF/Excel y bloquea
-                    meses cerrados con clave de seguridad.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowNovedades(false)}
-                className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black rounded-xl text-sm transition-all"
-              >
-                ¡Entendido!
-              </button>
-            </div>
-          </div>
-        )}
+        <PaywallModal
+          isOpen={showPaywall}
+          onClose={() => setShowPaywall(false)}
+          userEmail={email}
+          userNombre={nombre}
+        />
       </div>
     </div>
   );
