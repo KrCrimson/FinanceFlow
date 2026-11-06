@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinanceFlow — Sustentación Integral de Software (FD01 - FD07)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="assets/FD01_img_1.png">
+</head>
+<body>
+
+  <!-- Top Navigation & Controls Bar -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <span class="brand-badge">FINANCEFLOW</span>
+      <span class="presentation-title">Sustentación Oficial de Ingeniería de Software (FD01 al FD07)</span>
+    </div>
+
+    <div class="top-bar-center">
+      <button id="btn-prev" class="nav-btn" title="Diapositiva anterior (Flecha Izquierda / Backspace)">◀ Anterior</button>
+      <div class="slide-counter">
+        <span id="current-slide-num">1</span> / <span id="total-slides-num">22</span>
+      </div>
+      <button id="btn-next" class="nav-btn" title="Siguiente diapositiva (Flecha Derecha / Espacio)">Siguiente ▶</button>
+    </div>
+
+    <div class="top-bar-right">
+      <div id="timer-display" class="timer-badge" title="Clic para iniciar/pausar timer. Doble clic para reiniciar.">⏱️ 00:00</div>
+      <button id="btn-grid" class="nav-btn" title="Ver mosaico de diapositivas (G / O)">🗂️ Mosaico</button>
+      <button id="btn-notes" class="nav-btn" title="Notas del orador (S / N)">📝 Notas</button>
+      <button id="btn-fullscreen" class="nav-btn" title="Pantalla completa (F)">🖥️ Pantalla Completa</button>
+      <button id="btn-print" class="nav-btn" title="Imprimir o Exportar a PDF (Ctrl+P / P)">🖨️ PDF</button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div id="progress-fill" class="progress-bar-fill"></div>
+    </div>
+  </header>
+
+  <!-- Stage and 16:9 Slide Deck Area -->
+  <main class="deck-stage">
+    <div class="slide-wrapper">
+
+      <!-- SLIDE 1: PORTADA -->
+      <section class="slide active" id="slide-1">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, rgba(11, 19, 43, 0) 60%);">
+          <div style="display: flex; align-items: center; gap: 24px;">
+            <img src="assets/FD01_img_1.png" alt="Escudo UPT" style="height: 75px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));">
+            <div>
+              <div style="font-size: 14px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 1px;">UNIVERSIDAD PRIVADA DE TACNA • FACULTAD DE INGENIERÍA</div>
+              <div style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Escuela Profesional de Ingeniería de Sistemas • Construcción de Software I</div>
+            </div>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h1 style="font-size: 38px; font-weight: 800; color: var(--text-primary); line-height: 1.15; margin-bottom: 8px;">
+              FinanceFlow: Sistema de Gestión Financiera e IA
+            </h1>
+            <p style="font-size: 18px; color: var(--accent-green); font-weight: 600;">
+              Sustentación de Ingeniería de Software — Trazabilidad Documental FD01 al FD04 y FD07
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <span class="badge-pill badge-cyan">ESTUDIO FACTIBILIDAD (FD01)</span>
+            <span class="badge-pill badge-amber">DOCUMENTO VISIÓN (FD02)</span>
+            <span class="badge-pill badge-green">ESPECIFICACIÓN SRS (FD03)</span>
+            <span class="badge-pill badge-purple">ARQUITECTURA SAD 4+1 (FD04)</span>
+            <span class="badge-pill badge-cyan">METODOLOGÍA SCRUM (FD07)</span>
+          </div>
+
+          <div class="card card-alt" style="padding: 16px 24px; border-color: rgba(245, 158, 11, 0.4);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 12.5px;">
+              <div>
+                <strong style="color: var(--accent-amber);">DOCENTE ASESOR:</strong><br>
+                Mag. Ricardo Eduardo Valcárcel Alvarado
+              </div>
+              <div>
+                <strong style="color: var(--accent-cyan);">EQUIPO DE DESARROLLO (GRUPO 03):</strong><br>
+                • Sebastian Rodrigo Arce Bracamonte (Código: 2019062886)<br>
+                • Brant Antony Chata Choque (Código: 2020067577)
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
+            <span>Versión Oficial 2.0 • Release de Producción</span>
+            <span>Tacna — Perú, 2026</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: HOJA DE RUTA -->
+      <section class="slide" id="slide-2">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">MARCO METODOLÓGICO</div>
+          <h2 class="slide-title">Hoja de Ruta del Proyecto: De la Factibilidad al Despliegue</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content" style="flex-direction: column;">
+          <div class="grid-5" style="flex: 1;">
+            <div class="card">
+              <span class="badge-pill badge-cyan" style="margin-bottom: 8px;">FD01</span>
+              <div class="card-title" style="color: var(--accent-cyan);">Factibilidad</div>
+              <ul class="bullet-list" style="font-size: 11.5px;">
+                <li class="bullet-item">• Diagnóstico de la fricción financiera.</li>
+                <li class="bullet-item">• Evaluación en 5 dimensiones (Técnica, Económica, Operativa, Legal, Ambiental).</li>
+                <li class="bullet-item">• Costos cloud ($20-$43/mes) y mitigación de riesgos.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-amber" style="margin-bottom: 8px;">FD02</span>
+              <div class="card-title" style="color: var(--accent-amber);">Visión</div>
+              <ul class="bullet-list" style="font-size: 11.5px;">
+                <li class="bullet-item">• Oportunidad de mercado PFM en Latam.</li>
+                <li class="bullet-item">• Declaración formal de posicionamiento.</li>
+                <li class="bullet-item">• Delimitación estricta de alcance (inclusiones vs exclusiones de fase 1).</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-green" style="margin-bottom: 8px;">FD03</span>
+              <div class="card-title" style="color: var(--accent-green);">Requisitos SRS</div>
+              <ul class="bullet-list" style="font-size: 11.5px;">
+                <li class="bullet-item">• FinanceFlow Solutions S.A.C.</li>
+                <li class="bullet-item">• Comparativa AS-IS vs TO-BE.</li>
+                <li class="bullet-item">• 22 Requerimientos Funcionales, 14 RNF y 18 Casos de Uso formales.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-purple" style="margin-bottom: 8px;">FD04</span>
+              <div class="card-title" style="color: var(--accent-purple);">Arquitectura SAD</div>
+              <ul class="bullet-list" style="font-size: 11.5px;">
+                <li class="bullet-item">• Modelo 4+1 de Kruchten.</li>
+                <li class="bullet-item">• Vistas: Casos de Uso, Lógica, Implementación, Procesos y Despliegue.</li>
+                <li class="bullet-item">• Monorepo, SDK desacoplado y 8 escenarios de calidad.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-cyan" style="margin-bottom: 8px;">FD07</span>
+              <div class="card-title" style="color: var(--accent-cyan);">Metodología SCRUM</div>
+              <ul class="bullet-list" style="font-size: 11.5px;">
+                <li class="bullet-item">• Roles: PO, SM rotativo, Dev Team.</li>
+                <li class="bullet-item">• Sprints 1 al 7 con Definition of Done.</li>
+                <li class="bullet-item">• 94 tests automatizados (100% pass rate) y resolución de impedimentos.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="card card-alt" style="padding: 12px 20px; border-color: var(--accent-green); margin-top: 10px;">
+            <strong style="color: var(--accent-green); font-size: 11.5px;">TRAZABILIDAD BIDIRECCIONAL INTEGRAL:</strong>
+            <span style="font-size: 11px; color: var(--text-secondary);">
+              Cada necesidad de negocio identificada en FD01 y FD02 se tradujo en especificaciones formales en FD03, se diseñó modularmente bajo el modelo 4+1 en FD04 y se implementó y probó en 7 Sprints continuos en FD07.
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: FD01 - DIAGNÓSTICO Y OBJETIVOS -->
+      <section class="slide" id="slide-3">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">FD01: ESTUDIO DE FACTIBILIDAD</div>
+          <h2 class="slide-title">Diagnóstico de la Situación Actual y Objetivos Estratégicos</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-amber);">⚠️ Diagnóstico del Problema Real</div>
+            <ul class="bullet-list">
+              <li class="bullet-item"><strong>Fricción y Abandono:</strong> El 78% de usuarios que intentan registrar sus gastos en libretas o Excel abandonan antes de 3 semanas por la carga repetitiva de digitación.</li>
+              <li class="bullet-item"><strong>Pérdida de Comprobantes:</strong> Los tickets térmicos físicos pierden legibilidad rápidamente o se extravían, impidiendo reconstruir el histórico de gastos.</li>
+              <li class="bullet-item"><strong>Dispersión de Fondos:</strong> Falta de consolidación entre compras en efectivo, transferencias digitales y tarjetas de débito.</li>
+              <li class="bullet-item"><strong>Carencia de Analítica Predictiva:</strong> Desconocimiento de gastos hormiga y ausencia de alertas tempranas ante sobregiros.</li>
+              <li class="bullet-item"><strong>Impacto Social:</strong> Elevado estrés financiero y baja tasa de ahorro en estudiantes universitarios y jóvenes profesionales en Tacna.</li>
+            </ul>
+          </div>
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-green);">🎯 Objetivos del Sistema FinanceFlow</div>
+            <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--accent-green); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px;">
+              <strong style="color: var(--accent-green); font-size: 11px;">OBJETIVO GENERAL:</strong>
+              <div style="font-size: 11.5px; color: var(--text-primary); margin-top: 2px;">
+                Desarrollar e implementar una plataforma web de gestión financiera personal que integre OCR e Inteligencia Artificial para la captura y clasificación automatizada de gastos.
+              </div>
+            </div>
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">OBJETIVOS ESPECÍFICOS CLAVE:</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item"><strong>1. Lectura OCR Automática:</strong> Microservicio con OpenCV y Tesseract OCR para procesar tickets en <2 segundos.</li>
+              <li class="bullet-item"><strong>2. Clasificador con IA:</strong> Modelo Multinomial Naive Bayes en Python/FastAPI con Silent Training continuo.</li>
+              <li class="bullet-item"><strong>3. Visualización Dinámica:</strong> Dashboard interactivo con Recharts para arqueo diario, flujo de caja y cierre mensual.</li>
+              <li class="bullet-item"><strong>4. Alertas Proactivas:</strong> Sistema de notificaciones ante picos anómalos o proximidad de límites de presupuesto.</li>
+              <li class="bullet-item"><strong>5. Arquitectura Cloud:</strong> Autenticación JWT, soft delete y despliegue seguro con Uptime ≥ 99.5%.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: FD01 - 5 DIMENSIONES FACTIBILIDAD -->
+      <section class="slide" id="slide-4">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">FD01: ESTUDIO DE FACTIBILIDAD</div>
+          <h2 class="slide-title">Evaluación Multidimensional de Factibilidad (Las 5 Dimensiones)</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="col-half" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="card" style="padding: 12px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-green);">1. FACTIBILIDAD TÉCNICA</span>
+                <span class="badge-pill badge-green">100% VIABLE</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Stack de alta madurez: Node.js/Express, Python/FastAPI, React.js/Vite y MongoDB Atlas. Motores consolidados: Tesseract OCR y Scikit-learn.
+              </p>
+            </div>
+            <div class="card" style="padding: 12px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-cyan);">2. FACTIBILIDAD ECONÓMICA</span>
+                <span class="badge-pill badge-cyan">ALTA RENTABILIDAD</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Costo mensual de infraestructura en la nube sumamente bajo ($20 - $43/mes). Inversión amortizable en corto plazo con alto ROI social y económico.
+              </p>
+            </div>
+            <div class="card" style="padding: 12px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-amber);">3. FACTIBILIDAD OPERATIVA</span>
+                <span class="badge-pill badge-amber">ADOPCIÓN INMEDIATA</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Curva de aprendizaje inferior a 5 minutos. Interfaz intuitiva y responsive pensada para usuarios sin formación técnica ni contable.
+              </p>
+            </div>
+          </div>
+          <div class="col-half" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="card" style="padding: 12px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-purple);">4. FACTIBILIDAD LEGAL</span>
+                <span class="badge-pill badge-purple">CUMPLIMIENTO TOTAL</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Alineado estrictamente a la Ley N° 29733 (Protección de Datos Personales del Perú). Hashing bcrypt, tokens JWT efímeros y borrado lógico seguro.
+              </p>
+            </div>
+            <div class="card" style="padding: 12px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-green);">5. FACTIBILIDAD AMBIENTAL</span>
+                <span class="badge-pill badge-green">GREEN IT / ZERO PAPER</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Filosofía de cero papel. Reducción de la exposición humana y desecho de tickets térmicos con Bisfenol A (BPA) altamente contaminantes.
+              </p>
+            </div>
+            <div class="card card-alt" style="padding: 14px 18px; border-color: var(--accent-green);">
+              <div style="font-size: 11px; font-weight: 800; color: var(--accent-green); margin-bottom: 4px;">DICTAMEN FORMAL DEL INFORME FD01:</div>
+              <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">PROYECTO PLENAMENTE VIABLE EN LAS 5 DIMENSIONES</div>
+              <p style="font-size: 10.5px; color: var(--text-muted); line-height: 1.4;">
+                Se autorizó el paso inmediato al Documento de Visión (FD02) y Requerimientos (FD03) asegurando soporte técnico, financiero y operativo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: FD01 - COSTOS Y RIESGOS -->
+      <section class="slide" id="slide-5">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">FD01: ESTUDIO DE FACTIBILIDAD</div>
+          <h2 class="slide-title">Presupuesto Operativo Cloud y Matriz de Riesgos Mitigados</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-cyan);">💰 Costos Cloud Mensuales (Producción)</div>
+            <table class="trace-table" style="margin-bottom: 12px;">
+              <thead>
+                <tr>
+                  <th>Componente</th>
+                  <th>Servicio Cloud</th>
+                  <th>Costo Mensual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Frontend SPA</td>
+                  <td>Vercel CDN Edge</td>
+                  <td>USD $0 - $20</td>
+                </tr>
+                <tr>
+                  <td>Backend API</td>
+                  <td>Render Web Service (Node.js)</td>
+                  <td>USD $0 - $7</td>
+                </tr>
+                <tr>
+                  <td>Microservicio ML</td>
+                  <td>Render Web Service (FastAPI)</td>
+                  <td>USD $0 - $7</td>
+                </tr>
+                <tr>
+                  <td>Base de Datos</td>
+                  <td>MongoDB Atlas M0/M10</td>
+                  <td>USD $0 - $9</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="stat-box" style="margin-top: auto; border-color: var(--accent-green);">
+              <span class="stat-val">$20.00 - $43.00 / mes</span>
+              <span class="stat-label">Presupuesto Operativo Total en Producción</span>
+              <span class="stat-sub">Inversión de Desarrollo: 120 hrs x $4.50 = $540.00 USD (S/. 12,000 global)</span>
+            </div>
+          </div>
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-red);">🛡️ Matriz de Riesgos y Mitigaciones Clave</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item">
+                <strong style="color: var(--accent-amber);">Baja nitidez en fotos de comprobantes [ALTO]:</strong><br>
+                <em>Mitigación:</em> Pipeline OpenCV con umbralización adaptativa de Otsu, escala de grises y corrección de perspectiva antes del OCR.
+              </li>
+              <li class="bullet-item">
+                <strong style="color: var(--accent-amber);">Deriva del modelo de clasificación [MEDIO]:</strong><br>
+                <em>Mitigación:</em> Silent Training supervisado por las confirmaciones del usuario con validación de threshold probabilístico.
+              </li>
+              <li class="bullet-item">
+                <strong style="color: var(--accent-red);">Latencia por Cold Start en Render Free [ALTO]:</strong><br>
+                <em>Mitigación:</em> Tareas periódicas de Keep-Alive HTTP para mantener los contenedores calientes, reduciendo el inicio de 45s a <400ms.
+              </li>
+              <li class="bullet-item">
+                <strong style="color: var(--accent-red);">Brechas de seguridad en datos contables [CRÍTICO]:</strong><br>
+                <em>Mitigación:</em> Cifrado de contraseñas con bcrypt (10 salt rounds), autenticación stateless con JWT y headers Helmet.js.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: FD02 - VISIÓN Y POSICIONAMIENTO -->
+      <section class="slide" id="slide-6">
+        <div class="slide-header">
+          <div class="slide-tag tag-amber">FD02: DOCUMENTO DE VISIÓN</div>
+          <h2 class="slide-title">Propósito del Producto, Mercado y Declaración de Posicionamiento</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-two-thirds">
+            <div class="card-title" style="color: var(--accent-amber);">🎯 Declaración Formal de Posicionamiento</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11.5px;">
+              <div><strong style="color: var(--accent-cyan);">Para:</strong> Jóvenes profesionales, egresados y estudiantes universitarios que necesitan ordenar sus finanzas y reducir el estrés financiero.</div>
+              <div><strong style="color: var(--accent-cyan);">Que tienen el problema de:</strong> La pérdida de comprobantes, la inconsistencia del registro manual y la falta de tiempo para categorizar gastos.</div>
+              <div><strong style="color: var(--accent-cyan);">El producto FinanceFlow es:</strong> Una plataforma web inteligente de gestión financiera personal (Personal Finance Management - PFM).</div>
+              <div><strong style="color: var(--accent-cyan);">Que ofrece:</strong> Captura instantánea de gastos por OCR, sugerencia predictiva de categorías con IA, balance en tiempo real, arqueo diario y cierre mensual contable.</div>
+              <div><strong style="color: var(--accent-cyan);">A diferencia de:</strong> Hojas de cálculo complejas (Excel) o aplicaciones bancarias aisladas que no permiten unificar efectivo y comprobantes físicos.</div>
+              <div><strong style="color: var(--accent-green);">Nuestra ventaja competitiva:</strong> Cero fricción mediante digitalización asistida por IA y aprendizaje continuo (Silent Training) adaptado a los hábitos del usuario.</div>
+            </div>
+          </div>
+          <div class="card col-third">
+            <div class="card-title" style="color: var(--accent-green);">👥 Perfiles de Usuarios Clave</div>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 11px;">
+              <div>
+                <strong style="color: var(--text-primary);">👤 Usuario Final:</strong><br>
+                Estudiante o profesional que registra movimientos de alimentación, transporte y ocio de forma veloz.
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">⚙️ Administrador Cloud:</strong><br>
+                Monitorea el estado de Vercel/Render, métricas de latencia y analiza logs del sistema.
+              </div>
+              <div class="stat-box" style="margin-top: 6px; border-color: var(--accent-amber);">
+                <span class="stat-val" style="color: var(--accent-amber);">+25% Anual</span>
+                <span class="stat-label">Crecimiento del Mercado PFM</span>
+                <span class="stat-sub">Expansión acelerada de soluciones fintech personales en Latinoamérica</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: FD02 - ALCANCE Y ATRIBUTOS -->
+      <section class="slide" id="slide-7">
+        <div class="slide-header">
+          <div class="slide-tag tag-amber">FD02: DOCUMENTO DE VISIÓN</div>
+          <h2 class="slide-title">Límites del Alcance: Inclusiones, Exclusiones y Criterios de Éxito</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-green);">✅ Inclusiones Confirmadas (Dentro del Alcance)</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item"><strong>Acceso Web Universal:</strong> SPA responsive operable en desktop, tablet y móviles sin descargas.</li>
+              <li class="bullet-item"><strong>OCR Automatizado:</strong> Extracción de total, fecha y proveedor desde fotos de comprobantes.</li>
+              <li class="bullet-item"><strong>Clasificación con IA:</strong> Modelo Naive Bayes reentrenable dinámicamente con Silent Training.</li>
+              <li class="bullet-item"><strong>Dashboard y Reportes:</strong> Visualizaciones interactivas con Recharts para balances y tendencias.</li>
+              <li class="bullet-item"><strong>Control Contable Riguroso:</strong> Arqueo diario de caja con semáforo y cierre mensual protegido con contraseña.</li>
+              <li class="bullet-item"><strong>Planificador de Metas:</strong> Cálculo del tiempo necesario de ahorro mensual para compras programadas.</li>
+            </ul>
+          </div>
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-red);">❌ Límites Explícitos (Exclusiones de Fase 1)</div>
+            <ul class="bullet-list" style="font-size: 11px; margin-bottom: 12px;">
+              <li class="bullet-item"><strong>No Apps Nativas iOS/Android:</strong> Se prioriza la Web App PWA para maximizar compatibilidad y agilidad de entrega.</li>
+              <li class="bullet-item"><strong>No Integración Bancaria Directa:</strong> Se evita la burocracia de Open Banking y costos de token bancario regulado en fase 1.</li>
+              <li class="bullet-item"><strong>No Módulo de Inversiones Bursátiles:</strong> Foco exclusivo en finanzas personales operativas (ingresos, gastos y ahorros).</li>
+            </ul>
+            <div class="card card-alt" style="padding: 10px 14px; border-color: var(--accent-cyan); margin-top: auto;">
+              <strong style="color: var(--accent-cyan); font-size: 11px;">CRITERIOS DE CALIDAD COMPROMETIDOS:</strong>
+              <div style="font-size: 10.5px; color: var(--text-secondary); margin-top: 4px;">
+                • Disponibilidad Uptime: ≥ 99.5% mensual garantizado.<br>
+                • Inmediatez: Latencia CRUD API < 300ms; procesamiento OCR < 3s.<br>
+                • Tasa de Éxito de Tareas: ≥ 90% sin capacitación técnica.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: FD03 - EMPRESA Y AS-IS vs TO-BE -->
+      <section class="slide" id="slide-8">
+        <div class="slide-header">
+          <div class="slide-tag tag-green">FD03: ESPECIFICACIÓN DE REQUISITOS (SRS)</div>
+          <h2 class="slide-title">Identidad Corporativa y Rediseño de Procesos AS-IS vs TO-BE</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-green);">🏢 FinanceFlow Solutions S.A.C.</div>
+            <div style="font-size: 11px; display: flex; flex-direction: column; gap: 8px;">
+              <div><strong style="color: var(--accent-cyan);">Misión:</strong> "Desarrollar y mantener soluciones de software financiero de alta calidad que permitan a los usuarios tomar decisiones informadas para mejorar su bienestar económico."</div>
+              <div><strong style="color: var(--accent-cyan);">Visión:</strong> "Ser la plataforma de referencia en gestión financiera personal en Latinoamérica, empoderando a las personas mediante herramientas digitales accesibles e inteligentes."</div>
+              <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; border: 1px solid var(--border-card);">
+                <strong style="color: var(--accent-amber);">Organigrama Operativo:</strong><br>
+                • Dirección General & Product Ownership<br>
+                • Liderazgo Técnico & Arquitectura Cloud (Sebastian Arce)<br>
+                • Ingeniería de Datos & Pipeline Machine Learning (Brant Chata)<br>
+                • Aseguramiento de Calidad y Testing Automatizado
+              </div>
+            </div>
+            <div style="margin-top: auto; font-size: 11px; color: var(--accent-green);">
+              <strong>Transformación Radical:</strong> Reducción del tiempo de registro de 15 minutos en Excel a < 3 segundos con FinanceFlow.
+            </div>
+          </div>
+          <div class="card col-half" style="padding: 10px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px; padding-left: 6px;">
+              DIAGRAMA DEL PROCESO PROPUESTO (TO-BE AUTOMATIZADO)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/FD03_img_6.png" alt="Proceso Propuesto TO-BE">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: FD03 - REQUERIMIENTOS FUNCIONALES (RF-01 a RF-22) -->
+      <section class="slide" id="slide-9">
+        <div class="slide-header">
+          <div class="slide-tag tag-green">FD03: ESPECIFICACIÓN DE REQUISITOS (SRS)</div>
+          <h2 class="slide-title">Catálogo de Requerimientos Funcionales Priorizados (RF-01 al RF-22)</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="grid-2x2">
+            <div class="card" style="padding: 14px;">
+              <span class="badge-pill badge-cyan">MÓDULO 1</span>
+              <strong style="font-size: 12px; color: var(--accent-cyan);">Autenticación & Seguridad</strong>
+              <ul class="bullet-list" style="font-size: 11px; margin-top: 6px;">
+                <li class="bullet-item">• <strong>RF-01:</strong> Registro de usuario con validaciones Zod.</li>
+                <li class="bullet-item">• <strong>RF-02:</strong> Login con emisión de JWT (TTL 7 días).</li>
+                <li class="bullet-item">• <strong>RF-03:</strong> Recuperación de contraseña por token email.</li>
+                <li class="bullet-item">• <strong>RF-22:</strong> Borrado lógico de cuenta (soft-delete seguro).</li>
+              </ul>
+            </div>
+            <div class="card" style="padding: 14px;">
+              <span class="badge-pill badge-green">MÓDULO 2</span>
+              <strong style="font-size: 12px; color: var(--accent-green);">Transaccional & OCR</strong>
+              <ul class="bullet-list" style="font-size: 11px; margin-top: 6px;">
+                <li class="bullet-item">• <strong>RF-04:</strong> Registro de movimientos de ingreso y egreso.</li>
+                <li class="bullet-item">• <strong>RF-05:</strong> Extracción OCR de datos desde fotos de boletas.</li>
+                <li class="bullet-item">• <strong>RF-06:</strong> Categorías dinámicas ("Otros" personalizable).</li>
+                <li class="bullet-item">• <strong>RF-08:</strong> Desactivación lógica de movimientos transaccionales.</li>
+              </ul>
+            </div>
+            <div class="card" style="padding: 14px;">
+              <span class="badge-pill badge-amber">MÓDULO 3</span>
+              <strong style="font-size: 12px; color: var(--accent-amber);">Analítica, Alertas & Planificador</strong>
+              <ul class="bullet-list" style="font-size: 11px; margin-top: 6px;">
+                <li class="bullet-item">• <strong>RF-09 & 10:</strong> Dashboard con métricas de balance y flujo.</li>
+                <li class="bullet-item">• <strong>RF-11:</strong> Generación automática de alertas de sobregasto.</li>
+                <li class="bullet-item">• <strong>RF-12:</strong> Planificador de compras proyectadas por ahorro.</li>
+                <li class="bullet-item">• <strong>RF-13:</strong> Gráficos interactivos Recharts de balance y categorías.</li>
+              </ul>
+            </div>
+            <div class="card" style="padding: 14px;">
+              <span class="badge-pill badge-purple">MÓDULO 4</span>
+              <strong style="font-size: 12px; color: var(--accent-purple);">Control Contable & Cierres</strong>
+              <ul class="bullet-list" style="font-size: 11px; margin-top: 6px;">
+                <li class="bullet-item">• <strong>RF-16:</strong> Banners recordatorios de arqueo y cierre pendiente.</li>
+                <li class="bullet-item">• <strong>RF-17:</strong> Arqueo diario de caja calculando diferencias en vivo.</li>
+                <li class="bullet-item">• <strong>RF-18:</strong> Cierre mensual formal protegido con contraseña.</li>
+                <li class="bullet-item">• <strong>RF-19:</strong> Bloqueo estricto de transacciones en periodos cerrados.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: FD03 - MOCKUPS REALES -->
+      <section class="slide" id="slide-10">
+        <div class="slide-header">
+          <div class="slide-tag tag-green">FD03: ESPECIFICACIÓN DE REQUISITOS (SRS)</div>
+          <h2 class="slide-title">Casos de Uso Críticos e Interfaces Reales del Sistema</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-third" style="padding: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; text-align: center;">
+              CU-05: DASHBOARD ANALÍTICO
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/FD03_img_19.png" alt="Dashboard Principal">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); text-align: center; margin-top: 4px;">Balance general y gráficos Recharts</div>
+          </div>
+          <div class="card col-third" style="padding: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-amber); margin-bottom: 4px; text-align: center;">
+              CU-14: ARQUEO DIARIO DE CAJA
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/FD03_img_21.png" alt="Arqueo Diario de Caja">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); text-align: center; margin-top: 4px;">Semáforo: Verde (cuadra), Rojo (faltante)</div>
+          </div>
+          <div class="card col-third" style="padding: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-purple); margin-bottom: 4px; text-align: center;">
+              CU-15: CIERRE MENSUAL FORMAL
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/FD03_img_22.png" alt="Cierre Mensual">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); text-align: center; margin-top: 4px;">Bloqueo contable validado con password</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: FD03 - RNF Y DOMINIO -->
+      <section class="slide" id="slide-11">
+        <div class="slide-header">
+          <div class="slide-tag tag-green">FD03: ESPECIFICACIÓN DE REQUISITOS (SRS)</div>
+          <h2 class="slide-title">Requerimientos No Funcionales (RNF) y Modelo del Dominio</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-cyan);">⚙️ Métricas RNF Rigurosas (RNF-01 a RNF-14)</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item">• <strong>RNF-01 Seguridad:</strong> Hashing bcryptjs (10 salt rounds) computado en <300ms.</li>
+              <li class="bullet-item">• <strong>RNF-02 Protección:</strong> 100% de rutas privadas exigen JWT Bearer token válido.</li>
+              <li class="bullet-item">• <strong>RNF-03 Hardening:</strong> Cabeceras HTTP activas con Helmet.js y TLS 1.3 forzado.</li>
+              <li class="bullet-item">• <strong>RNF-06 Rendimiento:</strong> Latencia en operaciones CRUD ≤ 300ms en carga normal.</li>
+              <li class="bullet-item">• <strong>RNF-07 Concurrencia:</strong> Soporte verificado para 100 peticiones simultáneas sin fallo.</li>
+              <li class="bullet-item">• <strong>RNF-09 Usabilidad:</strong> Diseño 100% responsivo desde 320px hasta monitores 4K.</li>
+              <li class="bullet-item">• <strong>RNF-14 Disponibilidad:</strong> Uptime mensual garantizado superior al 99.0%.</li>
+            </ul>
+          </div>
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; padding-left: 6px;">
+              MODELO DE CLASES DEL DOMINIO DEL NEGOCIO
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/FD03_img_40.png" alt="Modelo de Dominio">
+            </div>
+            <div style="font-size: 10px; color: var(--text-muted); padding: 4px 6px;">
+              Composición 1 a N: Usuario es dueño de Movimientos, Planes de Ahorro y Arqueos.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: FD04 - SAD Y CASOS DE USO (4+1) -->
+      <section class="slide" id="slide-12">
+        <div class="slide-header">
+          <div class="slide-tag tag-purple">FD04: ARQUITECTURA DE SOFTWARE (SAD)</div>
+          <h2 class="slide-title">Fundamentos Arquitectónicos y Vista de Casos de Uso (Modelo 4+1)</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-purple);">🏛️ El Modelo de Vistas 4+1 de Kruchten</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item"><strong>Adopción del Estándar:</strong> Estructuración formal según el estándar de Philippe Kruchten para satisfacer las perspectivas de usuarios, desarrolladores, arquitectos y operadores.</li>
+              <li class="bullet-item"><strong>Vista de Casos de Uso (Eje Central):</strong> Articula el valor de negocio y justifica la existencia de todos los componentes de las otras cuatro vistas.</li>
+              <li class="bullet-item"><strong>Principios Rectores Aplicados:</strong>
+                <br>• Separación de responsabilidades (SoC).
+                <br>• Arquitectura sin estado (Stateless REST API).
+                <br>• Microservicios especializados desacoplados (Node.js + Python FastAPI).
+                <br>• Consumo unificado mediante SDK cliente tipado.
+              </li>
+            </ul>
+          </div>
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; padding-left: 6px;">
+              DIAGRAMA DE CASOS DE USO ARQUITECTÓNICO (VISTA 4+1)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_casos_uso_4_1.png" alt="Casos de Uso Arquitectónicos">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 13: FD04 - SUBSISTEMAS Y SECUENCIA -->
+      <section class="slide" id="slide-13">
+        <div class="slide-header">
+          <div class="slide-tag tag-purple">FD04: ARQUITECTURA DE SOFTWARE (SAD)</div>
+          <h2 class="slide-title">Vista Lógica: Diagrama de Subsistemas y Dinámica de Secuencia</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; padding-left: 6px;">
+              DIAGRAMA DE SUBSISTEMAS (PAQUETES DESACOPLADOS)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_subsistemas_paquetes.png" alt="Diagrama de Paquetes">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Flujo: Frontend -> SDK Balance -> Controllers -> Services -> Models -> ML FastAPI
+            </div>
+          </div>
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-amber); margin-bottom: 4px; padding-left: 6px;">
+              SECUENCIA DE DISEÑO: CIERRE MENSUAL CONTABLE
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_secuencia_cierre_mensual.png" alt="Secuencia Cierre Mensual">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Verificación de credencial, consolidación de saldo y bloqueo transaccional estricto.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 14: FD04 - CLASES Y MONGODB ATLAS -->
+      <section class="slide" id="slide-14">
+        <div class="slide-header">
+          <div class="slide-tag tag-purple">FD04: ARQUITECTURA DE SOFTWARE (SAD)</div>
+          <h2 class="slide-title">Vista Lógica: Diagrama de Clases del Sistema y Esquema NoSQL</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; padding-left: 6px;">
+              DIAGRAMA DE CLASES DEL SISTEMA
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_clases_sistema.png" alt="Diagrama de Clases">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Estructura estática: AuthController, MovementService, MLService y modelos Mongoose.
+            </div>
+          </div>
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; padding-left: 6px;">
+              DIAGRAMA DE BASE DE DATOS (MONGODB ATLAS)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_bd_mongodb.png" alt="Esquema MongoDB Atlas">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Colecciones users, movimientos, arqueocajas y cierresmensuales con índices y soft delete.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 15: FD04 - MONOREPO Y COMPONENTES -->
+      <section class="slide" id="slide-15">
+        <div class="slide-header">
+          <div class="slide-tag tag-purple">FD04: ARQUITECTURA DE SOFTWARE (SAD)</div>
+          <h2 class="slide-title">Vista de Implementación: Monorepo y Diagrama de Componentes</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-amber); margin-bottom: 4px; padding-left: 6px;">
+              ESTRUCTURA FÍSICA MONOREPO (PAQUETES DE CÓDIGO)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_arquitectura_monorepo.png" alt="Monorepo Paquetes">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Organización: frontend/, backend/, ml_backend/, sdk/ y admin-dashboard/
+            </div>
+          </div>
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; padding-left: 6px;">
+              DIAGRAMA DE COMPONENTES DEL SISTEMA
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_componentes_sistema.png" alt="Componentes del Sistema">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Desacoplamiento tipado: El frontend consume la API exclusivamente vía @financeflow/sdk
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 16: FD04 - PIPELINE OCR Y SILENT TRAINING -->
+      <section class="slide" id="slide-16">
+        <div class="slide-header">
+          <div class="slide-tag tag-purple">FD04: ARQUITECTURA DE SOFTWARE (SAD)</div>
+          <h2 class="slide-title">Vista de Procesos: Pipeline de OCR Asistido y Silent Training IA</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; padding-left: 6px;">
+              ACTIVIDAD 1: OCR Y CLASIFICACIÓN PREDICTIVA (SÍNCRONA)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_actividad_ocr.png" alt="Pipeline OCR">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Foto -> OpenCV -> Tesseract OCR -> Parsing Regex -> Naive Bayes -> Autocompletado < 2s.
+            </div>
+          </div>
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-amber); margin-bottom: 4px; padding-left: 6px;">
+              ACTIVIDAD 2: SILENT TRAINING ASÍNCRONO EN BACKGROUND
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_actividad_silent_training.png" alt="Silent Training">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Corrección del usuario -> Encolado de muestra -> Reentrenamiento continuo sin bloquear la UI.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 17: FD04 - DESPLIEGUE CLOUD Y CALIDAD -->
+      <section class="slide" id="slide-17">
+        <div class="slide-header">
+          <div class="slide-tag tag-purple">FD04: ARQUITECTURA DE SOFTWARE (SAD)</div>
+          <h2 class="slide-title">Vista de Despliegue Físico y Escenarios de Atributos de Calidad</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half" style="padding: 8px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; padding-left: 6px;">
+              DIAGRAMA DE DESPLIEGUE CLOUD (VISTA FÍSICA)
+            </div>
+            <div class="diagram-frame">
+              <img src="assets/diagrama_despliegue_cloud.png" alt="Despliegue Cloud">
+            </div>
+            <div style="font-size: 9.5px; color: var(--text-muted); padding: 4px 6px;">
+              Browser -> Vercel Edge CDN -> Render (Node.js API) -> Render (FastAPI ML) -> MongoDB Atlas
+            </div>
+          </div>
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-green);">📋 Escenarios de Calidad Validados</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item"><strong>Mitigación de Cold Start:</strong> Ping periódico a Render mantiene activos los contenedores Docker, reduciendo latencias de 45s a < 400ms.</li>
+              <li class="bullet-item"><strong>Carga Concurrente:</strong> Test de estrés con 100 peticiones/s arrojó 0% de errores y latencia media de 245ms.</li>
+              <li class="bullet-item"><strong>Mantenibilidad vía SDK:</strong> La incorporación de nuevos endpoints backend se integra en el SDK en <1 hora sin tocar componentes visuales.</li>
+              <li class="bullet-item"><strong>Auditoría & Soft Delete:</strong> Flag <code>activo: false</code> preserva el 100% de la integridad de los datos contables históricos.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 18: FD07 - METODOLOGÍA SCRUM Y DOD -->
+      <section class="slide" id="slide-18">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">FD07: METODOLOGÍA ÁGIL SCRUM</div>
+          <h2 class="slide-title">Organización del Equipo, Ceremonias y Definition of Done (DoD)</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content" style="flex-direction: column;">
+          <div class="grid-4" style="flex: 1;">
+            <div class="card">
+              <span class="badge-pill badge-amber">ROL 1</span>
+              <strong style="color: var(--accent-amber); font-size: 12px;">Product Owner</strong>
+              <p style="font-size: 11px; margin-top: 6px; color: var(--text-secondary); line-height: 1.4;">
+                Priorización del Product Backlog, alineación con requerimientos académicos de la cátedra y validación de criterios de aceptación de negocio.
+              </p>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-cyan">ROL 2</span>
+              <strong style="color: var(--accent-cyan); font-size: 12px;">Scrum Master</strong>
+              <p style="font-size: 11px; margin-top: 6px; color: var(--text-secondary); line-height: 1.4;">
+                Rol rotativo (S. Arce / B. Chata) enfocado en remoción de bloqueos técnicos (CORS, límites de RAM en Render) y facilitación de ceremonias.
+              </p>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-green">ROL 3</span>
+              <strong style="color: var(--accent-green); font-size: 12px;">Equipo de Desarrollo</strong>
+              <p style="font-size: 11px; margin-top: 6px; color: var(--text-secondary); line-height: 1.4;">
+                Sebastian Arce y Brant Chata: Equipo multidisciplinario autoorganizado (Full-Stack, Cloud & Data/ML) responsable de la entrega continua.
+              </p>
+            </div>
+            <div class="card">
+              <span class="badge-pill badge-purple">CEREMONIAS</span>
+              <strong style="color: var(--accent-purple); font-size: 12px;">Eventos del Sprint</strong>
+              <p style="font-size: 11px; margin-top: 6px; color: var(--text-secondary); line-height: 1.4;">
+                Sprints de 1-2 semanas, Sprint Planning con Story Points (Fibonacci), Daily Standups focalizadas, Sprint Reviews y Retrospectivas de mejora.
+              </p>
+            </div>
+          </div>
+          <div class="card card-alt" style="padding: 12px 18px; border-color: var(--accent-green); margin-top: 10px;">
+            <strong style="color: var(--accent-green); font-size: 11.5px;">CRITERIOS DE LA DEFINITION OF DONE (DoD) EN FINANCEFLOW:</strong>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>✅ 1. Código refactorizado y formateado según ESLint/Prettier y PEP8.</div>
+              <div>✅ 2. Suite de pruebas unitarias e integración en verde con Jest y Pytest al 100%.</div>
+              <div>✅ 3. Pull Request revisado y aprobado formalmente por el compañero de equipo.</div>
+              <div>✅ 4. Despliegue verificado en entornos cloud y documentación técnica actualizada.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 19: FD07 - SPRINTS Y GANTT 4K -->
+      <section class="slide" id="slide-19">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">FD07: METODOLOGÍA ÁGIL SCRUM</div>
+          <h2 class="slide-title">Cronograma Ejecutivo de Desarrollo: Evolución de Sprints 1 al 7</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content" style="flex-direction: column;">
+          <div class="card" style="padding: 8px; flex: 1;">
+            <div class="diagram-frame">
+              <img src="assets/cronograma_financeflow.png" alt="Cronograma Gantt FinanceFlow">
+            </div>
+          </div>
+          <div class="grid-5" style="margin-top: 8px;">
+            <div class="card" style="padding: 8px 10px;">
+              <strong style="font-size: 10.5px; color: var(--accent-green);">S1-S2: Core & Auth</strong>
+              <div style="font-size: 9.5px; color: var(--text-muted);">MongoDB Atlas, JWT, Mongoose, CRUD básico.</div>
+            </div>
+            <div class="card" style="padding: 8px 10px;">
+              <strong style="font-size: 10.5px; color: var(--accent-green);">S3-S4: Soft Delete & UI</strong>
+              <div style="font-size: 9.5px; color: var(--text-muted);">Borrado lógico, Recharts, Dashboard y Alertas.</div>
+            </div>
+            <div class="card" style="padding: 8px 10px;">
+              <strong style="font-size: 10.5px; color: var(--accent-green);">S5: IA & Visión OCR</strong>
+              <div style="font-size: 9.5px; color: var(--text-muted);">OpenCV, Tesseract OCR y Naive Bayes continuo.</div>
+            </div>
+            <div class="card" style="padding: 8px 10px;">
+              <strong style="font-size: 10.5px; color: var(--accent-green);">S6: Arqueo & Cierres</strong>
+              <div style="font-size: 9.5px; color: var(--text-muted);">Arqueo de caja con semáforo y Cierre Mensual.</div>
+            </div>
+            <div class="card" style="padding: 8px 10px;">
+              <strong style="font-size: 10.5px; color: var(--accent-amber);">S7: Hardening & Tests</strong>
+              <div style="font-size: 9.5px; color: var(--text-muted);">Refactorización SDK y 94 pruebas Jest/Pytest.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 20: FD07 - TESTING Y CALIDAD -->
+      <section class="slide" id="slide-20">
+        <div class="slide-header">
+          <div class="slide-tag tag-cyan">FD07: METODOLOGÍA ÁGIL SCRUM</div>
+          <h2 class="slide-title">Aseguramiento de Calidad, Testing Automatizado e Impedimentos</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-green);">🧪 Suite de 94 Pruebas Automatizadas</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item">• <strong>42 Pruebas Unitarias Backend (Jest):</strong> Autenticación, JWT, middleware de seguridad y esquemas Mongoose.</li>
+              <li class="bullet-item">• <strong>24 Pruebas de SDK Balance:</strong> Validación de HttpClient, adaptadores y manejo de excepciones.</li>
+              <li class="bullet-item">• <strong>18 Pruebas de IA y ML (Pytest):</strong> Endpoints FastAPI, preprocesamiento de imagen y parsing regex.</li>
+              <li class="bullet-item">• <strong>10 Pruebas E2E de Integración:</strong> Flujo completo de login, carga de comprobante y cierre mensual.</li>
+            </ul>
+            <div class="stat-box" style="margin-top: auto; border-color: var(--accent-green);">
+              <span class="stat-val">100% Pass Rate</span>
+              <span class="stat-label">94 Tests Automatizados en Verde</span>
+              <span class="stat-sub">Ejecución total en < 14 segundos en el pipeline de CI/CD</span>
+            </div>
+          </div>
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-amber);">🛠️ Gestión de Impedimentos Técnicos (SM)</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item">
+                <strong style="color: var(--accent-amber);">Bloqueo de CORS cruzado Vercel-Render [ALTO]:</strong><br>
+                <em>Solución:</em> Middleware CORS dinámico en Express con whitelist estricta y cabeceras autorizadas.
+              </li>
+              <li class="bullet-item">
+                <strong style="color: var(--accent-red);">Picos de RAM por Tesseract en Render [CRÍTICO]:</strong><br>
+                <em>Solución:</em> Optimización de imagen Docker y preprocesamiento que escala las fotos antes del OCR.
+              </li>
+              <li class="bullet-item">
+                <strong style="color: var(--accent-cyan);">Acoplamiento de controladores frontend [MEDIO]:</strong><br>
+                <em>Solución:</em> Migración total al paquete desacoplado <code>@financeflow/sdk</code>, unificando tipados y contratos de llamada.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 21: TRAZABILIDAD INTEGRAL -->
+      <section class="slide" id="slide-21">
+        <div class="slide-header">
+          <div class="slide-tag tag-green">SÍNTESIS DE INGENIERÍA</div>
+          <h2 class="slide-title">Matriz de Trazabilidad Cruzada: Desde la Necesidad al Código</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content" style="flex-direction: column;">
+          <div class="grid-4" style="margin-bottom: 10px;">
+            <div class="stat-box" style="border-color: var(--accent-green);">
+              <span class="stat-val">-85%</span>
+              <span class="stat-label">Tiempo de Registro</span>
+              <span class="stat-sub">Frente al ingreso manual en Excel</span>
+            </div>
+            <div class="stat-box" style="border-color: var(--accent-cyan);">
+              <span class="stat-val">> 90%</span>
+              <span class="stat-label">Precisión del Clasificador</span>
+              <span class="stat-sub">Naive Bayes + Silent Training</span>
+            </div>
+            <div class="stat-box" style="border-color: var(--accent-amber);">
+              <span class="stat-val">94 Tests</span>
+              <span class="stat-label">100% de Aprobación</span>
+              <span class="stat-sub">Cobertura de pruebas en Jest y Pytest</span>
+            </div>
+            <div class="stat-box" style="border-color: var(--accent-purple);">
+              <span class="stat-val">99.7%</span>
+              <span class="stat-label">Uptime Cloud</span>
+              <span class="stat-sub">Vercel + Render + MongoDB Atlas</span>
+            </div>
+          </div>
+          <div class="card" style="padding: 12px; flex: 1;">
+            <table class="trace-table">
+              <thead>
+                <tr>
+                  <th>Módulo del Sistema</th>
+                  <th>Diagnóstico FD01/FD02</th>
+                  <th>Requerimientos FD03</th>
+                  <th>Arquitectura FD04</th>
+                  <th>Sprint SCRUM FD07</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Seguridad & Auth</strong></td>
+                  <td>Protección datos (Ley 29733)</td>
+                  <td>RF-01 a RF-03, RF-22, CU-01</td>
+                  <td>Secuencia 1, JWT Bearer, Bcrypt</td>
+                  <td>Sprint 1 (100% Done)</td>
+                </tr>
+                <tr>
+                  <td><strong>Transaccional & OCR</strong></td>
+                  <td>Fricción en registro manual</td>
+                  <td>RF-04 a RF-08, CU-06, CU-07</td>
+                  <td>Actividad 1, Tesseract OCR</td>
+                  <td>Sprint 2 y 5 (100% Done)</td>
+                </tr>
+                <tr>
+                  <td><strong>Clasificador IA / ML</strong></td>
+                  <td>Categorización automática</td>
+                  <td>RF-06, RF-11, PatronClasif.</td>
+                  <td>Actividad 2, Silent Training</td>
+                  <td>Sprint 5 (100% Done)</td>
+                </tr>
+                <tr>
+                  <td><strong>Arqueo y Cierres</strong></td>
+                  <td>Control estricto de efectivo</td>
+                  <td>RF-16 a RF-20, CU-14, CU-15</td>
+                  <td>Secuencia 3, CierreMensual</td>
+                  <td>Sprint 6 (100% Done)</td>
+                </tr>
+                <tr>
+                  <td><strong>SDK & Hardening</strong></td>
+                  <td>Mantenibilidad y testing</td>
+                  <td>RNF-06, RNF-07, RNF-13</td>
+                  <td>Vista Implementación Monorepo</td>
+                  <td>Sprint 7 (100% Done)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 22: CONCLUSIONES Y CIERRE -->
+      <section class="slide" id="slide-22">
+        <div class="slide-header">
+          <div class="slide-tag tag-green">EVALUACIÓN FINAL</div>
+          <h2 class="slide-title">Conclusiones de Ingeniería, Trabajo Futuro y Cierre</h2>
+          <div class="slide-divider"></div>
+        </div>
+        <div class="slide-content">
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-green);">🏆 Conclusiones Principales</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item"><strong>Factibilidad Comprobada:</strong> Se demostró el 100% de viabilidad en las 5 dimensiones (técnica, económica, operativa, legal y ambiental) del documento FD01.</li>
+              <li class="bullet-item"><strong>Arquitectura Resiliente 4+1:</strong> El desacoplamiento en monorepo con el SDK Balance garantiza que el frontend y los microservicios evolucionen de forma independiente.</li>
+              <li class="bullet-item"><strong>Eliminación de la Fricción Real:</strong> La combinación de OCR y Machine Learning resolvió el motivo principal de abandono de los usuarios.</li>
+              <li class="bullet-item"><strong>Disciplina Metodológica:</strong> El ciclo ágil de 7 sprints con Definition of Done estricta resultó en un release estable con 94 tests en verde.</li>
+            </ul>
+          </div>
+          <div class="card col-half">
+            <div class="card-title" style="color: var(--accent-amber);">🚀 Líneas de Trabajo Futuro (Roadmap)</div>
+            <ul class="bullet-list" style="font-size: 11px;">
+              <li class="bullet-item"><strong>App Móvil con React Native:</strong> Reutilización directa del paquete <code>@financeflow/sdk</code> para compilar apps nativas iOS y Android.</li>
+              <li class="bullet-item"><strong>Integración Open Banking:</strong> Conexión automatizada con entidades bancarias locales para conciliar saldos de cuentas de ahorro.</li>
+              <li class="bullet-item"><strong>Asesor Financiero con Modelos LLM:</strong> Incorporación de agentes conversacionales para recomendaciones personalizadas de ahorro e inversión.</li>
+            </ul>
+            <div class="card card-alt" style="padding: 10px 14px; border-color: var(--accent-cyan); margin-top: auto;">
+              <strong style="color: var(--accent-cyan); font-size: 11px;">UNIVERSIDAD PRIVADA DE TACNA • EPIS (2026)</strong>
+              <div style="font-size: 10.5px; color: var(--text-secondary); margin-top: 2px;">
+                Agradecimiento especial al Asesor Mag. Ricardo Eduardo Valcárcel Alvarado.<br>
+                Autores: Sebastian Rodrigo Arce Bracamonte & Brant Antony Chata Choque.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Speaker Notes Drawer (Bottom) -->
+  <aside id="notes-drawer" class="notes-drawer">
+    <div class="notes-header">
+      <span class="notes-title">📝 Notas del Orador (Diapositiva Actual)</span>
+      <button id="btn-close-notes" class="nav-btn" style="padding: 2px 8px; font-size: 11px;">Cerrar ✕</button>
+    </div>
+    <div id="notes-content" class="notes-content">
+      Cargando notas...
+    </div>
+  </aside>
+
+  <!-- Overview Grid Modal (Mosaico) -->
+  <div id="modal-grid" class="modal-grid">
+    <div class="modal-grid-header">
+      <div class="modal-title">🗂️ Mosaico de Diapositivas (22 Pantallas)</div>
+      <button id="btn-close-grid" class="nav-btn">Cerrar ✕ (Esc)</button>
+    </div>
+    <div id="modal-grid-container" class="modal-grid-container">
+      <!-- Generated dynamically by app.js -->
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

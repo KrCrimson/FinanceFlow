@@ -1,0 +1,114 @@
+@startuml Diagrama_Paquetes_FinanceFlow
+!theme plain
+skinparam backgroundColor #070B19
+skinparam defaultFontName "Segoe UI"
+skinparam roundcorner 10
+skinparam packageStyle rectangle
+
+skinparam package {
+    BackgroundColor #131E38
+    BorderColor #223254
+    FontColor #FFFFFF
+    FontSize 12
+    FontStyle bold
+}
+
+skinparam arrow {
+    Color #06B6D4
+    FontColor #E2E8F0
+    FontSize 10
+}
+
+package "Capa 1: Clientes y Presentación" as Capa1 #0D152D {
+    package "frontend/ (React 18 SPA)" as PkgFrontend #131E38 {
+        [pages/ (Dashboard, Reports, Profile, Arqueo)]
+        [components/ (Recharts, Paywall, UI)]
+        [hooks/ (useImageToMovimiento, useAuth)]
+        [context/ (AuthContext, ThemeContext)]
+    }
+
+    package "mobile/ (React Native Expo)" as PkgMobile #131E38 {
+        [screens/ (Dashboard, NewMovement)]
+        [components/ (VoucherScanner)]
+        [navigation/ (AppNavigator)]
+    }
+
+    package "admin-dashboard/ (Observabilidad)" as PkgAdmin #131E38 {
+        [Visor de Logs y Telemetría]
+        [Contador de Peticiones Gemini OCR]
+        [Monitor de Endpoints REST]
+    }
+}
+
+package "Capa 2: SDK Cliente Desacoplado (@financeflow/sdk)" as Capa2 #0D152D {
+    package "sdk/src/ (Core Client)" as PkgSDKCore #142240 {
+        [HttpClient (Axios con JWT & Timeout 20s)]
+        [types/ & DTOs (Movimiento, User, Arqueo)]
+        [ErrorHandler (Normalización HTTP)]
+    }
+
+    package "sdk/adapters/ (Adaptadores)" as PkgAdapters #142240 {
+        [AuthAdapter (login, register, reset)]
+        [MovementsAdapter (CRUD, softDelete)]
+        [CashClosingAdapter (arqueo, cierre)]
+        [ReportsAdapter (métricas, balances)]
+    }
+}
+
+package "Capas 3, 4 y 5: Backend REST API (Node.js & Express)" as CapaBackend #0D152D {
+    package "backend/controllers/ & routes/" as PkgControllers #182548 {
+        [Routing (auth, movimientos, cierres, logs)]
+        [Middlewares (JWT Auth, CORS, Helmet, Sentry)]
+        [Schemas (Validaciones estrictas Zod)]
+    }
+
+    package "backend/services/ (Lógica de Negocio)" as PkgServices #182548 {
+        [AuthService (Bcrypt 10 rounds, JWT)]
+        [MovementService (Balances, Soft Delete)]
+        [ClosingService (Bloqueo contable inmutable)]
+        [OCRService (Orquestación Gemini Vision)]
+        [EmailService (Tokens vía Brevo/Resend)]
+    }
+
+    package "backend/database/models/ (Mongoose ODM)" as PkgModels #182548 {
+        [UserModel (email, passwordHash, activo)]
+        [MovimientoModel (usuario_id, monto, tipo, fecha, activo)]
+        [ArqueoCajaModel (saldoEsperado, saldoReal, dif)]
+        [CierreMensualModel (mes, anio, balance, hash)]
+        [AlertaGastoModel (tipoAlerta, disparador)]
+    }
+}
+
+package "Capa 6: Microservicio IA & Visión (Python / FastAPI)" as CapaML #0D152D {
+    package "ml_backend/ (FastAPI Microservice)" as PkgML #142240 {
+        [Endpoints (/predict, /retrain, /health)]
+        [OpenCV Preprocessing (Binarización Otsu)]
+        [Tesseract OCR Engine]
+        [Multinomial Naive Bayes + TF-IDF]
+        [Silent Training Pipeline (.joblib)]
+    }
+}
+
+package "Capa 7: Infraestructura Cloud & Servicios Externos" as CapaCloud #0D152D {
+    cloud "Google Gemini AI Pro Vision" as ExtGemini #1A284A
+    database "MongoDB Atlas (NoSQL Clúster)" as ExtAtlas #1A284A
+    cloud "Brevo / Resend (Gateway Emails)" as ExtEmail #1A284A
+    cloud "Sentry (APM & Telemetría)" as ExtSentry #1A284A
+    cloud "Vercel Edge CDN & Render Hosts" as ExtHosting #1A284A
+}
+
+' Relaciones de dependencia
+PkgFrontend ..> Capa2 : import @financeflow/sdk
+PkgMobile ..> Capa2 : import @financeflow/sdk
+PkgAdmin ..> PkgControllers : HTTPS / REST
+
+Capa2 --> PkgControllers : HTTPS / REST (JWT Bearer)
+PkgControllers --> PkgServices : Invocación de Servicios
+PkgServices --> PkgModels : Mongoose Queries
+PkgServices --> PkgML : HTTP /predict & /retrain
+PkgServices --> ExtGemini : Gemini Vision API
+PkgServices --> ExtEmail : Envío Transaccional
+PkgModels --> ExtAtlas : mongodb+srv:// (TLS 1.3)
+PkgControllers ..> ExtSentry : Captura de Excepciones
+
+@enduml

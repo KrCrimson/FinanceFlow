@@ -10,7 +10,7 @@
 
 **La solución definitiva para el control de finanzas personales y empresariales, potenciada con Visión Artificial por IA, pasarelas de pago internacionales y seguridad de nivel bancario.**
 
-[Explorar Módulos](#-módulos-y-características-del-producto) • [Arquitectura](#-arquitectura-tecnológica) • [Instalación Local](#-guía-de-instalación-y-ejecución-local) • [Seguridad](#-estándares-de-seguridad-y-auditoría)
+[Explorar Módulos](#-módulos-y-características-del-producto) • [Arquitectura](#-arquitectura-tecnológica) • [Instalación Local](#-guía-de-instalación-y-ejecución-local) • [Manual de Despliegue](MANUAL_DESPLIEGUE.md) • [Seguridad](#-estándares-de-seguridad-y-auditoría)
 
 </div>
 

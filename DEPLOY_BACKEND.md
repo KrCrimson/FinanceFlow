@@ -1,6 +1,9 @@
 # Sistema de Balance - Backend
 
-## Despliegue en Render
+> [!NOTE]
+> Para una guía exhaustiva paso a paso desde cero (configuración de MongoDB Atlas, arquitectura y diccionario de documentos, catálogo de variables de entorno y troubleshooting), consulte el [MANUAL_DESPLIEGUE.md](file:///c:/Users/HP/Documents/GitHub/FinanceFlow/MANUAL_DESPLIEGUE.md).
+
+## Despliegue Rápido en Render
 
 ### 1. Crear cuenta en MongoDB Atlas
 1. Ve a https://cloud.mongodb.com
