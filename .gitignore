@@ -166,3 +166,7 @@ backend/scratch_*.js
 scratch_*.js
 **/crear_usuario.js
 backend/dev_recovery_links.log
+
+# Paquetes de despliegue (no versionar)
+backend_deploy.zip
+*_deploy.zip
