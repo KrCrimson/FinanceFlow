@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/EgresosPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla (sin ruta)
+ * Función .........: Lista de egresos de una versión anterior; hoy no está enlazada en la navegación (el panel la reemplaza).
+ * Requerimientos ..: RF-14, RF-13  (módulos: Movimientos)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-08 Desactivar movimiento
+ * Depende de ......: frontend/src/hooks/useMovimientos.js
+ *                    frontend/src/services/movimientos-adapter.js
+ * Pruebas .........: frontend/src/__tests__/EgresosPage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useNavigate } from 'react-router-dom';

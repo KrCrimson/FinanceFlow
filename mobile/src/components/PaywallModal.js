@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/components/PaywallModal.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Oferta del Plan Pro en el prototipo móvil.
+ * Casos de uso ....: CU-19 Contratar el Plan Pro
+ * Depende de ......: mobile/src/services/api.js
+ * Lo usan .........: mobile/src/screens/ProfileScreen.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,

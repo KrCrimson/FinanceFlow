@@ -1,4 +1,18 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/reportesService.js
+ * Capa / módulo ...: Frontend · Servicio
+ * Función .........: Servicio básico de respaldo que arma los datos de reportes con consultas directas.
+ * Requerimientos ..: RF-22  (módulos: Reportes)
+ * Casos de uso ....: CU-09 Visualizar reportes y gráficos
+ * Lo usan .........: frontend/src/services/reportes-adapter.js
+ *                    sdk/adapters/reportes-adapter.js
+ * Pruebas .........: frontend/src/__tests__/services.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🚨 EMERGENCY FALLBACK - Reportes Service
  * 
  * Servicio básico sin SDK para evitar crashes de la aplicación.

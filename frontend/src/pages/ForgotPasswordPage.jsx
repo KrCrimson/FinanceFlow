@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/ForgotPasswordPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Pantalla para pedir el enlace de recuperación de contraseña.
+ * Requerimientos ..: RF-04  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-03 Solicitar recuperación de contraseña
+ * Reglas de negocio : RN-09
+ * Depende de ......: frontend/src/utils/logger.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logger from '../utils/logger';

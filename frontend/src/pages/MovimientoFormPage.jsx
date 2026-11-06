@@ -1,3 +1,23 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/MovimientoFormPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Formulario de registro de movimientos con categorías por uso, rango de fechas permitido, ingreso constante y lectura de comprobante.
+ * Requerimientos ..: RF-09, RF-10, RF-11, RF-12, RF-15, RF-17  (módulos: Movimientos, Comprobantes)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-06 Registrar movimiento manual
+ *                    CU-07 Cargar comprobante por imagen
+ *                    CU-17 Marcar y quitar ingreso constante
+ * Reglas de negocio : RN-04, RN-06, RN-10, RN-13
+ * Depende de ......: frontend/src/hooks/useImageToMovimiento.js
+ *                    frontend/src/services/cierresService.js
+ *                    frontend/src/services/movimientos-adapter.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/MovimientoFormPage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 import { createMovimiento } from '../services/movimientos-adapter';
 import { getCierres } from '../services/cierresService';
@@ -167,29 +187,6 @@ function MovimientoFormPage() {
         esRecurrente: tipo === 'ingreso' ? esRecurrente : false
       });
       setSuccess('¡Movimiento registrado exitosamente!');
-
-      // CONTINUOUS LEARNING: Sincronización transparente en segundo plano      
-      try {
-        const { getMovimientos } = await import('../services/movimientosService');
-        const movs = await getMovimientos();
-        const trainingData = movs
-          .filter(m => m.nombre && m.categoria)
-          .map(m => ({
-            descripcion: m.descripcion ? `${m.nombre} ${m.descripcion}` : m.nombre,
-            categoria: m.categoria
-          }));
-        
-        if (trainingData.length > 5) {
-          const API_URL = process.env.REACT_APP_ML_URL || 'http://localhost:8000';
-          fetch(`${API_URL}/retrain`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: trainingData })
-          }).catch(err => console.warn('Background ML Sync Error:', err));
-        }
-      } catch(e) {
-        console.warn('Silent ML Training failed:', e);
-      }
 
       setTimeout(() => navigate('/'), 1500);
     } catch (err) {

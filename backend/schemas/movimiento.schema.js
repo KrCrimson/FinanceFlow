@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/schemas/movimiento.schema.js
+ * Capa / módulo ...: Backend · Validación
+ * Función .........: Reglas de datos de movimiento: tipo, nombre, monto mayor que cero, categoría y fecha.
+ * Requerimientos ..: RF-09  (módulos: Movimientos)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-06 Registrar movimiento manual
+ * Reglas de negocio : RN-04, RN-06
+ * Lo usan .........: backend/routes/movimientos.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const { z } = require('zod');
 
 const crearMovimientoSchema = z.object({

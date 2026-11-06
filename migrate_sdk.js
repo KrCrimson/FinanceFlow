@@ -1,3 +1,13 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: migrate_sdk.js
+ * Capa / módulo ...: Utilitario de desarrollo
+ * Función .........: Script de una sola vez que copió el SDK al frontend.
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const fs = require('fs');
 const path = require('path');
 const files = [

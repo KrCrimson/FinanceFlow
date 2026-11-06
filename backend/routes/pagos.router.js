@@ -1,8 +1,28 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/routes/pagos.router.js
+ * Capa / módulo ...: Backend · Rutas
+ * Función .........: Atiende el pago del Plan Pro: cobro con la pasarela (S/ 19.90 definido en el servidor), solicitud manual, estado del plan y utilidades de desarrollo.
+ * Requerimientos ..: RF-33, RF-34  (módulos: Plan Pro)
+ * Calidad (RNF) ...: RNF-02
+ * Casos de uso ....: CU-19 Contratar el Plan Pro
+ * Reglas de negocio : RN-17
+ * Depende de ......: backend/database/pago.model.js
+ *                    backend/database/usuario.model.js
+ *                    backend/middlewares/auth.js
+ * Lo usan .........: backend/routes/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const express = require("express");
 const router = express.Router();
 const Pago = require("../database/pago.model");
 const Usuario = require("../database/usuario.model");
 const auth = require("../middlewares/auth");
+
+// El precio del plan Pro lo define el servidor: nunca se confía en el monto que envía el cliente.
+const PRECIO_PRO = { monto: 19.9, moneda: "PEN" };
 
 // 1. Solicitar aprobación de pago manual (Yape / BCP)
 router.post("/solicitar-pro", async (req, res) => {
@@ -101,7 +121,7 @@ router.post("/checkout-directo", async (req, res) => {
 // 2. Culqi — cargo directo con tarjeta (token generado por Culqi Checkout.js en el frontend)
 router.post("/crear-cargo-culqi", auth, async (req, res) => {
   try {
-    const { token, monto, moneda } = req.body;
+    const { token } = req.body;
 
     if (!token) {
       return res.status(400).json({ success: false, error: "Falta el token de Culqi (source_id)" });
@@ -120,7 +140,7 @@ router.post("/crear-cargo-culqi", auth, async (req, res) => {
       return res.status(404).json({ success: false, error: "Usuario no encontrado" });
     }
 
-    const amountInCents = Math.round(Number(monto || 19.9) * 100);
+    const amountInCents = Math.round(PRECIO_PRO.monto * 100);
 
     const culqiRes = await fetch("https://api.culqi.com/v2/charges", {
       method: "POST",
@@ -130,7 +150,7 @@ router.post("/crear-cargo-culqi", auth, async (req, res) => {
       },
       body: JSON.stringify({
         amount: amountInCents,
-        currency_code: moneda || "PEN",
+        currency_code: PRECIO_PRO.moneda,
         email: usuario.email,
         source_id: token,
       }),

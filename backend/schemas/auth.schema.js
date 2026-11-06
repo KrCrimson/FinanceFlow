@@ -1,3 +1,20 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/schemas/auth.schema.js
+ * Capa / módulo ...: Backend · Validación
+ * Función .........: Reglas de datos de cuenta: nombre (2+), correo válido, contraseña (6+), perfil y restablecimiento.
+ * Requerimientos ..: RF-01, RF-05, RF-07  (módulos: Cuenta, Perfil)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-04 Restablecer contraseña
+ *                    CU-12 Gestionar información de perfil
+ * Reglas de negocio : RN-01
+ * Lo usan .........: backend/routes/usuarios.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const { z } = require('zod');
 
 const registerSchema = z.object({

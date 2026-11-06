@@ -1,3 +1,16 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/recordatoriosService.js
+ * Capa / módulo ...: Frontend · Servicio
+ * Función .........: Pide al backend listar, crear, actualizar y eliminar recordatorios.
+ * Requerimientos ..: RF-31, RF-32  (módulos: Recordatorios)
+ * Casos de uso ....: CU-20 Gestionar préstamos y recordatorios
+ * Lo usan .........: frontend/src/pages/RecordatoriosPage.jsx
+ * Pruebas .........: frontend/src/__tests__/services.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 // Helper para cabeceras con JWT

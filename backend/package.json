@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
-    "test": "jest --config jest.config.js"
+    "test": "jest --config jest.config.js",
+    "test:ci": "jest --config jest.config.js --coverage",
+    "test:integration": "jest --config jest.integration.config.js --runInBand"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
@@ -26,7 +28,7 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.2",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^10.1.7",
     "zod": "^4.4.3"
   }
 }

@@ -1,3 +1,21 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/database/cierre.model.js
+ * Capa / módulo ...: Backend · Datos
+ * Función .........: Define el arqueo diario y el cierre mensual (totales, saldo esperado, dinero contado, diferencia, comentario); impide dos cierres del mismo tipo y periodo.
+ * Requerimientos ..: RF-27, RF-28, RF-40  (módulos: Cierres)
+ * Calidad (RNF) ...: RNF-13
+ * Casos de uso ....: CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ *                    CU-16 Reabrir periodo cerrado
+ * Reglas de negocio : RN-11, RN-12
+ * Lo usan .........: backend/services/cierres.service.js
+ * Pruebas .........: backend/__tests__/cierres.service.test.js
+ *                    backend/__tests__/cierres.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const mongoose = require('mongoose');
 
 const cierreSchema = new mongoose.Schema({

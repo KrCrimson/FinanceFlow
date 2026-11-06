@@ -1,3 +1,14 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/screens/SplashScreen.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Pantalla de bienvenida del prototipo móvil.
+ * Lo usan .........: mobile/App.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

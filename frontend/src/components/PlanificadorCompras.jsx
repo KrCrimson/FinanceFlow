@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/PlanificadorCompras.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Carrera de Compras Planificadas: metas, avance contra el saldo, comprado y cancelar.
+ * Requerimientos ..: RF-25, RF-26  (módulos: Planificador)
+ * Casos de uso ....: CU-11 Planificar compras (Carrera de compras planificadas)
+ * Reglas de negocio : RN-19
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/PlanificadorPage.jsx
+ * Pruebas .........: frontend/src/__tests__/PlanificadorCompras.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 
 function PlanificadorCompras({ resumenMensual, movimientos, balanceTotal, onCrearEgreso, onUpdateEgreso }) {

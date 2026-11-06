@@ -1,3 +1,16 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/ErrorBoundary.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Atrapa fallos inesperados de pantalla y muestra un aviso en lugar de una pantalla en blanco.
+ * Calidad (RNF) ...: RNF-14
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/componentes-base.test.jsx
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React from 'react';
 
 class ErrorBoundary extends React.Component {

@@ -1,3 +1,21 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/controllers/cierres.controller.js
+ * Capa / módulo ...: Backend · Controladores
+ * Función .........: Recibe las solicitudes de arqueo diario, cierre mensual, reapertura, resumen del periodo y cierres pendientes.
+ * Requerimientos ..: RF-21, RF-27, RF-28, RF-30, RF-40  (módulos: Panel, Cierres)
+ * Calidad (RNF) ...: RNF-05
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ *                    CU-16 Reabrir periodo cerrado
+ * Reglas de negocio : RN-11, RN-12, RN-14
+ * Depende de ......: backend/services/cierres.service.js
+ * Lo usan .........: backend/routes/cierres.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const cierresService = require('../services/cierres.service');
 
 module.exports = {

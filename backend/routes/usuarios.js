@@ -1,3 +1,28 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/routes/usuarios.js
+ * Capa / módulo ...: Backend · Rutas
+ * Función .........: Define las direcciones de cuenta: registro, inicio de sesión, perfil, baja, recuperación y restablecimiento; aplica validación y límite de intentos.
+ * Requerimientos ..: RF-01 a RF-08
+ * Calidad (RNF) ...: RNF-02
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-03 Solicitar recuperación de contraseña
+ *                    CU-04 Restablecer contraseña
+ *                    CU-12 Gestionar información de perfil
+ *                    CU-18 Eliminar cuenta
+ * Reglas de negocio : RN-08, RN-09
+ * Depende de ......: backend/controllers/usuarios.controller.js
+ *                    backend/middlewares/auth.js
+ *                    backend/middlewares/isAdmin.js
+ *                    backend/middlewares/rateLimit.js
+ *                    backend/middlewares/validate.js
+ *                    backend/schemas/auth.schema.js
+ * Lo usan .........: backend/routes/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const express = require('express');
 const router = express.Router();
 const usuariosController = require('../controllers/usuarios.controller');

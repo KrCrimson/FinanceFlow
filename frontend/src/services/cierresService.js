@@ -1,3 +1,22 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/cierresService.js
+ * Capa / módulo ...: Frontend · Servicio
+ * Función .........: Pide al backend crear y reabrir cierres, listar cierres, obtener el resumen y los pendientes.
+ * Requerimientos ..: RF-21, RF-27, RF-28, RF-30  (módulos: Panel, Cierres)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ *                    CU-16 Reabrir periodo cerrado
+ * Lo usan .........: frontend/src/components/CajaChicaModal.jsx
+ *                    frontend/src/components/ReabrirModal.jsx
+ *                    frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/MovimientoFormPage.jsx
+ * Pruebas .........: frontend/src/__tests__/services.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const API_BASE_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const API_BASE = `${API_BASE_URL}/api`;
 

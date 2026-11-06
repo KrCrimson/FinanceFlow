@@ -1,4 +1,18 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/src/modules/movimientos.js
+ * Capa / módulo ...: SDK · Núcleo
+ * Función .........: Módulo de movimientos del SDK independiente.
+ * Requerimientos ..: RF-09, RF-12, RF-13, RF-14  (módulos: Movimientos)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-08 Desactivar movimiento
+ * Lo usan .........: sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 💰 Módulo de Movimientos
  * 
  * Maneja todas las operaciones CRUD de movimientos financieros:

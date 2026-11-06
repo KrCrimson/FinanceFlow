@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/CajaChicaModal.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Ventana de arqueo diario y cierre mensual: saldo esperado, diferencia en colores, comentario y contraseña (solo mensual).
+ * Requerimientos ..: RF-27, RF-28, RF-40  (módulos: Cierres)
+ * Calidad (RNF) ...: RNF-05
+ * Casos de uso ....: CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ * Reglas de negocio : RN-11, RN-14
+ * Depende de ......: frontend/src/services/cierresService.js
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from 'react';
 import { crearCierre, getResumenPeriodo } from '../services/cierresService';
 

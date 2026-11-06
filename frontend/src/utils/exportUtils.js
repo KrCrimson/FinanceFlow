@@ -1,3 +1,16 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/utils/exportUtils.js
+ * Capa / módulo ...: Frontend · Utilidad
+ * Función .........: Genera el archivo .csv (para Excel) y el reporte imprimible en PDF de los movimientos filtrados.
+ * Requerimientos ..: RF-24  (módulos: Reportes)
+ * Casos de uso ....: CU-21 Exportar reportes a Excel y PDF
+ * Reglas de negocio : RN-16
+ * Lo usan .........: frontend/src/pages/ReportesPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Utilitario ejecutable para exportación a Excel y PDF en la Web
 
 // 1. Exportación a Excel (.csv con formato UTF-8 BOM y estructura ejecutiva para Microsoft Excel)

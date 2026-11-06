@@ -1,4 +1,24 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/auth-adapter.js
+ * Capa / módulo ...: Frontend · Adaptador
+ * Función .........: Capa intermedia que mantiene la interfaz de autenticación y delega en el SDK o en el servicio directo.
+ * Requerimientos ..: RF-01, RF-02, RF-06  (módulos: Cuenta)
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-13 Cerrar sesión
+ * Depende de ......: frontend/src/sdk/index.js
+ *                    frontend/src/services/adapter-config.js
+ *                    frontend/src/services/authService.js
+ * Lo usan .........: frontend/src/hooks/useAuth.js
+ *                    frontend/src/pages/LoginPage.jsx
+ *                    frontend/src/pages/ProfilePage.jsx
+ *                    frontend/src/pages/RegisterPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Adaptador de Autenticación - Auth Service
  * 
  * FASE 2: Wrapper que mantiene la API existente pero usa el SDK internamente.

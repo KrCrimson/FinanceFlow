@@ -1,4 +1,19 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/src/modules/auth.js
+ * Capa / módulo ...: SDK · Núcleo
+ * Función .........: Módulo de autenticación del SDK independiente.
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05  (módulos: Cuenta)
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-03 Solicitar recuperación de contraseña
+ *                    CU-04 Restablecer contraseña
+ * Lo usan .........: sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔐 Módulo de Autenticación
  * 
  * Maneja todas las operaciones relacionadas con autenticación:

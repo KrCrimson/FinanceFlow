@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/database/log.model.js
+ * Capa / módulo ...: Backend · Datos
+ * Función .........: Define el evento del sistema (acción, usuario, nivel, mensaje y fecha).
+ * Requerimientos ..: RF-37  (módulos: Administración)
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Reglas de negocio : RN-22
+ * Lo usan .........: backend/services/logs.service.js
+ * Pruebas .........: backend/__tests__/logs.controller.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const mongoose = require('mongoose');
 
 const logSchema = new mongoose.Schema({

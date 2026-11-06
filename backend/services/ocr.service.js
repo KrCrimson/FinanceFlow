@@ -1,3 +1,20 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/services/ocr.service.js
+ * Capa / módulo ...: Backend · Servicios (lógica)
+ * Función .........: Envía la imagen del comprobante al servicio de lectura y devuelve tipo, nombre, monto, categoría y fecha; corta la espera a los 20 segundos.
+ * Requerimientos ..: RF-15  (módulos: Comprobantes)
+ * Calidad (RNF) ...: RNF-06
+ * Casos de uso ....: CU-07 Cargar comprobante por imagen
+ * Reglas de negocio : RN-15
+ * Lo usan .........: backend/controllers/movimientos.controller.js
+ *                    scratch/test_ocr.js
+ * Pruebas .........: backend/__tests__/ocr.service.test.js
+ *                    backend/__tests__/rutas.movimientos-cierres.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const apiKey = process.env.GEMINI_API_KEY;

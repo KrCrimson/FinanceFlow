@@ -1,3 +1,20 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/PaywallModal.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Ventana de beneficios y pago del Plan Pro (S/ 19.90) con la pasarela de pagos.
+ * Requerimientos ..: RF-33, RF-34  (módulos: Plan Pro)
+ * Calidad (RNF) ...: RNF-04
+ * Casos de uso ....: CU-19 Contratar el Plan Pro
+ *                    CU-21 Exportar reportes a Excel y PDF
+ * Reglas de negocio : RN-17
+ * Depende de ......: frontend/src/services/pagosService.js
+ * Lo usan .........: frontend/src/pages/ProfilePage.jsx
+ *                    frontend/src/pages/ReportesPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from "react";
 import { crearCargoCulqi } from "../services/pagosService";
 
@@ -67,7 +84,7 @@ export default function PaywallModal({
         if (window.Culqi.token) {
           const tokenId = window.Culqi.token.id;
           try {
-            await crearCargoCulqi(tokenId, PRECIO_PRO.monto, PRECIO_PRO.moneda);
+            await crearCargoCulqi(tokenId);
             setPaso("exito");
             setTimeout(() => {
               window.location.reload();

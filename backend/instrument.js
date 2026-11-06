@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/instrument.js
+ * Capa / módulo ...: Backend · Observabilidad
+ * Función .........: Inicia el monitoreo de errores y rendimiento (Sentry) cuando hay una clave configurada.
+ * Requerimientos ..: RF-37  (módulos: Administración)
+ * Calidad (RNF) ...: RNF-14
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Reglas de negocio : RN-22
+ * Lo usan .........: backend/app.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const Sentry = require("@sentry/node");
 
 // Inicialización de Sentry para Observabilidad y Monitoreo en Tiempo Real

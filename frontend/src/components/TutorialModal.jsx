@@ -1,3 +1,16 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/TutorialModal.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Guía inicial de 4 pasos del panel, con opción «no mostrar de nuevo».
+ * Requerimientos ..: RF-38  (módulos: Información legal y ayuda)
+ * Calidad (RNF) ...: RNF-11
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from 'react';
 
 const STEPS = [

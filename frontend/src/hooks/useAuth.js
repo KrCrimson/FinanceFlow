@@ -1,3 +1,22 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/hooks/useAuth.js
+ * Capa / módulo ...: Frontend · Hook
+ * Función .........: Mantiene el estado de sesión (usuario, carga, cierre y verificación de la vigencia de 7 días).
+ * Requerimientos ..: RF-02, RF-06  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-02
+ * Casos de uso ....: CU-02 Iniciar sesión
+ *                    CU-13 Cerrar sesión
+ * Reglas de negocio : RN-07
+ * Depende de ......: frontend/src/services/auth-adapter.js
+ * Lo usan .........: frontend/src/components/Navbar.jsx
+ *                    frontend/src/components/ProtectedRoute.jsx
+ *                    frontend/src/pages/LoginPage.jsx
+ * Pruebas .........: frontend/src/__tests__/componentes-base.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import { useState, useEffect, useCallback } from 'react';
 import { getToken, logout as logoutService, onAuthChange, isTokenValid } from '../services/auth-adapter';
 

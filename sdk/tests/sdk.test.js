@@ -1,4 +1,13 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/tests/sdk.test.js
+ * Capa / módulo ...: Pruebas automáticas
+ * Función .........: Pruebas automáticas de sdk: verifican que el comportamiento descrito en el SRS se cumple.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🧪 Tests básicos del SDK
  * 
  * Suite de tests para verificar funcionalidad principal

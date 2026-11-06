@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/TerminosPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Muestra los términos de uso.
+ * Requerimientos ..: RF-38  (módulos: Información legal y ayuda)
+ * Casos de uso ....: CU-01 Registrar cuenta
+ * Lo usan .........: frontend/src/App.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React from "react";
 import { Link } from "react-router-dom";
 

@@ -1,4 +1,22 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/usuarios-adapter.js
+ * Capa / módulo ...: Frontend · Adaptador
+ * Función .........: Capa intermedia de usuarios que mantiene la interfaz y delega en el SDK.
+ * Requerimientos ..: RF-07, RF-08  (módulos: Perfil)
+ * Casos de uso ....: CU-12 Gestionar información de perfil
+ *                    CU-18 Eliminar cuenta
+ * Depende de ......: frontend/src/sdk/index.js
+ *                    frontend/src/services/adapter-config.js
+ *                    frontend/src/services/userService.js
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/ProfilePage.jsx
+ * Pruebas .........: frontend/src/__tests__/ProfilePage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Adaptador de Usuarios - User Service
  * 
  * FASE 2: Wrapper que mantiene la API existente pero usa el SDK internamente.

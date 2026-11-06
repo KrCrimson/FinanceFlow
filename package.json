@@ -34,5 +34,16 @@
     "concurrently": "^10.0.6",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "test": "npm --prefix backend test && npm --prefix frontend run test:ci",
+    "test:backend": "npm --prefix backend test",
+    "test:backend:coverage": "npm --prefix backend test -- --coverage",
+    "test:frontend": "npm --prefix frontend run test:ci",
+    "test:frontend:coverage": "npm --prefix frontend test -- --watchAll=false --coverage",
+    "test:sdk": "npm --prefix sdk test -- tests/sdk.test.js tests/sdk-integration.test.js",
+    "test:sdk:all": "npm --prefix sdk test",
+    "audit:backend": "npm --prefix backend audit",
+    "audit:frontend": "npm --prefix frontend audit"
   }
 }

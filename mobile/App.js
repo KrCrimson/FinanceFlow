@@ -1,3 +1,25 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/App.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Navegación y arranque de la aplicación móvil de prototipo.
+ * Depende de ......: mobile/src/screens/DashboardScreen.js
+ *                    mobile/src/screens/ForgotPasswordScreen.js
+ *                    mobile/src/screens/LoginScreen.js
+ *                    mobile/src/screens/NewMovementScreen.js
+ *                    mobile/src/screens/PlannerScreen.js
+ *                    mobile/src/screens/ProfileScreen.js
+ *                    mobile/src/screens/RegisterScreen.js
+ *                    mobile/src/screens/RemindersScreen.js
+ *                    mobile/src/screens/ReportsScreen.js
+ *                    mobile/src/screens/SplashScreen.js
+ *                    mobile/src/services/api.js
+ *                    mobile/src/utils/currency.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from "react";
 import {
   View,

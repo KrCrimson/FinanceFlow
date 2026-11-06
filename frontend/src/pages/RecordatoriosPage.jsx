@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/RecordatoriosPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Préstamos y recordatorios: crear, filtrar, marcar pagado, eliminar y ver totales y vencimientos críticos.
+ * Requerimientos ..: RF-31, RF-32  (módulos: Recordatorios)
+ * Casos de uso ....: CU-20 Gestionar préstamos y recordatorios
+ * Reglas de negocio : RN-21, RN-25
+ * Depende de ......: frontend/src/services/recordatoriosService.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from "react";
 import {
   getRecordatorios,

@@ -7,10 +7,12 @@ on:
     branches: [ main, master ]
 
 jobs:
-  audit-and-test:
-    name: 🛡️ Audit, Lint & Test (Backend & Frontend)
+  backend:
+    name: ⚙️ Backend (auditoría, pruebas y cobertura)
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./backend
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -20,32 +22,74 @@ jobs:
         with:
           node-version: '20'
 
-      # --- FASE 1: DEVSECOPS AUDIT & SECURITY SCAN ---
-      - name: 🔍 Security Audit - Backend Dependencies
-        working-directory: ./backend
-        run: npm audit --audit-level=high || echo "Vulnerabilidades encontradas, revisar reporte"
-
-      - name: 🔍 Security Audit - Frontend Dependencies
-        working-directory: ./frontend
-        run: npm audit --audit-level=high || echo "Vulnerabilidades encontradas, revisar reporte"
-
-      # --- FASE 2: BACKEND LINT, BUILD & TEST ---
-      - name: ⚙️ Install Backend Dependencies
-        working-directory: ./backend
+      - name: ⚙️ Install dependencies
         run: npm install
 
-      - name: 🧪 Run Backend Unit & Integration Tests
-        working-directory: ./backend
-        run: npm test
+      # Bloquea el pipeline si hay vulnerabilidades altas o críticas en dependencias de producción.
+      - name: 🔍 Security audit (producción, bloqueante)
+        run: npm audit --omit=dev --audit-level=high
+
+      # Falla si la cobertura baja del umbral definido en jest.config.js (70 % de líneas).
+      - name: 🧪 Unit tests con cobertura (con mocks)
+        run: npm run test:ci
         env:
           NODE_ENV: test
           JWT_SECRET: testsecretkey1234567890
 
-      # --- FASE 3: FRONTEND LINT, BUILD & TEST ---
-      - name: ⚙️ Install Frontend Dependencies
+      # Pruebas contra una MongoDB real en memoria (sin mocks de base de datos).
+      - name: 🗄️ Integration tests (MongoDB en memoria)
+        run: npm run test:integration
+        env:
+          NODE_ENV: test
+          JWT_SECRET: testsecretkey1234567890
+
+  frontend:
+    name: 🖥️ Frontend (auditoría, pruebas y cobertura)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: ./frontend
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: ⚙️ Install dependencies
         run: npm install
 
-      - name: 🧪 Run Frontend Unit Tests
-        working-directory: ./frontend
+      # Excepción documentada: las vulnerabilidades restantes son transitivas de react-scripts (deprecado).
+      # No se puede bloquear hasta migrar a Vite (hallazgo D-04 del informe de QA); se muestra el reporte sin fallar.
+      - name: 🔍 Security audit (informativo)
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      # Falla si la cobertura baja del umbral mínimo definido en package.json (se irá subiendo sprint a sprint).
+      - name: 🧪 Unit tests con cobertura
         run: npm run test:ci
+        env:
+          CI: true
+
+  sdk:
+    name: 📦 SDK (pruebas)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./sdk
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: ⚙️ Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: 🧪 Run SDK tests
+        run: npm test

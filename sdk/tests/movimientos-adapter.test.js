@@ -1,23 +1,38 @@
 /**
- * 🧪 Tests del Adaptador de Movimientos
- * 
- * FASE 2: Verificar que el patrón adaptador mantiene la compatibilidad
- * y funciona correctamente con ambos métodos (SDK y original).
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/tests/movimientos-adapter.test.js
+ * Capa / módulo ...: Pruebas automáticas
+ * Función .........: Pruebas automáticas de movimientos-adapter: verifican que el comportamiento descrito en el SRS se cumple.
+ * Requerimientos ..: RF-09, RF-12, RF-13, RF-14  (módulos: Movimientos)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-08 Desactivar movimiento
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ *                    CU-17 Marcar y quitar ingreso constante
+ * Depende de ......: frontend/src/services/movimientosService.js
+ *                    sdk/adapters/movimientos-adapter.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
+ * Tests del adaptador de movimientos (SDK <-> servicio original).
+ *
+ * Ejercitan la instancia real del adaptador (movimientosAdapter). Solo se simulan
+ * sus dependencias: el servicio original del frontend (usa window al cargarse) y el SDK.
  */
 
-const MovimientosAdapter = require('../adapters/movimientos-adapter.js');
-const AdapterConfig = require('../adapters/adapter-config.js');
-
-// Mock del servicio original
-const mockOriginalService = {
+jest.mock('../../frontend/src/services/movimientosService.js', () => ({
   getMovimientos: jest.fn(),
   createMovimiento: jest.fn(),
   updateMovimiento: jest.fn(),
-  inhabilitarMovimiento: jest.fn()
-};
+  inhabilitarMovimiento: jest.fn(),
+}));
 
-// Mock del SDK
-const mockSDK = {
+const original = require('../../frontend/src/services/movimientosService.js');
+const { movimientosAdapter: adapter } = require('../adapters/movimientos-adapter.js');
+
+const crearSdkFalso = () => ({
   movimientos: {
     getAll: jest.fn(),
     create: jest.fn(),
@@ -26,402 +41,231 @@ const mockSDK = {
     getById: jest.fn(),
     getIngresos: jest.fn(),
     getEgresos: jest.fn(),
-    getResumen: jest.fn()
+    getResumen: jest.fn(),
   },
   setToken: jest.fn(),
   removeToken: jest.fn(),
-  getStats: jest.fn()
-};
+  getStats: jest.fn().mockReturnValue({ totalRequests: 10 }),
+});
 
-// Mock de localStorage
-const mockLocalStorage = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn()
-};
+const MOVS = [
+  { id: 1, tipo: 'ingreso', monto: 1000 },
+  { id: 2, tipo: 'egreso', monto: 400 },
+  { id: 3, tipo: 'ingreso', monto: 250 },
+];
 
-// Mock de console.log para tests
-const mockConsole = {
-  log: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn()
-};
+function usarSdk(sdk) {
+  adapter.sdk = sdk;
+  adapter.isSDKEnabled = true;
+  adapter.isSDKInitialized = true;
+  adapter.fallbackToOriginal = false;
+}
 
-describe('MovimientosAdapter', () => {
-  let adapter;
+function usarOriginal() {
+  adapter.sdk = null;
+  adapter.isSDKEnabled = false;
+  adapter.fallbackToOriginal = false;
+}
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  adapter.config.debug = false;
+  global.localStorage = { getItem: jest.fn(), setItem: jest.fn(), removeItem: jest.fn() };
+  usarOriginal();
+});
+
+describe('MovimientosAdapter con el SDK deshabilitado (servicio original)', () => {
+  test('getMovimientos delega en el servicio original', async () => {
+    original.getMovimientos.mockResolvedValue(MOVS);
+    await expect(adapter.getMovimientos()).resolves.toEqual(MOVS);
+    expect(original.getMovimientos).toHaveBeenCalledTimes(1);
+  });
+
+  test('createMovimiento pasa los datos tal cual al servicio original', async () => {
+    const data = { tipo: 'ingreso', monto: 1500 };
+    original.createMovimiento.mockResolvedValue({ id: 9, ...data });
+    await expect(adapter.createMovimiento(data)).resolves.toEqual({ id: 9, ...data });
+    expect(original.createMovimiento).toHaveBeenCalledWith(data);
+  });
+
+  test('getIngresos y getEgresos filtran manualmente por tipo', async () => {
+    original.getMovimientos.mockResolvedValue(MOVS);
+    expect((await adapter.getIngresos()).map(m => m.id)).toEqual([1, 3]);
+    expect((await adapter.getEgresos()).map(m => m.id)).toEqual([2]);
+  });
+
+  test('getMovimientoById exige SDK habilitado', async () => {
+    await expect(adapter.getMovimientoById(1)).rejects.toThrow('solo con SDK habilitado');
+  });
+});
+
+describe('MovimientosAdapter con el SDK habilitado', () => {
+  let sdk;
   beforeEach(() => {
-    jest.clearAllMocks();
-    
-    // Configurar mocks globales
-    global.localStorage = mockLocalStorage;
-    global.console = mockConsole;
-    
-    // Configurar respuestas por defecto
-    mockLocalStorage.getItem.mockReturnValue(null);
-    mockSDK.getStats.mockReturnValue({ 
-      totalRequests: 10, 
-      successRate: 0.95 
-    });
+    sdk = crearSdkFalso();
+    usarSdk(sdk);
   });
 
-  describe('Inicialización', () => {
-    test('debe inicializarse con SDK deshabilitado por defecto', () => {
-      // TODO: Implementar test de inicialización
-      expect(true).toBe(true); // Placeholder
-    });
-
-    test('debe habilitar SDK cuando está configurado', () => {
-      // TODO: Implementar test de habilitación SDK
-      expect(true).toBe(true); // Placeholder
-    });
-
-    test('debe configurar token automáticamente si existe', () => {
-      mockLocalStorage.getItem.mockReturnValue('test-token');
-      // TODO: Verificar configuración de token
-      expect(true).toBe(true); // Placeholder
-    });
+  test('getMovimientos devuelve la lista del SDK sin llamar al original', async () => {
+    sdk.movimientos.getAll.mockResolvedValue({ success: true, movimientos: MOVS });
+    await expect(adapter.getMovimientos()).resolves.toEqual(MOVS);
+    expect(original.getMovimientos).not.toHaveBeenCalled();
   });
 
-  describe('Métodos principales - Modo SDK', () => {
-    beforeEach(() => {
-      // Habilitar SDK para estos tests
-      mockLocalStorage.getItem.mockImplementation((key) => {
-        if (key === 'enable_sdk') return 'true';
-        if (key === 'token') return 'test-token';
-        return null;
-      });
-    });
-
-    test('getMovimientos debe usar SDK y adaptar respuesta', async () => {
-      const mockMovimientos = [
-        { id: 1, tipo: 'ingreso', monto: 1000 },
-        { id: 2, tipo: 'egreso', monto: 500 }
-      ];
-      
-      mockSDK.movimientos.getAll.mockResolvedValue({
-        success: true,
-        movimientos: mockMovimientos
-      });
-
-      // TODO: Implementar test completo
-      expect(mockSDK.movimientos.getAll).not.toHaveBeenCalled();
-    });
-
-    test('createMovimiento debe crear con SDK', async () => {
-      const nuevoMovimiento = { tipo: 'ingreso', monto: 1500 };
-      const movimientoCreado = { id: 3, ...nuevoMovimiento };
-      
-      mockSDK.movimientos.create.mockResolvedValue({
-        success: true,
-        movimiento: movimientoCreado
-      });
-
-      // TODO: Implementar test completo
-      expect(mockSDK.movimientos.create).not.toHaveBeenCalled();
-    });
-
-    test('updateMovimiento debe actualizar con SDK', async () => {
-      const updateData = { monto: 2000 };
-      const movimientoActualizado = { id: 1, tipo: 'ingreso', monto: 2000 };
-      
-      mockSDK.movimientos.update.mockResolvedValue({
-        success: true,
-        movimiento: movimientoActualizado
-      });
-
-      // TODO: Implementar test completo
-      expect(mockSDK.movimientos.update).not.toHaveBeenCalled();
-    });
-
-    test('inhabilitarMovimiento debe usar delete del SDK', async () => {
-      mockSDK.movimientos.delete.mockResolvedValue({
-        success: true,
-        message: 'Movimiento eliminado'
-      });
-
-      // TODO: Implementar test completo
-      expect(mockSDK.movimientos.delete).not.toHaveBeenCalled();
-    });
+  test('getMovimientos devuelve [] si el SDK no trae la propiedad movimientos', async () => {
+    sdk.movimientos.getAll.mockResolvedValue({ success: true });
+    await expect(adapter.getMovimientos()).resolves.toEqual([]);
   });
 
-  describe('Métodos principales - Modo Fallback', () => {
-    beforeEach(() => {
-      // Deshabilitar SDK para estos tests
-      mockLocalStorage.getItem.mockImplementation((key) => {
-        if (key === 'enable_sdk') return 'false';
-        if (key === 'token') return 'test-token';
-        return null;
-      });
-    });
-
-    test('getMovimientos debe usar servicio original', async () => {
-      const mockMovimientos = [
-        { id: 1, tipo: 'ingreso', monto: 1000 }
-      ];
-      
-      mockOriginalService.getMovimientos.mockResolvedValue(mockMovimientos);
-
-      // TODO: Implementar test completo
-      expect(mockOriginalService.getMovimientos).not.toHaveBeenCalled();
-    });
-
-    test('createMovimiento debe usar servicio original', async () => {
-      const nuevoMovimiento = { tipo: 'egreso', monto: 800 };
-      const movimientoCreado = { id: 4, ...nuevoMovimiento };
-      
-      mockOriginalService.createMovimiento.mockResolvedValue(movimientoCreado);
-
-      // TODO: Implementar test completo
-      expect(mockOriginalService.createMovimiento).not.toHaveBeenCalled();
-    });
+  test('createMovimiento devuelve el movimiento creado por el SDK', async () => {
+    const data = { tipo: 'egreso', monto: 80 };
+    sdk.movimientos.create.mockResolvedValue({ success: true, movimiento: { id: 7, ...data } });
+    await expect(adapter.createMovimiento(data)).resolves.toEqual({ id: 7, ...data });
+    expect(sdk.movimientos.create).toHaveBeenCalledWith(data);
   });
 
-  describe('Fallback automático en errores', () => {
-    beforeEach(() => {
-      // Habilitar SDK pero configurar errores
-      mockLocalStorage.getItem.mockImplementation((key) => {
-        if (key === 'enable_sdk') return 'true';
-        if (key === 'token') return 'test-token';
-        return null;
-      });
-    });
-
-    test('debe hacer fallback cuando SDK falla', async () => {
-      // Configurar SDK para fallar
-      mockSDK.movimientos.getAll.mockRejectedValue(new Error('SDK Error'));
-      
-      // Configurar servicio original para éxito
-      const mockMovimientos = [{ id: 1, tipo: 'ingreso', monto: 1000 }];
-      mockOriginalService.getMovimientos.mockResolvedValue(mockMovimientos);
-
-      // TODO: Implementar test completo
-      expect(mockSDK.movimientos.getAll).not.toHaveBeenCalled();
-    });
-
-    test('debe logear el error y fallback', async () => {
-      mockSDK.movimientos.getAll.mockRejectedValue(new Error('Network Error'));
-      mockOriginalService.getMovimientos.mockResolvedValue([]);
-
-      // TODO: Verificar logging
-      expect(mockConsole.log).not.toHaveBeenCalled();
-    });
+  test('updateMovimiento envia id y datos al SDK', async () => {
+    sdk.movimientos.update.mockResolvedValue({ success: true, movimiento: { id: 2, monto: 999 } });
+    await adapter.updateMovimiento(2, { monto: 999 });
+    expect(sdk.movimientos.update).toHaveBeenCalledWith(2, { monto: 999 });
   });
 
-  describe('Métodos nuevos del SDK', () => {
-    beforeEach(() => {
-      mockLocalStorage.getItem.mockImplementation((key) => {
-        if (key === 'enable_sdk') return 'true';
-        return null;
-      });
+  test('inhabilitarMovimiento usa delete del SDK y devuelve el mensaje esperado por el frontend', async () => {
+    sdk.movimientos.delete.mockResolvedValue({ success: true });
+    await expect(adapter.inhabilitarMovimiento(5)).resolves.toEqual({
+      message: 'Movimiento inhabilitado exitosamente',
     });
-
-    test('getMovimientoById debe funcionar solo con SDK', async () => {
-      const mockMovimiento = { id: 1, tipo: 'ingreso', monto: 1000 };
-      
-      mockSDK.movimientos.getById.mockResolvedValue({
-        success: true,
-        movimiento: mockMovimiento
-      });
-
-      // TODO: Implementar test
-      expect(mockSDK.movimientos.getById).not.toHaveBeenCalled();
-    });
-
-    test('getIngresos debe filtrar por tipo', async () => {
-      const mockIngresos = [
-        { id: 1, tipo: 'ingreso', monto: 1000 },
-        { id: 3, tipo: 'ingreso', monto: 1500 }
-      ];
-      
-      mockSDK.movimientos.getIngresos.mockResolvedValue({
-        success: true,
-        movimientos: mockIngresos
-      });
-
-      // TODO: Implementar test
-      expect(mockSDK.movimientos.getIngresos).not.toHaveBeenCalled();
-    });
-
-    test('getEgresos debe filtrar por tipo', async () => {
-      const mockEgresos = [
-        { id: 2, tipo: 'egreso', monto: 500 }
-      ];
-      
-      mockSDK.movimientos.getEgresos.mockResolvedValue({
-        success: true,
-        movimientos: mockEgresos
-      });
-
-      // TODO: Implementar test
-      expect(mockSDK.movimientos.getEgresos).not.toHaveBeenCalled();
-    });
-
-    test('getResumen debe calcular estadísticas', async () => {
-      const mockResumen = {
-        ingresos: 2500,
-        egresos: 800,
-        balance: 1700,
-        totalMovimientos: 3
-      };
-      
-      mockSDK.movimientos.getResumen.mockResolvedValue({
-        success: true,
-        resumen: mockResumen
-      });
-
-      // TODO: Implementar test
-      expect(mockSDK.movimientos.getResumen).not.toHaveBeenCalled();
-    });
+    expect(sdk.movimientos.delete).toHaveBeenCalledWith(5);
   });
 
-  describe('Fallback manual para métodos nuevos', () => {
-    beforeEach(() => {
-      // Deshabilitar SDK
-      mockLocalStorage.getItem.mockImplementation((key) => {
-        if (key === 'enable_sdk') return 'false';
-        return null;
-      });
-    });
-
-    test('getIngresos debe filtrar movimientos manualmente', async () => {
-      const mockMovimientos = [
-        { id: 1, tipo: 'ingreso', monto: 1000 },
-        { id: 2, tipo: 'egreso', monto: 500 },
-        { id: 3, tipo: 'ingreso', monto: 1500 }
-      ];
-      
-      mockOriginalService.getMovimientos.mockResolvedValue(mockMovimientos);
-
-      // TODO: Implementar test de filtrado manual
-      expect(mockOriginalService.getMovimientos).not.toHaveBeenCalled();
-    });
-
-    test('getResumen debe calcular manualmente', async () => {
-      const mockMovimientos = [
-        { id: 1, tipo: 'ingreso', monto: 1000 },
-        { id: 2, tipo: 'egreso', monto: 500 }
-      ];
-      
-      mockOriginalService.getMovimientos.mockResolvedValue(mockMovimientos);
-
-      // TODO: Implementar test de cálculo manual
-      const expectedResumen = {
-        ingresos: 1000,
-        egresos: 500,
-        balance: 500,
-        totalMovimientos: 2
-      };
-      
-      expect(expectedResumen.balance).toBe(500);
-    });
+  test('getMovimientoById devuelve el dato del SDK', async () => {
+    sdk.movimientos.getById.mockResolvedValue({ success: true, data: MOVS[0] });
+    await expect(adapter.getMovimientoById(1)).resolves.toEqual(MOVS[0]);
   });
 
-  describe('Control del adaptador', () => {
-    test('enableSDK debe habilitar el SDK', () => {
-      // TODO: Implementar test de habilitación
-      expect(true).toBe(true);
-    });
-
-    test('disableSDK debe deshabilitar el SDK', () => {
-      // TODO: Implementar test de deshabilitación
-      expect(true).toBe(true);
-    });
-
-    test('updateToken debe actualizar token en SDK', () => {
-      // TODO: Implementar test de actualización de token
-      expect(true).toBe(true);
-    });
-
-    test('getAdapterStats debe retornar estadísticas', () => {
-      // TODO: Implementar test de estadísticas
-      const stats = {
-        sdkEnabled: false,
-        sdkInitialized: false,
-        fallbackMode: false,
-        sdkStats: null
-      };
-      
-      expect(stats).toBeDefined();
-    });
-  });
-
-  describe('Adaptación de respuestas', () => {
-    test('debe extraer datos correctos de respuesta SDK', () => {
-      // TODO: Implementar tests de adaptación
-      const sdkResponse = {
-        success: true,
-        movimientos: [{ id: 1, tipo: 'ingreso' }],
-        meta: { total: 1 }
-      };
-      
-      expect(sdkResponse.success).toBe(true);
-    });
-
-    test('debe manejar errores de SDK correctamente', () => {
-      // TODO: Implementar test de manejo de errores
-      const errorResponse = {
-        success: false,
-        message: 'Error de validación'
-      };
-      
-      expect(errorResponse.success).toBe(false);
-    });
+  test('getIngresos usa el SDK cuando responde bien', async () => {
+    sdk.movimientos.getIngresos.mockResolvedValue({ success: true, data: [MOVS[0]] });
+    await expect(adapter.getIngresos()).resolves.toEqual([MOVS[0]]);
+    expect(original.getMovimientos).not.toHaveBeenCalled();
   });
 });
 
-describe('Integración AdapterConfig', () => {
-  test('debe respetar configuración global', () => {
-    // TODO: Implementar test de integración con configuración
-    expect(true).toBe(true);
+describe('Fallback al servicio original cuando el SDK falla', () => {
+  let sdk;
+  beforeEach(() => {
+    sdk = crearSdkFalso();
+    usarSdk(sdk);
   });
 
-  test('debe manejar feature flags', () => {
-    // TODO: Implementar test de feature flags
-    expect(true).toBe(true);
+  test('si el SDK lanza una excepción, getMovimientos usa el servicio original', async () => {
+    sdk.movimientos.getAll.mockRejectedValue(new Error('timeout'));
+    original.getMovimientos.mockResolvedValue(MOVS);
+    await expect(adapter.getMovimientos()).resolves.toEqual(MOVS);
+    expect(original.getMovimientos).toHaveBeenCalledTimes(1);
   });
 
-  test('debe soportar rollout gradual', () => {
-    // TODO: Implementar test de rollout
-    expect(true).toBe(true);
+  test('si el SDK responde success=false, createMovimiento cae al servicio original', async () => {
+    const data = { tipo: 'ingreso', monto: 10 };
+    sdk.movimientos.create.mockResolvedValue({ success: false, message: 'rechazado' });
+    original.createMovimiento.mockResolvedValue({ id: 1, ...data });
+    await expect(adapter.createMovimiento(data)).resolves.toEqual({ id: 1, ...data });
+    expect(original.createMovimiento).toHaveBeenCalledWith(data);
+  });
+
+  test('si el SDK no pudo inhabilitar (success=false), se usa el servicio original', async () => {
+    sdk.movimientos.delete.mockResolvedValue({ success: false, message: 'no encontrado' });
+    original.inhabilitarMovimiento.mockResolvedValue({ message: 'ok original' });
+    await expect(adapter.inhabilitarMovimiento(5)).resolves.toEqual({ message: 'ok original' });
+    expect(original.inhabilitarMovimiento).toHaveBeenCalledWith(5);
+  });
+
+  test('getIngresos cae al filtro manual si el SDK falla', async () => {
+    sdk.movimientos.getIngresos.mockRejectedValue(new Error('500'));
+    original.getMovimientos.mockResolvedValue(MOVS);
+    expect((await adapter.getIngresos()).map(m => m.id)).toEqual([1, 3]);
+  });
+
+  test('si fallbackToOriginal está activo, ni siquiera se intenta el SDK', async () => {
+    adapter.fallbackToOriginal = true;
+    original.getMovimientos.mockResolvedValue(MOVS);
+    await adapter.getMovimientos();
+    expect(sdk.movimientos.getAll).not.toHaveBeenCalled();
   });
 });
 
-// Tests de rendimiento
-describe('Performance', () => {
-  test('no debe agregar latencia significativa', async () => {
-    // TODO: Implementar test de rendimiento
-    const startTime = Date.now();
-    // Simular operación
-    await new Promise(resolve => setTimeout(resolve, 10));
-    const endTime = Date.now();
-    
-    expect(endTime - startTime).toBeLessThan(100);
+describe('adaptSDKResponse', () => {
+  test('lanza el mensaje del SDK cuando success es false', () => {
+    expect(() => adapter.adaptSDKResponse({ success: false, message: 'sin permiso' }, 'getMovimientos'))
+      .toThrow('sin permiso');
   });
 
-  test('debe manejar concurrencia correctamente', async () => {
-    // TODO: Implementar test de concurrencia
-    const promises = Array(10).fill().map(async (_, i) => {
-      return Promise.resolve(`result-${i}`);
+  test('lanza un mensaje genérico cuando no hay respuesta', () => {
+    expect(() => adapter.adaptSDKResponse(undefined, 'getMovimientos')).toThrow('Error en respuesta del SDK');
+  });
+
+  test('deleteMovimiento devuelve un mensaje por defecto', () => {
+    expect(adapter.adaptSDKResponse({ success: true }, 'deleteMovimiento'))
+      .toEqual({ message: 'Movimiento eliminado' });
+  });
+});
+
+describe('calculateResumen (cálculo manual de respaldo)', () => {
+  test('suma ingresos y egresos y calcula el balance', () => {
+    expect(adapter.calculateResumen(MOVS)).toEqual({
+      ingresos: 1250,
+      egresos: 400,
+      balance: 850,
+      totalMovimientos: 3,
+      periodo: 'actual',
     });
-    
-    const results = await Promise.all(promises);
-    expect(results).toHaveLength(10);
+  });
+
+  test('trata un monto ausente como 0', () => {
+    const r = adapter.calculateResumen([{ tipo: 'ingreso' }, { tipo: 'egreso', monto: 30 }]);
+    expect(r.ingresos).toBe(0);
+    expect(r.balance).toBe(-30);
+  });
+
+  test('usa el mes recibido como periodo', () => {
+    expect(adapter.calculateResumen([], { mes: '2026-10' }).periodo).toBe('2026-10');
+  });
+
+  test('getResumen sin SDK calcula con los movimientos del servicio original', async () => {
+    original.getMovimientos.mockResolvedValue(MOVS);
+    const r = await adapter.getResumen();
+    expect(r.balance).toBe(850);
   });
 });
 
-// Helper para crear adapter con configuración específica
-function createAdapterWithConfig(config = {}) {
-  // TODO: Implementar helper para crear adaptador con configuración
-  return {};
-}
+describe('Control del adaptador', () => {
+  test('disableSDK desactiva el SDK y guarda la preferencia', () => {
+    usarSdk(crearSdkFalso());
+    adapter.disableSDK();
+    expect(adapter.isSDKEnabled).toBe(false);
+    expect(adapter.fallbackToOriginal).toBe(true);
+    expect(global.localStorage.setItem).toHaveBeenCalledWith('enable_sdk', 'false');
+  });
 
-// Helper para limpiar estado entre tests
-function cleanupAdapter() {
-  // TODO: Implementar limpieza de estado
-}
+  test('updateToken con valor lo envía al SDK y sin valor lo remueve', () => {
+    const sdk = crearSdkFalso();
+    usarSdk(sdk);
+    adapter.updateToken('abc');
+    expect(sdk.setToken).toHaveBeenCalledWith('abc');
+    adapter.updateToken(null);
+    expect(sdk.removeToken).toHaveBeenCalledTimes(1);
+  });
 
-module.exports = {
-  createAdapterWithConfig,
-  cleanupAdapter
-};
+  test('updateToken no hace nada si el SDK está deshabilitado', () => {
+    expect(() => adapter.updateToken('abc')).not.toThrow();
+  });
+
+  test('getAdapterStats refleja el estado actual', () => {
+    usarSdk(crearSdkFalso());
+    expect(adapter.getAdapterStats()).toEqual({
+      sdkEnabled: true,
+      sdkInitialized: true,
+      fallbackMode: false,
+      sdkStats: { totalRequests: 10 },
+    });
+  });
+});

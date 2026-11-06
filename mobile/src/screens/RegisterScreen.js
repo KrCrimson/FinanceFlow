@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/screens/RegisterScreen.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Pantalla de registro del prototipo móvil.
+ * Casos de uso ....: CU-01 Registrar cuenta
+ * Depende de ......: mobile/src/services/api.js
+ * Lo usan .........: mobile/App.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

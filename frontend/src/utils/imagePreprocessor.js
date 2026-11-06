@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/utils/imagePreprocessor.js
+ * Capa / módulo ...: Frontend · Utilidad
+ * Función .........: Mejora la imagen del comprobante (tamaño, contraste) antes de enviarla a leer.
+ * Requerimientos ..: RF-15  (módulos: Comprobantes)
+ * Calidad (RNF) ...: RNF-06
+ * Casos de uso ....: CU-07 Cargar comprobante por imagen
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Utilidades avanzadas para preprocesar imágenes antes del OCR
 export const preprocessImageForOCR = (file) => {
   return new Promise((resolve) => {

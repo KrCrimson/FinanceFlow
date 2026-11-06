@@ -1,3 +1,14 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: database/movimiento.model.js
+ * Capa / módulo ...: Base de datos · Modelo
+ * Función .........: Copia antigua del modelo de movimiento (vigente en backend/database).
+ * Requerimientos ..: RF-09  (módulos: Movimientos)
+ * Casos de uso ....: CU-06 Registrar movimiento manual
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const mongoose = require('mongoose');
 
 const movimientoSchema = new mongoose.Schema({

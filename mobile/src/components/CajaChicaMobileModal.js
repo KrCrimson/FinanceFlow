@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/components/CajaChicaMobileModal.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Arqueo y cierre en el prototipo móvil.
+ * Casos de uso ....: CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ * Depende de ......: mobile/src/services/api.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from "react";
 import {
   View,

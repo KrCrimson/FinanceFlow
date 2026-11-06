@@ -13,7 +13,8 @@
 Ve a tu proyecto en Vercel → Settings → Environment Variables:
 
 ```
-REACT_APP_API_URL=https://financeflow-backend.onrender.com
+REACT_APP_API_URL=https://financeflow-backend-4fbw.onrender.com
+REACT_APP_CULQI_PUBLIC_KEY=pk_test_tu_llave_publica_de_culqi
 ```
 
 ### 3. Configuración automática
@@ -34,4 +35,15 @@ En Vercel → Settings → Domains → Add
 
 ### URLs importantes
 - Frontend: https://financeflow-frontend.vercel.app
-- Backend API: https://financeflow-backend.onrender.com
+- Backend API: https://financeflow-backend-4fbw.onrender.com
+- OCR de comprobantes: lo hace el backend con la API de Gemini (variable `GEMINI_API_KEY` en el servidor)
+
+### Verificación de URLs (CP-42)
+Comprobado el 21-10-2026 con `curl`:
+
+| URL | Resultado esperado | Resultado obtenido |
+|-----|--------------------|--------------------|
+| https://financeflow-frontend.vercel.app | Carga la app (HTTP 200) | 200, título "Sistema de Balance" |
+| https://financeflow-backend-4fbw.onrender.com/api/movimientos (sin token) | Rechaza sin sesión (HTTP 401) | 401 `{"error":"Token no proporcionado"}` |
+
+Nota: el plan gratuito de Render duerme el servicio tras un tiempo sin tráfico; la primera petición puede tardar hasta cerca de un minuto en responder.

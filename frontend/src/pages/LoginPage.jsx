@@ -1,3 +1,20 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/LoginPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Pantalla «Iniciar sesión»: valida, entra al panel y muestra el aviso tras restablecer la contraseña.
+ * Requerimientos ..: RF-02, RF-03  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-02 Iniciar sesión
+ * Reglas de negocio : RN-07, RN-08
+ * Depende de ......: frontend/src/hooks/useAuth.js
+ *                    frontend/src/services/auth-adapter.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/LoginPage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

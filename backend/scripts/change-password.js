@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/scripts/change-password.js
+ * Capa / módulo ...: Backend · Utilitario de administración
+ * Función .........: Script manual que cambia la contraseña de una cuenta.
+ * Requerimientos ..: RF-05  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-01
+ * Casos de uso ....: CU-04 Restablecer contraseña
+ * Depende de ......: backend/database/database.js
+ *                    backend/database/usuario.model.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const connectDB = require('../database/database');

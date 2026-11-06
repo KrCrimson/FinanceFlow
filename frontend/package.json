@@ -6,7 +6,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "test:ci": "react-scripts test --env=jsdom --watchAll=false",
+    "test:ci": "react-scripts test --env=jsdom --watchAll=false --coverage",
     "eject": "react-scripts eject"
   },
   "dependencies": {
@@ -40,6 +40,9 @@
     ]
   },
   "jest": {
+    "coverageThreshold": {
+      "global": { "statements": 24, "branches": 14, "functions": 18, "lines": 25 }
+    },
     "moduleNameMapper": {
       "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
       "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",

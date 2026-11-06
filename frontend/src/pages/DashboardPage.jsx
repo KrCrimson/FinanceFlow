@@ -1,3 +1,35 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/DashboardPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Panel principal: totales del mes o histórico, alertas, avisos de arqueo y cierre, tabla de movimientos, desactivar, ingresos constantes y planificador.
+ * Requerimientos ..: RF-14, RF-18, RF-19, RF-20, RF-21, RF-13, RF-17  (módulos: Movimientos, Panel)
+ * Calidad (RNF) ...: RNF-06, RNF-09
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-08 Desactivar movimiento
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ *                    CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ *                    CU-16 Reabrir periodo cerrado
+ *                    CU-17 Marcar y quitar ingreso constante
+ * Reglas de negocio : RN-03, RN-13, RN-18
+ * Depende de ......: frontend/src/components/AlertasComponent.jsx
+ *                    frontend/src/components/CajaChicaModal.jsx
+ *                    frontend/src/components/PlanificadorCompras.jsx
+ *                    frontend/src/components/ReabrirModal.jsx
+ *                    frontend/src/components/TutorialModal.jsx
+ *                    frontend/src/hooks/useAnalisisGastos.js
+ *                    frontend/src/hooks/useMovimientos.js
+ *                    frontend/src/services/cierresService.js
+ *                    frontend/src/services/movimientos-adapter.js
+ *                    frontend/src/services/usuarios-adapter.js
+ *                    frontend/src/utils/currency.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/DashboardPage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useAnalisisGastos } from '../hooks/useAnalisisGastos';

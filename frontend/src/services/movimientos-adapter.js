@@ -1,4 +1,27 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/movimientos-adapter.js
+ * Capa / módulo ...: Frontend · Adaptador
+ * Función .........: Capa intermedia de movimientos que mantiene la interfaz y delega en el SDK.
+ * Requerimientos ..: RF-09, RF-12, RF-13, RF-14  (módulos: Movimientos)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-08 Desactivar movimiento
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ * Depende de ......: frontend/src/sdk/index.js
+ *                    frontend/src/services/movimientosService.js
+ * Lo usan .........: frontend/src/hooks/useMovimientos.js
+ *                    frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/EgresosPage.jsx
+ *                    frontend/src/pages/IngresosPage.jsx
+ *                    frontend/src/pages/MovimientoFormPage.jsx
+ *                    frontend/src/pages/PlanificadorPage.jsx
+ *                    frontend/src/pages/ReportesPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Adaptador de Transición - Movimientos Service
  * 
  * FASE 2: Wrapper que mantiene la API existente pero usa el SDK internamente.

@@ -1,3 +1,25 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/ProfilePage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Mi Perfil: edita nombre y correo, elige la moneda, muestra el plan, cierra sesión y elimina la cuenta.
+ * Requerimientos ..: RF-06, RF-07, RF-08, RF-33, RF-39  (módulos: Cuenta, Perfil, Plan Pro)
+ * Casos de uso ....: CU-12 Gestionar información de perfil
+ *                    CU-13 Cerrar sesión
+ *                    CU-18 Eliminar cuenta
+ *                    CU-19 Contratar el Plan Pro
+ * Reglas de negocio : RN-20
+ * Depende de ......: frontend/src/components/PaywallModal.jsx
+ *                    frontend/src/services/auth-adapter.js
+ *                    frontend/src/services/pagosService.js
+ *                    frontend/src/services/usuarios-adapter.js
+ *                    frontend/src/utils/currency.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/ProfilePage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useEffect, useState } from "react";
 import {
   getProfile,

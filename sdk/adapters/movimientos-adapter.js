@@ -1,4 +1,19 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/adapters/movimientos-adapter.js
+ * Capa / módulo ...: SDK · Adaptador
+ * Función .........: Adaptador de transición de movimientos del SDK independiente.
+ * Requerimientos ..: RF-09, RF-14  (módulos: Movimientos)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ * Depende de ......: frontend/src/services/movimientosService.js
+ *                    sdk/src/index.js
+ * Pruebas .........: sdk/tests/movimientos-adapter.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Adaptador de Transición - Movimientos Service
  * 
  * FASE 2: Wrapper que mantiene la API existente pero usa el SDK internamente.
@@ -177,6 +192,9 @@ class MovimientosAdapter {
       
       case 'deleteMovimiento':
         return { message: sdkResult.message || 'Movimiento eliminado' };
+
+      case 'inhabilitarMovimiento':
+        return { message: 'Movimiento inhabilitado exitosamente' };
       
       default:
         return sdkResult.data || sdkResult;
@@ -235,8 +253,8 @@ class MovimientosAdapter {
       async (movimientoId) => {
         // El SDK usa delete, pero necesitamos mantener la semántica de "inhabilitar"
         // Podríamos usar update con un campo "activo: false" o implementar endpoint específico
-        const result = await this.sdk.movimientos.delete(movimientoId);
-        return { message: 'Movimiento inhabilitado exitosamente' };
+        // Se devuelve la respuesta cruda: adaptSDKResponse valida success y arma el mensaje.
+        return await this.sdk.movimientos.delete(movimientoId);
       },
       originalService.inhabilitarMovimiento,
       'inhabilitarMovimiento',

@@ -1,4 +1,17 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/src/modules/usuarios.js
+ * Capa / módulo ...: SDK · Núcleo
+ * Función .........: Módulo de usuarios del SDK independiente.
+ * Requerimientos ..: RF-07, RF-08  (módulos: Perfil)
+ * Casos de uso ....: CU-12 Gestionar información de perfil
+ *                    CU-18 Eliminar cuenta
+ * Lo usan .........: sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 👤 Módulo de Usuarios
  * 
  * Maneja operaciones relacionadas con el perfil y gestión de usuarios.

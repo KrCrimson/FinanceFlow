@@ -1,3 +1,14 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/tailwind.config.js
+ * Capa / módulo ...: Frontend · Configuración
+ * Función .........: Define los colores, tipografías y animaciones de la interfaz (diseño que se adapta a celular, tableta y computadora).
+ * Calidad (RNF) ...: RNF-09, RNF-11
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [

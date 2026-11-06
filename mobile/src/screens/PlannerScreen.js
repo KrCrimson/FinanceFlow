@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/screens/PlannerScreen.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Planificador del prototipo móvil.
+ * Casos de uso ....: CU-11 Planificar compras (Carrera de compras planificadas)
+ * Depende de ......: mobile/src/services/api.js
+ * Lo usan .........: mobile/App.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,

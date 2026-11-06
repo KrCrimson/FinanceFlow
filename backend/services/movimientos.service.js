@@ -1,3 +1,30 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/services/movimientos.service.js
+ * Capa / módulo ...: Backend · Servicios (lógica)
+ * Función .........: Lógica de movimientos: crear, corregir, desactivar y listar; rechaza fechas futuras y periodos cerrados; incluye el registro histórico con contraseña.
+ * Requerimientos ..: RF-09, RF-11, RF-12, RF-13, RF-14, RF-17  (módulos: Movimientos)
+ * Calidad (RNF) ...: RNF-12, RNF-13
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-08 Desactivar movimiento
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ *                    CU-17 Marcar y quitar ingreso constante
+ * Reglas de negocio : RN-03, RN-04, RN-05, RN-06, RN-13
+ * Depende de ......: backend/database/movimiento.model.js
+ *                    backend/database/usuario.model.js
+ *                    backend/services/cierres.service.js
+ * Lo usan .........: backend/controllers/movimientos.controller.js
+ * Pruebas .........: backend/__tests__/e2e.test.js
+ *                    backend/__tests__/finance.unit.test.js
+ *                    backend/__tests__/movimientos.controller.test.js
+ *                    backend/__tests__/movimientos.service.test.js
+ *                    backend/__tests__/movimientos.unit.test.js
+ *                    backend/__tests__/rutas.movimientos-cierres.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const Movimiento = require('../database/movimiento.model');
 const Usuario = require('../database/usuario.model');
 const bcrypt = require('bcryptjs');

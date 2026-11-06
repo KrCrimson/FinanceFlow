@@ -1,3 +1,26 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/ReportesPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Reportes: resumen, gráficos, listado con filtros por mes y categoría, y exportación (Plan Pro).
+ * Requerimientos ..: RF-22, RF-23, RF-24  (módulos: Reportes)
+ * Calidad (RNF) ...: RNF-09
+ * Casos de uso ....: CU-09 Visualizar reportes y gráficos
+ *                    CU-10 Filtrar historial de movimientos
+ *                    CU-21 Exportar reportes a Excel y PDF
+ * Reglas de negocio : RN-03, RN-16
+ * Depende de ......: frontend/src/components/Graficos.jsx
+ *                    frontend/src/components/PaywallModal.jsx
+ *                    frontend/src/services/movimientos-adapter.js
+ *                    frontend/src/services/pagosService.js
+ *                    frontend/src/utils/exportUtils.js
+ *                    frontend/src/utils/logger.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/ReportesPage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useEffect, useState } from "react";
 import { getMovimientos } from "../services/movimientos-adapter";
 import { useNavigate } from "react-router-dom";

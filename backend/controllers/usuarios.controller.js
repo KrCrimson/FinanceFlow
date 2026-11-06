@@ -1,3 +1,23 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/controllers/usuarios.controller.js
+ * Capa / módulo ...: Backend · Controladores
+ * Función .........: Recibe las solicitudes de cuenta (registro, inicio de sesión, perfil, baja, recuperación y restablecimiento de contraseña), llama al servicio y devuelve la respuesta; emite la sesión de 7 días.
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08  (módulos: Cuenta, Perfil)
+ * Calidad (RNF) ...: RNF-01, RNF-02
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-03 Solicitar recuperación de contraseña
+ *                    CU-04 Restablecer contraseña
+ *                    CU-12 Gestionar información de perfil
+ *                    CU-18 Eliminar cuenta
+ * Reglas de negocio : RN-01, RN-07, RN-09, RN-20, RN-23
+ * Depende de ......: backend/services/usuarios.service.js
+ * Lo usan .........: backend/routes/usuarios.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Controlador de usuarios (esqueleto)
 const usuariosService = require('../services/usuarios.service');
 

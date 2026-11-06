@@ -1,3 +1,20 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/authService.js
+ * Capa / módulo ...: Frontend · Servicio
+ * Función .........: Registro, inicio y cierre de sesión, guardado de la sesión en el dispositivo y verificación de su vigencia.
+ * Requerimientos ..: RF-01, RF-02, RF-06  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-02
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-13 Cerrar sesión
+ * Reglas de negocio : RN-07
+ * Lo usan .........: frontend/src/services/auth-adapter.js
+ * Pruebas .........: frontend/src/__tests__/services.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Servicio de autenticación con JWT
 
 // Variables para manejar callbacks de autenticación

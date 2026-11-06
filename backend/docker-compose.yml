@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: financeflow-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/financeflow_test
+      - JWT_SECRET=24b54013c05fe73fdba1f4d864988d61356e6f94040f5250ff905a93ad233be244b15e002b12bb066611b1f698698cd6d73c4747666f08cadefb2ba6ed3a8f1b
+      - CORS_ORIGIN=http://192.168.1.110:3000
+      - FRONTEND_URL=http://localhost:3000
+    env_file:
+      - .env
+    # Límites estrictos para simular Render Free (512 MB RAM / 0.5 vCPU)
+    mem_limit: 512m
+    cpus: 0.5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: financeflow-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

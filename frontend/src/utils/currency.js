@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/utils/currency.js
+ * Capa / módulo ...: Frontend · Utilidad
+ * Función .........: Lista de 13 monedas, formato de montos y recuerdo de la moneda elegida.
+ * Requerimientos ..: RF-39  (módulos: Perfil)
+ * Casos de uso ....: CU-12 Gestionar información de perfil
+ *                    CU-05 Consultar resumen y balance (Panel principal)
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/ProfilePage.jsx
+ * Pruebas .........: frontend/src/__tests__/componentes-base.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 export const CURRENCIES = [
   { code: 'PEN', symbol: 'S/', name: 'Sol Peruano (S/) 🇵🇪' },
   { code: 'USD', symbol: '$', name: 'Dólar Estadounidense ($) 🇺🇸' },

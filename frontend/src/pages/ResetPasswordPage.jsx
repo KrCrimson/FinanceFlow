@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/ResetPasswordPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Pantalla que valida el enlace de recuperación y permite definir la nueva contraseña.
+ * Requerimientos ..: RF-05  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-04 Restablecer contraseña
+ * Reglas de negocio : RN-09
+ * Depende de ......: frontend/src/utils/logger.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import logger from '../utils/logger';

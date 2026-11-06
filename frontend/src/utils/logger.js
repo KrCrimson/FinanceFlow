@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/utils/logger.js
+ * Capa / módulo ...: Frontend · Utilidad
+ * Función .........: Registra eventos y errores de la aplicación y puede enviarlos al servicio de registros.
+ * Requerimientos ..: RF-37  (módulos: Administración)
+ * Calidad (RNF) ...: RNF-14
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Lo usan .........: frontend/src/components/DevLogger.jsx
+ *                    frontend/src/pages/ForgotPasswordPage.jsx
+ *                    frontend/src/pages/ReportesPage.jsx
+ *                    frontend/src/pages/ResetPasswordPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Sistema de logging para errores y debugging
 class Logger {
   constructor() {

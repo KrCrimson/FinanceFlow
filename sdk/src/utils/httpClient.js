@@ -1,4 +1,16 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/src/utils/httpClient.js
+ * Capa / módulo ...: SDK · Núcleo
+ * Función .........: Cliente de comunicación del SDK independiente.
+ * Calidad (RNF) ...: RNF-14
+ * Lo usan .........: sdk/src/index.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🌐 HTTP Client
  * 
  * Cliente HTTP centralizado que maneja todas las comunicaciones con la API.

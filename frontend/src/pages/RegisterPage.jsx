@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/RegisterPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Pantalla «Registro»: pide nombre, correo y contraseña, valida en el momento y muestra «Registro exitoso».
+ * Requerimientos ..: RF-01  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-01 Registrar cuenta
+ * Reglas de negocio : RN-01
+ * Depende de ......: frontend/src/services/auth-adapter.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/RegisterPage.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

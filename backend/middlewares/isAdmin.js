@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/middlewares/isAdmin.js
+ * Capa / módulo ...: Backend · Seguridad
+ * Función .........: Permite el paso solo a cuentas con rol de administrador.
+ * Requerimientos ..: RF-35, RF-36, RF-37  (módulos: Administración)
+ * Calidad (RNF) ...: RNF-02
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Reglas de negocio : RN-22
+ * Depende de ......: backend/database/usuario.model.js
+ * Lo usan .........: backend/routes/index.js
+ *                    backend/routes/usuarios.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Middleware para verificar permisos de administrador
 const Usuario = require('../database/usuario.model');
 

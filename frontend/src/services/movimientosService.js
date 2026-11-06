@@ -1,4 +1,23 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/services/movimientosService.js
+ * Capa / módulo ...: Frontend · Servicio
+ * Función .........: Pide al backend listar, crear, corregir y desactivar movimientos.
+ * Requerimientos ..: RF-09, RF-12, RF-13, RF-14  (módulos: Movimientos)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-08 Desactivar movimiento
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ *                    CU-17 Marcar y quitar ingreso constante
+ * Lo usan .........: frontend/src/services/movimientos-adapter.js
+ *                    sdk/adapters/movimientos-adapter.js
+ * Pruebas .........: frontend/src/__tests__/ReportesPage.test.jsx
+ *                    sdk/tests/movimientos-adapter.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🚨 EMERGENCY FALLBACK - Movimientos Service
  * 
  * Servicio básico sin SDK para evitar crashes de la aplicación.

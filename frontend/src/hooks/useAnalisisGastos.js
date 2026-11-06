@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/hooks/useAnalisisGastos.js
+ * Capa / módulo ...: Frontend · Hook
+ * Función .........: Calcula totales por categoría, promedios y las alertas de gasto (35 %, 60 %, doble del promedio y S/ 150, déficit).
+ * Requerimientos ..: RF-20  (módulos: Panel)
+ * Calidad (RNF) ...: RNF-13
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ * Reglas de negocio : RN-18
+ * Depende de ......: frontend/src/hooks/useMovimientos.js
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/PlanificadorPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import { useState, useEffect } from 'react';
 import { useMovimientos } from './useMovimientos';
 

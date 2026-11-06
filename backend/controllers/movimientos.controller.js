@@ -1,3 +1,25 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/controllers/movimientos.controller.js
+ * Capa / módulo ...: Backend · Controladores
+ * Función .........: Recibe las solicitudes de movimientos (listar, registrar, corregir, desactivar) y de lectura de comprobantes; aplica el cupo mensual de 5 lecturas del Plan Free (reserva, devolución y reinicio mensual).
+ * Requerimientos ..: RF-09, RF-12, RF-13, RF-14, RF-15, RF-16, RF-17  (módulos: Movimientos, Comprobantes)
+ * Calidad (RNF) ...: RNF-03, RNF-12
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-07 Cargar comprobante por imagen
+ *                    CU-08 Desactivar movimiento
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ *                    CU-17 Marcar y quitar ingreso constante
+ * Reglas de negocio : RN-02, RN-05, RN-15
+ * Depende de ......: backend/database/usuario.model.js
+ *                    backend/services/movimientos.service.js
+ *                    backend/services/ocr.service.js
+ * Lo usan .........: backend/routes/movimientos.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Controlador de movimientos (esqueleto)
 const movimientosService = require('../services/movimientos.service');
 

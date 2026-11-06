@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/routes/recordatorios.js
+ * Capa / módulo ...: Backend · Rutas
+ * Función .........: Define y atiende crear, listar, cambiar de estado y eliminar recordatorios del usuario.
+ * Requerimientos ..: RF-31, RF-32  (módulos: Recordatorios)
+ * Calidad (RNF) ...: RNF-03
+ * Casos de uso ....: CU-20 Gestionar préstamos y recordatorios
+ * Reglas de negocio : RN-02, RN-21
+ * Depende de ......: backend/database/recordatorio.model.js
+ *                    backend/middlewares/auth.js
+ * Lo usan .........: backend/routes/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const express = require("express");
 const router = express.Router();
 const Recordatorio = require("../database/recordatorio.model");

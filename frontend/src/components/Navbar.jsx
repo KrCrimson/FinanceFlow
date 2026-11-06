@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/Navbar.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Barra superior con navegación, saludo y cierre de sesión (también en menú móvil).
+ * Requerimientos ..: RF-06  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-09
+ * Casos de uso ....: CU-13 Cerrar sesión
+ * Depende de ......: frontend/src/components/FinanceFlowLogo.jsx
+ *                    frontend/src/hooks/useAuth.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";

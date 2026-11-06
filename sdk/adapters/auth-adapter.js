@@ -1,4 +1,18 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/adapters/auth-adapter.js
+ * Capa / módulo ...: SDK · Adaptador
+ * Función .........: Adaptador de transición de auth del SDK independiente.
+ * Requerimientos ..: RF-01, RF-02  (módulos: Cuenta)
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ * Depende de ......: sdk/adapters/adapter-config.js
+ *                    sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Adaptador de Autenticación - Auth Service
  * 
  * FASE 2: Wrapper que mantiene la API existente pero usa el SDK internamente.

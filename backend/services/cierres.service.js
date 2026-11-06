@@ -1,3 +1,28 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/services/cierres.service.js
+ * Capa / módulo ...: Backend · Servicios (lógica)
+ * Función .........: Lógica de cierres: resumen del periodo, saldo esperado y diferencia, arqueo y cierre mensual (con contraseña), reapertura, cierres pendientes y regla de periodo cerrado (incluye cierre por antigüedad).
+ * Requerimientos ..: RF-21, RF-27, RF-28, RF-29, RF-30, RF-40  (módulos: Panel, Cierres)
+ * Calidad (RNF) ...: RNF-05, RNF-13
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ *                    CU-16 Reabrir periodo cerrado
+ * Reglas de negocio : RN-11, RN-12, RN-13, RN-14
+ * Depende de ......: backend/database/cierre.model.js
+ *                    backend/database/movimiento.model.js
+ *                    backend/database/usuario.model.js
+ * Lo usan .........: backend/controllers/cierres.controller.js
+ *                    backend/services/movimientos.service.js
+ * Pruebas .........: backend/__tests__/cierres.service.test.js
+ *                    backend/__tests__/cierres.test.js
+ *                    backend/__tests__/movimientos.service.test.js
+ *                    backend/__tests__/rutas.movimientos-cierres.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const Cierre = require('../database/cierre.model');
 const Movimiento = require('../database/movimiento.model');
 const Usuario = require('../database/usuario.model');

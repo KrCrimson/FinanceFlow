@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/DevLogger.jsx
+ * Capa / módulo ...: Frontend · Componente (desarrollo)
+ * Función .........: Panel de depuración con los registros de la aplicación; solo se muestra en desarrollo.
+ * Depende de ......: frontend/src/utils/logger.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from 'react';
 import logger from '../utils/logger';
 

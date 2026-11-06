@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/ReabrirModal.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Ventana de reapertura de un periodo cerrado con confirmación de contraseña.
+ * Requerimientos ..: RF-30  (módulos: Cierres)
+ * Calidad (RNF) ...: RNF-05
+ * Casos de uso ....: CU-16 Reabrir periodo cerrado
+ * Reglas de negocio : RN-14
+ * Depende de ......: frontend/src/services/cierresService.js
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState } from 'react';
 import { reabrirCierre } from '../services/cierresService';
 

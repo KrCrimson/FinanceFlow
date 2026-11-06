@@ -1,3 +1,16 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/CookieBanner.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Aviso de cookies con «Solo Esenciales» y «Aceptar Todas», recordado en el dispositivo.
+ * Requerimientos ..: RF-38  (módulos: Información legal y ayuda)
+ * Casos de uso ....: CU-01 Registrar cuenta
+ * Lo usan .........: frontend/src/App.jsx
+ * Pruebas .........: frontend/src/__tests__/componentes-base.test.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 

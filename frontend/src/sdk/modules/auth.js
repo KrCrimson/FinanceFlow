@@ -1,4 +1,19 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/sdk/modules/auth.js
+ * Capa / módulo ...: Frontend · SDK
+ * Función .........: Módulo del SDK para registro, inicio de sesión y recuperación.
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05  (módulos: Cuenta)
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-03 Solicitar recuperación de contraseña
+ *                    CU-04 Restablecer contraseña
+ * Lo usan .........: frontend/src/sdk/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔐 Módulo de Autenticación
  * 
  * Maneja todas las operaciones relacionadas con autenticación:

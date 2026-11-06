@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/__tests__/RegisterPage.test.jsx
+ * Capa / módulo ...: Pruebas automáticas
+ * Función .........: Pruebas automáticas de RegisterPage: verifican que el comportamiento descrito en el SRS se cumple.
+ * Requerimientos ..: RF-01  (módulos: Cuenta)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-01 Registrar cuenta
+ * Reglas de negocio : RN-01
+ * Depende de ......: frontend/src/pages/RegisterPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 
 
 import { render, screen, fireEvent, act } from '@testing-library/react';

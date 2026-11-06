@@ -1,3 +1,18 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/scripts/aprobar-pago.js
+ * Capa / módulo ...: Backend · Utilitario de administración
+ * Función .........: Script manual que aprueba el pago de un correo y pasa su cuenta al Plan Pro.
+ * Requerimientos ..: RF-36  (módulos: Administración)
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Reglas de negocio : RN-17
+ * Depende de ......: backend/database/database.js
+ *                    backend/database/pago.model.js
+ *                    backend/database/usuario.model.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const mongoose = require("mongoose");
 const connectDB = require("../database/database");
 const Usuario = require("../database/usuario.model");

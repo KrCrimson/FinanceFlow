@@ -1,4 +1,15 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/tests/sdk-integration.test.js
+ * Capa / módulo ...: Pruebas automáticas
+ * Función .........: Pruebas automáticas de sdk-integration: verifican que el comportamiento descrito en el SRS se cumple.
+ * Calidad (RNF) ...: RNF-15
+ * Depende de ......: sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🧪 Tests de Integración - SDK Base
  * 
  * Demuestra que el SDK funciona independientemente sin tocar

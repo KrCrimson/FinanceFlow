@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/utils/currency.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Formato de monedas del prototipo móvil.
+ * Casos de uso ....: CU-12 Gestionar información de perfil
+ * Lo usan .........: mobile/App.js
+ *                    mobile/src/screens/DashboardScreen.js
+ *                    mobile/src/screens/NewMovementScreen.js
+ *                    mobile/src/screens/ProfileScreen.js
+ *                    mobile/src/screens/ReportsScreen.js
+ * Pruebas .........: mobile/__tests__/currency.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 export const CURRENCIES = [
   { code: 'PEN', symbol: 'S/', name: 'Sol Peruano (S/) 🇵🇪' },
   { code: 'USD', symbol: '$', name: 'Dólar Estadounidense ($) 🇺🇸' },

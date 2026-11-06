@@ -1,3 +1,13 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: presentacion_web/app.js
+ * Capa / módulo ...: Presentación · Web
+ * Función .........: Controla la presentación web de la sustentación (diapositivas, navegación y animaciones). No es parte del sistema.
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // =========================================================================
 // FINANCEFLOW PRESENTATION CONTROLLER (GAMMA-STYLE)
 // =========================================================================

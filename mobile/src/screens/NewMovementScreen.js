@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: mobile/src/screens/NewMovementScreen.js
+ * Capa / módulo ...: Prototipo móvil · Fuera del alcance de esta versión (SRS III.4)
+ * Función .........: Registro de movimientos del prototipo móvil.
+ * Casos de uso ....: CU-06 Registrar movimiento manual
+ *                    CU-07 Cargar comprobante por imagen
+ * Depende de ......: mobile/src/services/api.js
+ *                    mobile/src/utils/currency.js
+ * Lo usan .........: mobile/App.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,

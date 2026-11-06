@@ -1,3 +1,11 @@
+# ═══ FinanceFlow · Trazabilidad ═══
+# Archivo .........: generate_sustentacion_pptx.py
+# Capa / módulo ...: Documentación · Generador
+# Función .........: Genera la presentación de sustentación (PowerPoint). Es una herramienta del equipo, no forma parte del sistema.
+# Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+# Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+# Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+# ════════════════════════════════════════════════════════════
 import os
 import sys
 from pptx import Presentation

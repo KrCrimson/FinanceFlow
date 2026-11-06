@@ -1,4 +1,16 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/src/modules/reportes.js
+ * Capa / módulo ...: SDK · Núcleo
+ * Función .........: Módulo de reportes del SDK independiente.
+ * Requerimientos ..: RF-22  (módulos: Reportes)
+ * Casos de uso ....: CU-09 Visualizar reportes y gráficos
+ * Lo usan .........: sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 📊 Módulo de Reportes
  * 
  * Maneja todas las operaciones relacionadas con reportes,

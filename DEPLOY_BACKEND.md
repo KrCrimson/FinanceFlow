@@ -24,6 +24,8 @@ JWT_SECRET=tu_jwt_secret_personalizado_aqui
 NODE_ENV=production
 PORT=5000
 CORS_ORIGIN=https://financeflow-frontend.vercel.app
+GEMINI_API_KEY=tu_api_key_de_gemini
+CULQI_SECRET_KEY=sk_test_tu_llave_secreta_de_culqi
 ```
 
 ### 3. Configuración de Build
@@ -32,7 +34,7 @@ CORS_ORIGIN=https://financeflow-frontend.vercel.app
 - Node Version: 18.x
 
 ### API Endpoints
-- Base URL: https://financeflow-backend.onrender.com
+- Base URL: https://financeflow-backend-4fbw.onrender.com
 - Auth: `/api/usuarios/login`, `/api/usuarios/register`
 - Movimientos: `/api/movimientos`
 - Logs: `/api/logs`

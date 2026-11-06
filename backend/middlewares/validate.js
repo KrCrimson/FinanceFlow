@@ -1,3 +1,22 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/middlewares/validate.js
+ * Capa / módulo ...: Backend · Validación
+ * Función .........: Valida con esquemas el cuerpo, los parámetros y la consulta de cada solicitud antes de procesarla.
+ * Requerimientos ..: RF-01, RF-09  (módulos: Cuenta, Movimientos)
+ * Calidad (RNF) ...: RNF-10
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-04 Restablecer contraseña
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-12 Gestionar información de perfil
+ * Reglas de negocio : RN-04
+ * Lo usan .........: backend/routes/movimientos.js
+ *                    backend/routes/usuarios.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const { z } = require('zod');
 
 /**

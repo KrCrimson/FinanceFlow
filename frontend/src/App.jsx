@@ -1,3 +1,58 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/App.jsx
+ * Capa / módulo ...: Frontend · Navegación
+ * Función .........: Define las pantallas y sus direcciones, protege las privadas con ProtectedRoute y coloca la barra superior, el pie y el aviso de cookies.
+ * Requerimientos ..: RF-38  (módulos: Información legal y ayuda)
+ * Calidad (RNF) ...: RNF-02, RNF-09
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-03 Solicitar recuperación de contraseña
+ *                    CU-04 Restablecer contraseña
+ *                    CU-05 Consultar resumen y balance (Panel principal)
+ *                    CU-06 Registrar movimiento manual
+ *                    CU-07 Cargar comprobante por imagen
+ *                    CU-08 Desactivar movimiento
+ *                    CU-09 Visualizar reportes y gráficos
+ *                    CU-10 Filtrar historial de movimientos
+ *                    CU-11 Planificar compras (Carrera de compras planificadas)
+ *                    CU-12 Gestionar información de perfil
+ *                    CU-13 Cerrar sesión
+ *                    CU-14 Realizar arqueo diario
+ *                    CU-15 Realizar cierre mensual
+ *                    CU-16 Reabrir periodo cerrado
+ *                    CU-17 Marcar y quitar ingreso constante
+ *                    CU-18 Eliminar cuenta
+ *                    CU-19 Contratar el Plan Pro
+ *                    CU-20 Gestionar préstamos y recordatorios
+ *                    CU-21 Exportar reportes a Excel y PDF
+ *                    CU-22 Administrar la plataforma
+ * Depende de ......: frontend/src/components/CookieBanner.jsx
+ *                    frontend/src/components/DevLogger.jsx
+ *                    frontend/src/components/ErrorBoundary.jsx
+ *                    frontend/src/components/Footer.jsx
+ *                    frontend/src/components/Navbar.jsx
+ *                    frontend/src/components/ProtectedRoute.jsx
+ *                    frontend/src/pages/AdminDashboardPage.jsx
+ *                    frontend/src/pages/DashboardPage.jsx
+ *                    frontend/src/pages/ForgotPasswordPage.jsx
+ *                    frontend/src/pages/LandingPage.jsx
+ *                    frontend/src/pages/LoginPage.jsx
+ *                    frontend/src/pages/MovimientoFormPage.jsx
+ *                    frontend/src/pages/NotFoundPage.jsx
+ *                    frontend/src/pages/PlanificadorPage.jsx
+ *                    frontend/src/pages/PrivacidadPage.jsx
+ *                    frontend/src/pages/ProfilePage.jsx
+ *                    frontend/src/pages/RecordatoriosPage.jsx
+ *                    frontend/src/pages/RegisterPage.jsx
+ *                    frontend/src/pages/ReportesPage.jsx
+ *                    frontend/src/pages/ResetPasswordPage.jsx
+ *                    frontend/src/pages/TerminosPage.jsx
+ * Lo usan .........: frontend/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React from "react";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";

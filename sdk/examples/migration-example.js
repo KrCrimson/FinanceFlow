@@ -1,4 +1,15 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/examples/migration-example.js
+ * Capa / módulo ...: SDK · Demostración
+ * Función .........: Ejemplo de migración del frontend al SDK.
+ * Depende de ......: sdk/src/index.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Ejemplo de Migración al SDK
  * 
  * Este archivo muestra cómo migrar gradualmente desde el sistema actual

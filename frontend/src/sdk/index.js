@@ -1,4 +1,24 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/sdk/index.js
+ * Capa / módulo ...: Frontend · SDK
+ * Función .........: Punto de entrada del SDK que agrupa los módulos de autenticación, movimientos, reportes y usuarios.
+ * Calidad (RNF) ...: RNF-15
+ * Depende de ......: frontend/src/sdk/modules/auth.js
+ *                    frontend/src/sdk/modules/movimientos.js
+ *                    frontend/src/sdk/modules/reportes.js
+ *                    frontend/src/sdk/modules/usuarios.js
+ *                    frontend/src/sdk/utils/httpClient.js
+ * Lo usan .........: frontend/src/services/auth-adapter.js
+ *                    frontend/src/services/movimientos-adapter.js
+ *                    frontend/src/services/reportes-adapter.js
+ *                    frontend/src/services/usuarios-adapter.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🚀 Sistema de Balance SDK
  * 
  * SDK wrapper que simplifica el consumo de la API del Sistema de Balance.

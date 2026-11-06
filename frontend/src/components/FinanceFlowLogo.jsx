@@ -1,3 +1,15 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/FinanceFlowLogo.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Logotipo de FinanceFlow.
+ * Lo usan .........: frontend/src/components/Navbar.jsx
+ *                    frontend/src/pages/LandingPage.jsx
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React from 'react';
 
 export default function FinanceFlowLogo({ className = "h-9 w-auto", size = 36 }) {

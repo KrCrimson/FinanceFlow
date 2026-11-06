@@ -1,4 +1,17 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/adapters/usuarios-adapter.js
+ * Capa / módulo ...: SDK · Adaptador
+ * Función .........: Adaptador de transición de usuarios del SDK independiente.
+ * Requerimientos ..: RF-07  (módulos: Perfil)
+ * Casos de uso ....: CU-12 Gestionar información de perfil
+ * Depende de ......: sdk/adapters/adapter-config.js
+ *                    sdk/src/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🔄 Adaptador de Usuarios - User Service
  * 
  * FASE 2: Wrapper que mantiene la API existente pero usa el SDK internamente.

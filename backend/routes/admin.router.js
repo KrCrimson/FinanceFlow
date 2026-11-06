@@ -1,3 +1,19 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/routes/admin.router.js
+ * Capa / módulo ...: Backend · Rutas
+ * Función .........: Atiende el portal de administración: métricas, usuarios, cambio de plan, pagos y su aprobación.
+ * Requerimientos ..: RF-35, RF-36  (módulos: Administración)
+ * Calidad (RNF) ...: RNF-02
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Reglas de negocio : RN-22
+ * Depende de ......: backend/database/pago.model.js
+ *                    backend/database/usuario.model.js
+ * Lo usan .........: backend/routes/index.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 const express = require("express");
 const router = express.Router();
 const Usuario = require("../database/usuario.model");

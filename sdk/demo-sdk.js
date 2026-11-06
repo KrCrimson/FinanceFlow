@@ -1,4 +1,15 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/demo-sdk.js
+ * Capa / módulo ...: SDK · Demostración
+ * Función .........: Demostración de que el SDK funciona de forma independiente.
+ * Depende de ......: sdk/src/index.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * 🧪 DEMO: SDK funcionando independientemente
  * 
  * Este archivo demuestra que el SDK funciona completamente independiente

@@ -1,3 +1,27 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/services/usuarios.service.js
+ * Capa / módulo ...: Backend · Servicios (lógica)
+ * Función .........: Lógica de cuenta: crear cuenta, iniciar sesión, perfil, baja lógica, enlace de recuperación de 10 minutos con envío de correo y restablecimiento de contraseña.
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08  (módulos: Cuenta, Perfil)
+ * Calidad (RNF) ...: RNF-01
+ * Casos de uso ....: CU-01 Registrar cuenta
+ *                    CU-02 Iniciar sesión
+ *                    CU-03 Solicitar recuperación de contraseña
+ *                    CU-04 Restablecer contraseña
+ *                    CU-12 Gestionar información de perfil
+ *                    CU-18 Eliminar cuenta
+ * Reglas de negocio : RN-01, RN-09, RN-20, RN-23, RN-24
+ * Depende de ......: backend/database/usuario.model.js
+ * Lo usan .........: backend/controllers/usuarios.controller.js
+ * Pruebas .........: backend/__tests__/e2e.test.js
+ *                    backend/__tests__/usuarios.controller.test.js
+ *                    backend/__tests__/usuarios.integration.test.js
+ *                    backend/__tests__/usuarios.service.test.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -11,6 +35,7 @@ module.exports = {
     if (!data.nombre || typeof data.nombre !== 'string' || data.nombre.trim().length < 2) {
       throw new Error('El nombre es requerido y debe tener al menos 2 caracteres');
     }
+    if (typeof data.email === 'string') data = { ...data, email: data.email.trim() };
     if (!data.email || typeof data.email !== 'string' || !/^\S+@\S+\.\S+$/.test(data.email)) {
       throw new Error('Email inválido');
     }

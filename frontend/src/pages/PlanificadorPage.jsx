@@ -1,3 +1,20 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/pages/PlanificadorPage.jsx
+ * Capa / módulo ...: Frontend · Pantalla
+ * Función .........: Pantalla independiente que reúne los datos y muestra la Carrera de Compras Planificadas.
+ * Requerimientos ..: RF-25, RF-26  (módulos: Planificador)
+ * Casos de uso ....: CU-11 Planificar compras (Carrera de compras planificadas)
+ * Reglas de negocio : RN-19
+ * Depende de ......: frontend/src/components/PlanificadorCompras.jsx
+ *                    frontend/src/hooks/useAnalisisGastos.js
+ *                    frontend/src/hooks/useMovimientos.js
+ *                    frontend/src/services/movimientos-adapter.js
+ * Lo usan .........: frontend/src/App.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React from 'react';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useAnalisisGastos } from '../hooks/useAnalisisGastos';

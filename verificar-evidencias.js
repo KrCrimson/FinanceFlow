@@ -1,4 +1,15 @@
 #!/usr/bin/env node
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: verificar-evidencias.js
+ * Capa / módulo ...: Operación · Verificación
+ * Función .........: Revisa que el código y los documentos tengan la evidencia esperada y, con --tests, ejecuta las pruebas de backend, frontend y SDK.
+ * Calidad (RNF) ...: RNF-13
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Uso (desde la raíz del repo FinanceFlow):
 //   node verificar-evidencias.js            -> revisa código y documentos
 //   node verificar-evidencias.js --tests    -> además ejecuta Jest (backend, frontend, sdk)

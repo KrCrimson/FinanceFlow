@@ -1,3 +1,17 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: backend/services/logs.service.js
+ * Capa / módulo ...: Backend · Servicios (lógica)
+ * Función .........: Guarda y consulta los eventos del sistema (esqueleto).
+ * Requerimientos ..: RF-37  (módulos: Administración)
+ * Casos de uso ....: CU-22 Administrar la plataforma
+ * Reglas de negocio : RN-22
+ * Depende de ......: backend/database/log.model.js
+ * Lo usan .........: backend/controllers/logs.controller.js
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 // Servicio de logs (esqueleto)
 const Log = require('../database/log.model');
 

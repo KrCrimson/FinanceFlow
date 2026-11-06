@@ -1,4 +1,18 @@
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: sdk/adapters/adapter-config.js
+ * Capa / módulo ...: SDK · Adaptador
+ * Función .........: Configuración de adaptadores del SDK independiente.
+ * Calidad (RNF) ...: RNF-15
+ * Lo usan .........: sdk/adapters/auth-adapter.js
+ *                    sdk/adapters/reportes-adapter.js
+ *                    sdk/adapters/usuarios-adapter.js
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * ⚙️ Configuración del Sistema de Adaptadores
  * 
  * FASE 2: Sistema de configuración centralizado para controlar la transición

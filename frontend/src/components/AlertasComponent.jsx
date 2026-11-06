@@ -1,3 +1,16 @@
+/**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: frontend/src/components/AlertasComponent.jsx
+ * Capa / módulo ...: Frontend · Componente
+ * Función .........: Muestra las alertas de gasto (graves y medias) o «¡Todo bajo control!».
+ * Requerimientos ..: RF-20  (módulos: Panel)
+ * Casos de uso ....: CU-05 Consultar resumen y balance (Panel principal)
+ * Reglas de negocio : RN-18
+ * Lo usan .........: frontend/src/pages/DashboardPage.jsx
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
 import React from 'react';
 
 function AlertasComponent({ alertas }) {
