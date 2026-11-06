@@ -161,3 +161,8 @@ public/uploads/
 # Reportes de análisis
 reports/
 coverage/
+# Scripts de apoyo y datos locales que pueden contener credenciales (nunca subir)
+backend/scratch_*.js
+scratch_*.js
+**/crear_usuario.js
+backend/dev_recovery_links.log
