@@ -1,6 +1,9 @@
 # Sistema de Balance - Frontend
 
-## Despliegue en Vercel
+> [!NOTE]
+> Para una guía exhaustiva paso a paso desde cero (configuración de MongoDB Atlas, arquitectura y diccionario de documentos, catálogo de variables de entorno y troubleshooting), consulte el [MANUAL_DESPLIEGUE.md](file:///c:/Users/HP/Documents/GitHub/FinanceFlow/MANUAL_DESPLIEGUE.md).
+
+## Despliegue Rápido en Vercel
 
 ### 1. Preparar el proyecto
 1. Asegúrate de que el build funcione: `npm run build`
