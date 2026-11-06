@@ -1,0 +1,8 @@
+#!/bin/sh
+# FinanceFlow: bloquea el commit si hay claves, .env o archivos comprimidos.
+if ! command -v node >/dev/null 2>&1; then
+  echo "[secret-scan] No se encontro Node.js en el PATH: no se puede revisar si hay secretos."
+  echo "              Instala Node.js o, bajo tu responsabilidad, usa: git commit --no-verify"
+  exit 1
+fi
+node "$(git rev-parse --show-toplevel)/scripts/secret-scan.js" --staged || exit 1

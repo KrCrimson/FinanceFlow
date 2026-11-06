@@ -1,0 +1,8 @@
+#!/bin/sh
+# FinanceFlow: revisa los commits que se van a subir (stdin lo entrega Git).
+if ! command -v node >/dev/null 2>&1; then
+  echo "[secret-scan] No se encontro Node.js en el PATH: no se puede revisar el push."
+  echo "              Instala Node.js o, bajo tu responsabilidad, usa: git push --no-verify"
+  exit 1
+fi
+node "$(git rev-parse --show-toplevel)/scripts/secret-scan.js" --push || exit 1
