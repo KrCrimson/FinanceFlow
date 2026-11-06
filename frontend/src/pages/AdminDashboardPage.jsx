@@ -3,10 +3,11 @@
  * Archivo .........: frontend/src/pages/AdminDashboardPage.jsx
  * Capa / módulo ...: Frontend · Pantalla
  * Función .........: Portal de administración: métricas, auditoría de pagos y gestión de planes.
- * Requerimientos ..: RF-35, RF-36  (módulos: Administración)
+ * Requerimientos ..: RF-35, RF-36, RF-44  (módulos: Administración, Cuenta)
  * Calidad (RNF) ...: RNF-02
  * Casos de uso ....: CU-22 Administrar la plataforma
- * Reglas de negocio : RN-17, RN-22
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-17, RN-22, RN-28
  * Depende de ......: frontend/src/services/adminService.js
  * Lo usan .........: frontend/src/App.jsx
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
@@ -31,6 +32,7 @@ export default function AdminDashboardPage() {
   const [usuarios, setUsuarios] = useState([]);
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mfaFaltante, setMfaFaltante] = useState(false); // el servidor exige verificación en dos pasos al administrador
   const [userSearch, setUserSearch] = useState('');
   const [pagoSearch, setPagoSearch] = useState('');
   const [notification, setNotification] = useState('');
@@ -67,6 +69,7 @@ export default function AdminDashboardPage() {
       if (pRes.success) setPagos(pRes.pagos || []);
     } catch (err) {
       console.error("Error cargando dashboard admin:", err);
+      if (err && err.response && err.response.data && err.response.data.mfaRequerido) setMfaFaltante(true);
     } finally {
       setLoading(false);
     }
@@ -186,6 +189,13 @@ export default function AdminDashboardPage() {
         {notification && (
           <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-xs rounded-2xl animate-fade-in">
             ✅ {notification}
+          </div>
+        )}
+
+        {mfaFaltante && (
+          <div role="alert" className="bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-2xl p-4 text-sm">
+            Tu cuenta debe activar la <strong>verificación en dos pasos</strong> para usar el portal de administración.{' '}
+            <a href="/perfil" className="underline font-bold">Actívala en Mi Perfil</a> y vuelve a iniciar sesión.
           </div>
         )}
 

@@ -3,8 +3,8 @@
  * Archivo .........: backend/__tests__/usuarios.service.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas automáticas de usuarios.service: verifican que el comportamiento descrito en el SRS se cumple.
- * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-16, RF-33, RF-40  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Cierres)
- * Calidad (RNF) ...: RNF-01
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-16, RF-33, RF-40, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Cierres)
+ * Calidad (RNF) ...: RNF-01, RNF-05
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña
@@ -12,7 +12,8 @@
  *                    CU-12 Gestionar información de perfil
  *                    CU-18 Eliminar cuenta
  *                    CU-19 Contratar el Plan Pro
- * Reglas de negocio : RN-01, RN-09, RN-15, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-09, RN-15, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/database/usuario.model.js
  *                    backend/services/usuarios.service.js
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad

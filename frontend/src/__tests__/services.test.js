@@ -3,7 +3,7 @@
  * Archivo .........: frontend/src/__tests__/services.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas automáticas de services: verifican que el comportamiento descrito en el SRS se cumple.
- * Requerimientos ..: RF-01, RF-02, RF-06, RF-07, RF-08, RF-21, RF-22, RF-27, RF-28, RF-30, RF-31, RF-32, RF-33, RF-34, RF-35, RF-36  (módulos: Cuenta, Perfil, Panel, Reportes, Cierres, Recordatorios, Plan Pro, Administración)
+ * Requerimientos ..: RF-01, RF-02, RF-06, RF-07, RF-08, RF-21, RF-22, RF-27, RF-28, RF-30, RF-31, RF-32, RF-33, RF-34, RF-35, RF-36, RF-42  (módulos: Cuenta, Perfil, Panel, Reportes, Cierres, Recordatorios, Plan Pro, Administración)
  * Calidad (RNF) ...: RNF-02, RNF-04
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
@@ -18,7 +18,8 @@
  *                    CU-19 Contratar el Plan Pro
  *                    CU-20 Gestionar préstamos y recordatorios
  *                    CU-22 Administrar la plataforma
- * Reglas de negocio : RN-07, RN-17, RN-22
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-07, RN-17, RN-22, RN-26
  * Depende de ......: frontend/src/services/adminService.js
  *                    frontend/src/services/authService.js
  *                    frontend/src/services/cierresService.js

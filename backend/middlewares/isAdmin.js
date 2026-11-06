@@ -2,11 +2,12 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: backend/middlewares/isAdmin.js
  * Capa / módulo ...: Backend · Seguridad
- * Función .........: Permite el paso solo a cuentas con rol de administrador.
- * Requerimientos ..: RF-35, RF-36, RF-37  (módulos: Administración)
+ * Función .........: Permite el paso solo a cuentas con rol de administrador y que hayan iniciado sesión con verificación en dos pasos.
+ * Requerimientos ..: RF-35, RF-36, RF-37, RF-44  (módulos: Administración, Cuenta)
  * Calidad (RNF) ...: RNF-02
  * Casos de uso ....: CU-22 Administrar la plataforma
- * Reglas de negocio : RN-22
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-22, RN-28
  * Depende de ......: backend/database/usuario.model.js
  * Lo usan .........: backend/routes/index.js
  *                    backend/routes/usuarios.js
@@ -29,16 +30,25 @@ module.exports = async function (req, res, next) {
       return res.status(401).json({ error: 'Usuario no encontrado' });
     }
 
+    // El administrador solo opera con una sesión que pasó la verificación en dos pasos (MFA)
+    const exigirMfa = () => {
+      if (req.user.mfa === true) return next();
+      return res.status(403).json({
+        error: 'Los administradores deben activar e iniciar sesión con la verificación en dos pasos',
+        mfaRequerido: true,
+      });
+    };
+
     // 1. Verificación primaria: Campo 'rol' en la base de datos
     if (user.rol === 'admin') {
-      return next();
+      return exigirMfa();
     }
 
     // 2. Verificación secundaria: Lista configurable en variable de entorno ADMIN_EMAILS
     if (process.env.ADMIN_EMAILS) {
       const allowedAdmins = process.env.ADMIN_EMAILS.split(',').map(e => e.trim().toLowerCase());
       if (allowedAdmins.includes(user.email.toLowerCase())) {
-        return next();
+        return exigirMfa();
       }
     }
 

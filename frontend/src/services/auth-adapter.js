@@ -3,17 +3,20 @@
  * Archivo .........: frontend/src/services/auth-adapter.js
  * Capa / módulo ...: Frontend · Adaptador
  * Función .........: Capa intermedia que mantiene la interfaz de autenticación y delega en el SDK o en el servicio directo.
- * Requerimientos ..: RF-01, RF-02, RF-06  (módulos: Cuenta)
+ * Requerimientos ..: RF-01, RF-02, RF-06, RF-42  (módulos: Cuenta)
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-13 Cerrar sesión
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
  * Depende de ......: frontend/src/sdk/index.js
  *                    frontend/src/services/adapter-config.js
  *                    frontend/src/services/authService.js
- * Lo usan .........: frontend/src/hooks/useAuth.js
+ * Lo usan .........: frontend/src/components/MfaSection.jsx
+ *                    frontend/src/hooks/useAuth.js
  *                    frontend/src/pages/LoginPage.jsx
  *                    frontend/src/pages/ProfilePage.jsx
  *                    frontend/src/pages/RegisterPage.jsx
+ * Pruebas .........: frontend/src/__tests__/LoginMfa.test.jsx
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
  * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
  * ════════════════════════════════════════════════════════════
@@ -360,6 +363,12 @@ const authAdapter = new AuthAdapter();
 // Exportar los métodos manteniendo la misma interfaz
 export const login = (...args) => authAdapter.login(...args);
 export const register = (...args) => authAdapter.register(...args);
+// Paso 2 del login con verificación en dos pasos (no existe en el SDK: va directo al servicio)
+export const loginMfa = async (...args) => {
+  const resultado = await originalService.loginMfa(...args);
+  authAdapter.notifyAuthChange();
+  return resultado;
+};
 export const logout = (...args) => authAdapter.logout(...args);
 export const getToken = (...args) => authAdapter.getToken(...args);
 export const isTokenValid = (...args) => authAdapter.isTokenValid(...args);
@@ -380,6 +389,7 @@ export { authAdapter };
 // Default export mantiene compatibilidad
 export default {
   login,
+  loginMfa,
   register,
   logout,
   getToken,

@@ -3,11 +3,12 @@
  * Archivo .........: sdk/src/modules/auth.js
  * Capa / módulo ...: SDK · Núcleo
  * Función .........: Módulo de autenticación del SDK independiente.
- * Requerimientos ..: RF-01, RF-02, RF-04, RF-05  (módulos: Cuenta)
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-42  (módulos: Cuenta)
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña
  *                    CU-04 Restablecer contraseña
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
  * Lo usan .........: sdk/src/index.js
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
  * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
@@ -38,11 +39,15 @@ class AuthModule {
         password
       });
 
+      // Con verificación en dos pasos el servidor aún no entrega sesión: devuelve el token temporal del paso 2
       return {
         success: true,
         user: data.usuario,
         token: data.token,
-        message: 'Login exitoso'
+        mfaRequerido: Boolean(data.mfaRequerido),
+        mfaToken: data.mfaToken,
+        mfaObligatorioPendiente: Boolean(data.mfaObligatorioPendiente),
+        message: data.mfaRequerido ? 'Se requiere verificación en dos pasos' : 'Login exitoso'
       };
     } catch (error) {
       throw {

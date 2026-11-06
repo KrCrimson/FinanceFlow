@@ -3,7 +3,7 @@
  * Archivo .........: backend/__tests__/security.unit.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas de seguridad: sesión, límite de intentos y protección de datos.
- * Requerimientos ..: RF-01, RF-07, RF-08, RF-16, RF-33, RF-34, RF-36, RF-40  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Administración, Cierres)
+ * Requerimientos ..: RF-01, RF-07, RF-08, RF-16, RF-33, RF-34, RF-36, RF-40, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Administración, Cierres)
  * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-06, RNF-14
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
@@ -27,7 +27,8 @@
  *                    CU-20 Gestionar préstamos y recordatorios
  *                    CU-21 Exportar reportes a Excel y PDF
  *                    CU-22 Administrar la plataforma
- * Reglas de negocio : RN-01, RN-15, RN-17, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-15, RN-17, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/app.js
  *                    backend/database/pago.model.js
  *                    backend/database/usuario.model.js

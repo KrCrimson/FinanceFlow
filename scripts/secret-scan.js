@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 /**
+ * ═══ FinanceFlow · Trazabilidad ═══
+ * Archivo .........: scripts/secret-scan.js
+ * Capa / módulo ...: Operación · Seguridad
+ * Función .........: Detector de secretos que corre en los hooks pre-commit y pre-push: bloquea archivos .env, comprimidos y llaves, y claves con formato conocido (Mongo, Google, Culqi, Brevo, Sentry, etc.).
+ * Calidad (RNF) ...: RNF-01, RNF-02
+ * Nota ............: No implementa un requerimiento funcional del SRS: es soporte técnico, utilitario o prototipo.
+ * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
+ * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
+ * ════════════════════════════════════════════════════════════
+ */
+/**
  * FinanceFlow · Detector de secretos (sin dependencias)
  *
  * Bloquea commits y pushes que incluyan claves, contraseñas, archivos .env o paquetes comprimidos.

@@ -2,15 +2,17 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: frontend/src/pages/LoginPage.jsx
  * Capa / módulo ...: Frontend · Pantalla
- * Función .........: Pantalla «Iniciar sesión»: valida, entra al panel y muestra el aviso tras restablecer la contraseña.
- * Requerimientos ..: RF-02, RF-03  (módulos: Cuenta)
+ * Función .........: Pantalla «Iniciar sesión»: valida, y si la cuenta tiene verificación en dos pasos muestra el paso del código (o de recuperación); lleva al administrador sin MFA a Mi Perfil.
+ * Requerimientos ..: RF-02, RF-03, RF-42, RF-44  (módulos: Cuenta)
  * Calidad (RNF) ...: RNF-10
  * Casos de uso ....: CU-02 Iniciar sesión
- * Reglas de negocio : RN-07, RN-08
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-07, RN-08, RN-26, RN-28
  * Depende de ......: frontend/src/hooks/useAuth.js
  *                    frontend/src/services/auth-adapter.js
  * Lo usan .........: frontend/src/App.jsx
- * Pruebas .........: frontend/src/__tests__/LoginPage.test.jsx
+ * Pruebas .........: frontend/src/__tests__/LoginMfa.test.jsx
+ *                    frontend/src/__tests__/LoginPage.test.jsx
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
  * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
  * ════════════════════════════════════════════════════════════
@@ -20,7 +22,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { login } from '../services/auth-adapter';
+import { login, loginMfa } from '../services/auth-adapter';
 import { useAuth } from '../hooks/useAuth';
 
 const schema = z.object({
@@ -32,6 +34,9 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  // Verificación en dos pasos: si la cuenta la tiene, el login devuelve un token temporal y se pide el código
+  const [mfaToken, setMfaToken] = useState(null);
+  const [codigo, setCodigo] = useState('');
   const { user, updateAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,8 +65,18 @@ function LoginPage() {
     setError('');
     console.log("Intento de login. API URL:", process.env.REACT_APP_API_URL);
     try {
-      await login(data.email, data.password);
+      const resultado = await login(data.email, data.password);
+      if (resultado && resultado.mfaRequerido) {
+        setMfaToken(resultado.mfaToken);
+        setCodigo('');
+        return;
+      }
       updateAuth(); // Actualizar el estado de autenticación
+      if (resultado && resultado.mfaObligatorioPendiente) {
+        // Administrador sin verificación en dos pasos: debe activarla antes de usar el portal
+        navigate('/perfil', { replace: true, state: { mfaObligatorio: true } });
+        return;
+      }
       navigate('/', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -69,6 +84,68 @@ function LoginPage() {
       setLoading(false);
     }
   };
+
+  const onSubmitMfa = async (e) => {
+    e.preventDefault();
+    if (!codigo.trim()) {
+      setError('Ingresa el código de 6 dígitos');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await loginMfa(mfaToken, codigo.trim());
+      updateAuth();
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const volverAlLogin = () => {
+    setMfaToken(null);
+    setCodigo('');
+    setError('');
+  };
+
+  if (mfaToken) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center bg-background animate-fade-in">
+        <div className="bg-white/80 shadow-soft rounded-xl p-8 w-full max-w-md flex flex-col gap-4 border border-primary/30">
+          <h2 className="text-2xl font-bold text-center mb-2">Verificación en dos pasos</h2>
+          <p className="text-sm text-center text-gray-600">
+            Abre tu app autenticadora (Google Authenticator, Microsoft Authenticator o Authy) e ingresa el código de 6 dígitos de FinanceFlow.
+          </p>
+          <form onSubmit={onSubmitMfa} className="flex flex-col gap-3">
+            <input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              autoFocus
+              maxLength={20}
+              placeholder="Código de 6 dígitos"
+              aria-label="Código de verificación"
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value)}
+              className="rounded-xl border border-primary/40 px-4 py-2 text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <button type="submit" disabled={loading} className="bg-primary text-text font-semibold rounded-xl py-2 mt-2 shadow hover:bg-secondary transition-colors duration-200 disabled:opacity-60">
+              {loading ? 'Verificando...' : 'Verificar'}
+            </button>
+            {error && <div className="text-red-500 text-center animate-fade-in">{error}</div>}
+          </form>
+          <p className="text-xs text-center text-gray-500">
+            ¿Perdiste tu teléfono? Escribe en el mismo campo uno de tus códigos de recuperación (formato XXXXX-XXXXX).
+          </p>
+          <button type="button" onClick={volverAlLogin} className="text-center text-sm text-primary underline hover:text-accent transition-colors">
+            ← Volver al inicio de sesión
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-background animate-fade-in">

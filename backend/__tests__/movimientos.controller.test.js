@@ -4,7 +4,7 @@
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas de las respuestas de movimientos y del cupo de lecturas del Plan Free.
  * Requerimientos ..: RF-09, RF-11, RF-12, RF-13, RF-14, RF-17  (módulos: Movimientos)
- * Calidad (RNF) ...: RNF-02, RNF-03, RNF-04, RNF-06, RNF-12, RNF-13, RNF-14
+ * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-06, RNF-12, RNF-13, RNF-14
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña

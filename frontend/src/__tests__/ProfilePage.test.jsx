@@ -3,12 +3,13 @@
  * Archivo .........: frontend/src/__tests__/ProfilePage.test.jsx
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas automáticas de ProfilePage: verifican que el comportamiento descrito en el SRS se cumple.
- * Requerimientos ..: RF-06, RF-07, RF-08, RF-33, RF-39  (módulos: Cuenta, Perfil, Plan Pro)
+ * Requerimientos ..: RF-06, RF-07, RF-08, RF-33, RF-39, RF-41, RF-43, RF-44  (módulos: Cuenta, Perfil, Plan Pro)
  * Casos de uso ....: CU-12 Gestionar información de perfil
  *                    CU-13 Cerrar sesión
  *                    CU-18 Eliminar cuenta
  *                    CU-19 Contratar el Plan Pro
- * Reglas de negocio : RN-20
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-20, RN-28
  * Depende de ......: frontend/src/pages/ProfilePage.jsx
  *                    frontend/src/services/usuarios-adapter.js
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
@@ -22,11 +23,13 @@ import * as usuariosAdapter from '../services/usuarios-adapter';
 
 jest.mock('../services/usuarios-adapter');
 jest.mock('../services/auth-adapter', () => ({
-  logout: jest.fn()
+  logout: jest.fn(),
+  authAdapter: { notifyAuthChange: jest.fn() }
 }));
 
 jest.mock('react-router-dom', () => ({
-  useNavigate: () => jest.fn()
+  useNavigate: () => jest.fn(),
+  useLocation: () => ({ pathname: '/perfil', search: '', hash: '', state: null })
 }));
 
 describe('ProfilePage', () => {

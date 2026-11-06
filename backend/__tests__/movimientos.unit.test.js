@@ -3,7 +3,7 @@
  * Archivo .........: backend/__tests__/movimientos.unit.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas de la lógica de movimientos (montos, fechas, periodos cerrados, desactivación).
- * Requerimientos ..: RF-01, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-17, RF-25, RF-33, RF-40  (módulos: Cuenta, Perfil, Movimientos, Comprobantes, Planificador, Plan Pro, Cierres)
+ * Requerimientos ..: RF-01, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-17, RF-25, RF-33, RF-40, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Movimientos, Comprobantes, Planificador, Plan Pro, Cierres)
  * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-06, RNF-12, RNF-13, RNF-14
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
@@ -27,7 +27,8 @@
  *                    CU-20 Gestionar préstamos y recordatorios
  *                    CU-21 Exportar reportes a Excel y PDF
  *                    CU-22 Administrar la plataforma
- * Reglas de negocio : RN-01, RN-03, RN-04, RN-05, RN-06, RN-13, RN-15, RN-19, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-03, RN-04, RN-05, RN-06, RN-13, RN-15, RN-19, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/app.js
  *                    backend/database/movimiento.model.js
  *                    backend/database/usuario.model.js

@@ -3,7 +3,7 @@
  * Archivo .........: backend/routes/usuarios.js
  * Capa / módulo ...: Backend · Rutas
  * Función .........: Define las direcciones de cuenta: registro, inicio de sesión, perfil, baja, recuperación y restablecimiento; aplica validación y límite de intentos.
- * Requerimientos ..: RF-01 a RF-08
+ * Requerimientos ..: RF-01 a RF-08, RF-41, RF-42, RF-43  (módulos: Cuenta)
  * Calidad (RNF) ...: RNF-02
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
@@ -11,7 +11,8 @@
  *                    CU-04 Restablecer contraseña
  *                    CU-12 Gestionar información de perfil
  *                    CU-18 Eliminar cuenta
- * Reglas de negocio : RN-08, RN-09
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-08, RN-09, RN-29
  * Depende de ......: backend/controllers/usuarios.controller.js
  *                    backend/middlewares/auth.js
  *                    backend/middlewares/isAdmin.js
@@ -29,10 +30,13 @@ const usuariosController = require('../controllers/usuarios.controller');
 const auth = require('../middlewares/auth');
 const isAdmin = require('../middlewares/isAdmin');
 const validate = require('../middlewares/validate');
-const { loginLimiter, forgotPasswordLimiter } = require('../middlewares/rateLimit');
+const { loginLimiter, forgotPasswordLimiter, mfaLimiter } = require('../middlewares/rateLimit');
 const {
   registerSchema,
   loginSchema,
+  loginMfaSchema,
+  mfaCodigoSchema,
+  mfaDesactivarSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   updateProfileSchema,
@@ -45,6 +49,12 @@ router.post('/register', validate({ body: registerSchema }), usuariosController.
 router.post('/login', loginLimiter, validate({ body: loginSchema }), usuariosController.login);
 
 // Rutas protegidas para el perfil del usuario actual
+// Verificación en dos pasos (MFA)
+router.post('/login/mfa', mfaLimiter, validate({ body: loginMfaSchema }), usuariosController.loginMfa);
+router.post('/mfa/configurar', auth, mfaLimiter, usuariosController.mfaConfigurar);
+router.post('/mfa/activar', auth, mfaLimiter, validate({ body: mfaCodigoSchema }), usuariosController.mfaActivar);
+router.post('/mfa/desactivar', auth, mfaLimiter, validate({ body: mfaDesactivarSchema }), usuariosController.mfaDesactivar);
+
 router.get('/me', auth, usuariosController.getProfile);
 router.put('/me', auth, validate({ body: updateProfileSchema }), usuariosController.updateProfile);
 router.delete('/me', auth, usuariosController.deleteProfile);

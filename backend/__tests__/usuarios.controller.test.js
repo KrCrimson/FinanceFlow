@@ -3,8 +3,8 @@
  * Archivo .........: backend/__tests__/usuarios.controller.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas de las respuestas de cuenta (registro, inicio de sesión, perfil, baja).
- * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-16, RF-33, RF-40  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Cierres)
- * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-06, RNF-14
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-16, RF-33, RF-40, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Cierres)
+ * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-05, RNF-06, RNF-14
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña
@@ -27,7 +27,8 @@
  *                    CU-20 Gestionar préstamos y recordatorios
  *                    CU-21 Exportar reportes a Excel y PDF
  *                    CU-22 Administrar la plataforma
- * Reglas de negocio : RN-01, RN-09, RN-15, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-09, RN-15, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/app.js
  *                    backend/database/usuario.model.js
  *                    backend/services/usuarios.service.js

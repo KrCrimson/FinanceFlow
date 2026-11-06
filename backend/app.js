@@ -2,8 +2,8 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: backend/app.js
  * Capa / módulo ...: Backend · Arranque
- * Función .........: Crea y configura el servidor: cabeceras de seguridad, CORS, límite de solicitudes, lectura de JSON, conexión con la base de datos, montaje de rutas y manejo central de errores.
- * Calidad (RNF) ...: RNF-02, RNF-03, RNF-04, RNF-06, RNF-14
+ * Función .........: Crea y configura el servidor: cabeceras de seguridad, CORS, límite de solicitudes, lectura de JSON, registro de peticiones que oculta contraseñas, tokens y códigos MFA, conexión con la base de datos, montaje de rutas y manejo central de errores.
+ * Calidad (RNF) ...: RNF-02, RNF-03, RNF-04, RNF-06, RNF-14, RNF-01
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña
@@ -35,6 +35,7 @@
  *                    backend/__tests__/cierres.test.js
  *                    backend/__tests__/e2e.test.js
  *                    backend/__tests__/logs.controller.test.js
+ *                    backend/__tests__/mfa.test.js
  *                    backend/__tests__/movimientos.controller.test.js
  *                    backend/__tests__/movimientos.unit.test.js
  *                    backend/__tests__/pagos.culqi.test.js
@@ -114,6 +115,8 @@ app.use((req, res, next) => {
   if (safeBody.newPassword) safeBody.newPassword = '[REDACTED]';
   if (safeBody.currentPassword) safeBody.currentPassword = '[REDACTED]';
   if (safeBody.token) safeBody.token = '[REDACTED]';
+  // Segundo factor (MFA): ni los códigos ni el token temporal deben quedar en los registros
+  ['codigo', 'mfaToken', 'secreto', 'codigosRecuperacion'].forEach((k) => { if (safeBody[k]) safeBody[k] = '[REDACTED]'; });
   console.log(`${req.method} ${req.path}`, safeBody);
   next();
 });

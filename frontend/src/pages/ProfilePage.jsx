@@ -2,14 +2,16 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: frontend/src/pages/ProfilePage.jsx
  * Capa / módulo ...: Frontend · Pantalla
- * Función .........: Mi Perfil: edita nombre y correo, elige la moneda, muestra el plan, cierra sesión y elimina la cuenta.
- * Requerimientos ..: RF-06, RF-07, RF-08, RF-33, RF-39  (módulos: Cuenta, Perfil, Plan Pro)
+ * Función .........: Mi Perfil: edita nombre y correo, elige la moneda, muestra el plan, la verificación en dos pasos, cierra sesión y elimina la cuenta.
+ * Requerimientos ..: RF-06, RF-07, RF-08, RF-33, RF-39, RF-41, RF-43, RF-44  (módulos: Cuenta, Perfil, Plan Pro)
  * Casos de uso ....: CU-12 Gestionar información de perfil
  *                    CU-13 Cerrar sesión
  *                    CU-18 Eliminar cuenta
  *                    CU-19 Contratar el Plan Pro
- * Reglas de negocio : RN-20
- * Depende de ......: frontend/src/components/PaywallModal.jsx
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-20, RN-28
+ * Depende de ......: frontend/src/components/MfaSection.jsx
+ *                    frontend/src/components/PaywallModal.jsx
  *                    frontend/src/services/auth-adapter.js
  *                    frontend/src/services/pagosService.js
  *                    frontend/src/services/usuarios-adapter.js
@@ -28,16 +30,18 @@ import {
 } from "../services/usuarios-adapter";
 import { logout } from "../services/auth-adapter";
 import { getEstadoPlan } from "../services/pagosService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   CURRENCIES,
   getCurrencySymbol,
   setCurrencySymbol,
 } from "../utils/currency";
 import PaywallModal from "../components/PaywallModal";
+import MfaSection from "../components/MfaSection";
 
 function ProfilePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [perfil, setPerfil] = useState(null);
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -383,6 +387,13 @@ function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* Verificación en dos pasos (MFA) */}
+        <MfaSection
+          perfil={perfil}
+          obligatorioAviso={Boolean(location.state && location.state.mfaObligatorio)}
+          onCambio={async () => setPerfil(await getProfile())}
+        />
 
         {/* Acciones de Cuenta */}
         <div className="bg-white rounded-2xl shadow-lg p-6">

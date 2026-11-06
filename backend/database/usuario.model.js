@@ -2,8 +2,8 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: backend/database/usuario.model.js
  * Capa / módulo ...: Backend · Datos
- * Función .........: Define la cuenta de usuario: nombre, correo único, contraseña protegida, estado, rol, plan (Free/Pro), fondo fijo (S/ 1,000.00 por defecto), contador de lecturas de comprobantes y datos del enlace de recuperación.
- * Requerimientos ..: RF-01, RF-07, RF-08, RF-16, RF-33, RF-40  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Cierres)
+ * Función .........: Define la cuenta de usuario: nombre, correo único, contraseña protegida, estado, rol, plan (Free/Pro), fondo fijo, contador de lecturas de comprobantes, datos del enlace de recuperación y los datos de la verificación en dos pasos (secreto cifrado, último paso usado, códigos de recuperación en hash e intentos fallidos).
+ * Requerimientos ..: RF-01, RF-07, RF-08, RF-16, RF-33, RF-40, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Comprobantes, Plan Pro, Cierres)
  * Calidad (RNF) ...: RNF-01
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
@@ -12,7 +12,8 @@
  *                    CU-12 Gestionar información de perfil
  *                    CU-18 Eliminar cuenta
  *                    CU-19 Contratar el Plan Pro
- * Reglas de negocio : RN-01, RN-15, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-15, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Lo usan .........: backend/controllers/movimientos.controller.js
  *                    backend/integration/flujo-completo.itest.js
  *                    backend/jest.setup.js
@@ -29,6 +30,7 @@
  *                    backend/__tests__/cierres.service.test.js
  *                    backend/__tests__/cierres.test.js
  *                    backend/__tests__/logs.controller.test.js
+ *                    backend/__tests__/mfa.test.js
  *                    backend/__tests__/movimientos.service.test.js
  *                    backend/__tests__/movimientos.unit.test.js
  *                    backend/__tests__/pagos.culqi.test.js
@@ -110,6 +112,39 @@ const usuarioSchema = new mongoose.Schema({
 	},
 	lastPaymentId: {
 		type: String,
+		default: null,
+	},
+	// ---- Verificación en dos pasos (MFA, TOTP). Los secretos se guardan cifrados.
+	mfaActivo: {
+		type: Boolean,
+		default: false,
+	},
+	mfaSecreto: {
+		type: String,
+		default: null,
+	},
+	mfaSecretoPendiente: {
+		type: String,
+		default: null,
+	},
+	mfaUltimoPaso: {
+		type: Number,
+		default: 0,
+	},
+	mfaCodigosRecuperacion: {
+		type: [String],
+		default: [],
+	},
+	mfaActivadoEn: {
+		type: Date,
+		default: null,
+	},
+	mfaIntentosFallidos: {
+		type: Number,
+		default: 0,
+	},
+	mfaBloqueadoHasta: {
+		type: Date,
 		default: null,
 	},
 });

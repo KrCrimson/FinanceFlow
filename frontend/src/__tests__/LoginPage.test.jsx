@@ -3,10 +3,11 @@
  * Archivo .........: frontend/src/__tests__/LoginPage.test.jsx
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas automáticas de LoginPage: verifican que el comportamiento descrito en el SRS se cumple.
- * Requerimientos ..: RF-02, RF-03  (módulos: Cuenta)
+ * Requerimientos ..: RF-02, RF-03, RF-42, RF-44  (módulos: Cuenta)
  * Calidad (RNF) ...: RNF-10
  * Casos de uso ....: CU-02 Iniciar sesión
- * Reglas de negocio : RN-07, RN-08
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-07, RN-08, RN-26, RN-28
  * Depende de ......: frontend/src/pages/LoginPage.jsx
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
  * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque

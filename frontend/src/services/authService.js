@@ -2,15 +2,17 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: frontend/src/services/authService.js
  * Capa / módulo ...: Frontend · Servicio
- * Función .........: Registro, inicio y cierre de sesión, guardado de la sesión en el dispositivo y verificación de su vigencia.
- * Requerimientos ..: RF-01, RF-02, RF-06  (módulos: Cuenta)
+ * Función .........: Registro, inicio de sesión (con paso 2 de MFA), cierre de sesión, guardado de la sesión en el dispositivo y verificación de su vigencia.
+ * Requerimientos ..: RF-01, RF-02, RF-06, RF-42  (módulos: Cuenta)
  * Calidad (RNF) ...: RNF-02
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-13 Cerrar sesión
- * Reglas de negocio : RN-07
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-07, RN-26
  * Lo usan .........: frontend/src/services/auth-adapter.js
- * Pruebas .........: frontend/src/__tests__/services.test.js
+ * Pruebas .........: frontend/src/__tests__/mfaService.test.js
+ *                    frontend/src/__tests__/services.test.js
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
  * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
  * ════════════════════════════════════════════════════════════
@@ -58,6 +60,30 @@ export async function login(email, password) {
   }
 }
 
+
+// Paso 2 del inicio de sesión cuando la cuenta tiene verificación en dos pasos (MFA):
+// canjea el token temporal + el código de 6 dígitos (o de recuperación) por la sesión.
+export async function loginMfa(mfaToken, codigo) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/usuarios/login/mfa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mfaToken, codigo })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || data.error || 'No se pudo verificar el código');
+    }
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      notifyAuthChange();
+    }
+    return data;
+  } catch (error) {
+    console.error('Error en loginMfa:', error);
+    throw error;
+  }
+}
 
 export async function register(nombre, email, password) {
   try {

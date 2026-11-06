@@ -3,7 +3,7 @@
  * Archivo .........: backend/__tests__/cierres.service.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Pruebas automáticas de cierres.service: verifican que el comportamiento descrito en el SRS se cumple.
- * Requerimientos ..: RF-01, RF-07, RF-08, RF-09, RF-10, RF-13, RF-16, RF-17, RF-21, RF-25, RF-27, RF-28, RF-29, RF-30, RF-33, RF-40  (módulos: Cuenta, Perfil, Movimientos, Comprobantes, Panel, Planificador, Cierres, Plan Pro)
+ * Requerimientos ..: RF-01, RF-07, RF-08, RF-09, RF-10, RF-13, RF-16, RF-17, RF-21, RF-25, RF-27, RF-28, RF-29, RF-30, RF-33, RF-40, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Movimientos, Comprobantes, Panel, Planificador, Cierres, Plan Pro)
  * Calidad (RNF) ...: RNF-01, RNF-05, RNF-12, RNF-13
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
@@ -20,7 +20,8 @@
  *                    CU-17 Marcar y quitar ingreso constante
  *                    CU-18 Eliminar cuenta
  *                    CU-19 Contratar el Plan Pro
- * Reglas de negocio : RN-01, RN-03, RN-04, RN-05, RN-06, RN-11, RN-12, RN-13, RN-14, RN-15, RN-19, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-03, RN-04, RN-05, RN-06, RN-11, RN-12, RN-13, RN-14, RN-15, RN-19, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/database/cierre.model.js
  *                    backend/database/movimiento.model.js
  *                    backend/database/usuario.model.js

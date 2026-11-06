@@ -3,8 +3,8 @@
  * Archivo .........: backend/__tests__/e2e.test.js
  * Capa / módulo ...: Pruebas automáticas
  * Función .........: Prueba de extremo a extremo del flujo principal del sistema.
- * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-09, RF-11, RF-12, RF-13, RF-14, RF-17  (módulos: Cuenta, Perfil, Movimientos)
- * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-06, RNF-12, RNF-13, RNF-14
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-09, RF-11, RF-12, RF-13, RF-14, RF-17, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil, Movimientos)
+ * Calidad (RNF) ...: RNF-01, RNF-02, RNF-03, RNF-04, RNF-05, RNF-06, RNF-12, RNF-13, RNF-14
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña
@@ -27,7 +27,8 @@
  *                    CU-20 Gestionar préstamos y recordatorios
  *                    CU-21 Exportar reportes a Excel y PDF
  *                    CU-22 Administrar la plataforma
- * Reglas de negocio : RN-01, RN-03, RN-04, RN-05, RN-06, RN-09, RN-13, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-03, RN-04, RN-05, RN-06, RN-09, RN-13, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/app.js
  *                    backend/services/movimientos.service.js
  *                    backend/services/usuarios.service.js

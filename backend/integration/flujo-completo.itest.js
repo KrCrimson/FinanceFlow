@@ -18,6 +18,7 @@
  *                    backend/database/movimiento.model.js
  *                    backend/database/pago.model.js
  *                    backend/database/usuario.model.js
+ *                    backend/utils/totp.js
  * Documento .......: SRS FinanceFlow v4.0 (G03-FinanceFlow-FD03), Anexo A – Trazabilidad
  * Autores .........: Grupo G03 – Sebastian Arce Bracamonte, Brant Antony Chata Choque
  * ════════════════════════════════════════════════════════════
@@ -315,5 +316,102 @@ describe('Eliminación de cuenta (Sprint 7)', () => {
 
     const conTokenViejo = await request(app).get('/api/usuarios/me').set(auth(token));
     expect(conTokenViejo.status).toBe(401);
+  });
+});
+
+describe('Verificación en dos pasos (MFA) con base de datos real', () => {
+  // Nota: todas las rutas de MFA comparten un límite de 10 solicitudes por IP cada 15 min; este bloque usa 9.
+  const totp = require('../utils/totp');
+  let token;
+  let secreto;
+  let claros;
+
+  it('un usuario nuevo no tiene MFA y puede activarlo: configurar → código incorrecto → código correcto', async () => {
+    token = await registrarYEntrar('Mia Mfa', 'mia@test.com');
+    const perfil = await request(app).get('/api/usuarios/me').set(auth(token));
+    expect(perfil.body.mfaActivo).toBe(false);
+
+    const conf = await request(app).post('/api/usuarios/mfa/configurar').set(auth(token));
+    expect(conf.status).toBe(200);
+    secreto = conf.body.secreto;
+    expect(conf.body.otpauthUrl).toContain('otpauth://totp/FinanceFlow:mia%40test.com');
+    const pendiente = await Usuario.findOne({ email: 'mia@test.com' });
+    expect(pendiente.mfaActivo).toBe(false);
+    expect(pendiente.mfaSecretoPendiente).toMatch(/^v1:/);
+    expect(pendiente.mfaSecretoPendiente).not.toContain(secreto);
+
+    const mal = await request(app).post('/api/usuarios/mfa/activar').set(auth(token)).send({ codigo: '000000' });
+    expect(mal.status).toBe(400);
+    expect((await Usuario.findOne({ email: 'mia@test.com' })).mfaActivo).toBe(false);
+
+    const bien = await request(app).post('/api/usuarios/mfa/activar').set(auth(token)).send({ codigo: totp.totp(secreto) });
+    expect(bien.status).toBe(200);
+    expect(bien.body.codigosRecuperacion).toHaveLength(8);
+    expect(jwt.verify(bien.body.token, process.env.JWT_SECRET).mfa).toBe(true);
+    claros = bien.body.codigosRecuperacion;
+
+    const enBD = await Usuario.findOne({ email: 'mia@test.com' });
+    expect(enBD.mfaActivo).toBe(true);
+    expect(enBD.mfaSecretoPendiente).toBeNull();
+    expect(enBD.mfaSecreto).toMatch(/^v1:/);
+    expect(enBD.mfaSecreto).not.toContain(secreto);
+    expect(enBD.mfaCodigosRecuperacion).toHaveLength(8);
+    expect(enBD.mfaCodigosRecuperacion.join('')).not.toContain(claros[0].replace('-', ''));
+    expect(enBD.mfaUltimoPaso).toBeGreaterThan(0);
+  });
+
+  it('con MFA activo el login no da sesión; el paso 2 sí, y un código no se puede reutilizar', async () => {
+    const login = await request(app).post('/api/usuarios/login').send({ email: 'mia@test.com', password: PASS });
+    expect(login.status).toBe(200);
+    expect(login.body.mfaRequerido).toBe(true);
+    expect(login.body.token).toBeUndefined();
+
+    // el token temporal no sirve como sesión
+    const comoSesion = await request(app).get('/api/usuarios/me').set(auth(login.body.mfaToken));
+    expect(comoSesion.status).toBe(401);
+
+    // el código del paso siguiente (el actual ya se usó al activar) es válido por la ventana de ±30 s
+    const codigo = totp.totp(secreto, { tiempo: Date.now() + 30000 });
+    const ok = await request(app).post('/api/usuarios/login/mfa').send({ mfaToken: login.body.mfaToken, codigo });
+    expect(ok.status).toBe(200);
+    expect(jwt.verify(ok.body.token, process.env.JWT_SECRET).mfa).toBe(true);
+    const me = await request(app).get('/api/usuarios/me').set(auth(ok.body.token));
+    expect(me.status).toBe(200);
+    expect(me.body.mfaActivo).toBe(true);
+
+    const repetido = await request(app).post('/api/usuarios/login/mfa').send({ mfaToken: login.body.mfaToken, codigo });
+    expect(repetido.status).toBe(401);
+  });
+
+  it('desactivar exige contraseña y un código (aquí uno de recuperación, que se consume)', async () => {
+    const malPass = await request(app).post('/api/usuarios/mfa/desactivar').set(auth(token)).send({ password: 'incorrecta', codigo: claros[0] });
+    expect(malPass.status).toBe(400);
+    expect((await Usuario.findOne({ email: 'mia@test.com' })).mfaActivo).toBe(true);
+
+    const ok = await request(app).post('/api/usuarios/mfa/desactivar').set(auth(token)).send({ password: PASS, codigo: claros[0] });
+    expect(ok.status).toBe(200);
+    const enBD = await Usuario.findOne({ email: 'mia@test.com' });
+    expect(enBD.mfaActivo).toBe(false);
+    expect(enBD.mfaSecreto).toBeNull();
+    expect(enBD.mfaCodigosRecuperacion).toHaveLength(0);
+  });
+
+  it('el administrador no puede usar el portal sin MFA y sí después de activarlo', async () => {
+    const adminToken = await registrarYEntrar('Root Admin', 'root@test.com');
+    await Usuario.updateOne({ email: 'root@test.com' }, { rol: 'admin' });
+
+    const sinMfa = await request(app).get('/api/admin/metrics').set(auth(adminToken));
+    expect(sinMfa.status).toBe(403);
+    expect(sinMfa.body.mfaRequerido).toBe(true);
+
+    const conf = await request(app).post('/api/usuarios/mfa/configurar').set(auth(adminToken));
+    const act = await request(app).post('/api/usuarios/mfa/activar').set(auth(adminToken)).send({ codigo: totp.totp(conf.body.secreto) });
+    expect(act.status).toBe(200);
+
+    const conMfa = await request(app).get('/api/admin/metrics').set(auth(act.body.token));
+    expect(conMfa.status).toBe(200);
+    // la sesión anterior (sin segundo factor) sigue sin poder entrar
+    const anterior = await request(app).get('/api/admin/metrics').set(auth(adminToken));
+    expect(anterior.status).toBe(403);
   });
 });

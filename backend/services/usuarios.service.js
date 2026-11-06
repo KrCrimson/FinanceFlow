@@ -2,19 +2,22 @@
  * ═══ FinanceFlow · Trazabilidad ═══
  * Archivo .........: backend/services/usuarios.service.js
  * Capa / módulo ...: Backend · Servicios (lógica)
- * Función .........: Lógica de cuenta: crear cuenta, iniciar sesión, perfil, baja lógica, enlace de recuperación de 10 minutos con envío de correo y restablecimiento de contraseña.
- * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08  (módulos: Cuenta, Perfil)
- * Calidad (RNF) ...: RNF-01
+ * Función .........: Lógica de cuenta: crear cuenta, iniciar sesión, perfil, baja lógica, enlace de recuperación de 10 minutos y restablecimiento de contraseña; y la verificación en dos pasos: configurar, activar, verificar el segundo factor (código o recuperación, sin reutilizar, con bloqueo tras 5 fallos) y desactivar.
+ * Requerimientos ..: RF-01, RF-02, RF-04, RF-05, RF-07, RF-08, RF-41, RF-42, RF-43, RF-44  (módulos: Cuenta, Perfil)
+ * Calidad (RNF) ...: RNF-01, RNF-05
  * Casos de uso ....: CU-01 Registrar cuenta
  *                    CU-02 Iniciar sesión
  *                    CU-03 Solicitar recuperación de contraseña
  *                    CU-04 Restablecer contraseña
  *                    CU-12 Gestionar información de perfil
  *                    CU-18 Eliminar cuenta
- * Reglas de negocio : RN-01, RN-09, RN-20, RN-23, RN-24
+ *                    CU-23 Configurar la verificación en dos pasos (MFA)
+ * Reglas de negocio : RN-01, RN-09, RN-20, RN-23, RN-24, RN-26, RN-27, RN-28, RN-29
  * Depende de ......: backend/database/usuario.model.js
+ *                    backend/utils/totp.js
  * Lo usan .........: backend/controllers/usuarios.controller.js
  * Pruebas .........: backend/__tests__/e2e.test.js
+ *                    backend/__tests__/mfa.test.js
  *                    backend/__tests__/usuarios.controller.test.js
  *                    backend/__tests__/usuarios.integration.test.js
  *                    backend/__tests__/usuarios.service.test.js
@@ -27,6 +30,18 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const Usuario = require('../database/usuario.model');
+const totp = require('../utils/totp');
+
+// Cuentas con permisos de administrador: rol 'admin' en la base de datos o correo en ADMIN_EMAILS.
+const esAdministrador = (usuario) => {
+  if (!usuario) return false;
+  if (usuario.rol === 'admin') return true;
+  const lista = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return Boolean(usuario.email) && lista.includes(String(usuario.email).toLowerCase());
+};
+
+const MFA_MAX_INTENTOS = 5;
+const MFA_BLOQUEO_MS = 15 * 60 * 1000;
 
 module.exports = {
   // Registro seguro de usuario
@@ -80,7 +95,102 @@ module.exports = {
       estado: usuario.estado,
       fondoFijo: usuario.fondoFijo,
       creadoEn: usuario.creadoEn,
+      rol: usuario.rol,
+      mfaActivo: Boolean(usuario.mfaActivo),
+      esAdmin: esAdministrador(usuario),
     };
+  },
+
+
+  // ------------------------------------------------------------------ Verificación en dos pasos (MFA)
+  esAdministrador,
+
+  // Paso 1 de la activación: genera un secreto nuevo (queda pendiente hasta confirmar con un código)
+  mfaIniciarConfiguracion: async (userId) => {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) throw new Error('Usuario no encontrado');
+    if (usuario.mfaActivo) throw new Error('La verificación en dos pasos ya está activa');
+    const secreto = totp.generarSecreto();
+    usuario.mfaSecretoPendiente = totp.cifrar(secreto);
+    await usuario.save();
+    return { secreto, otpauthUrl: totp.urlOtpauth({ email: usuario.email, secreto }) };
+  },
+
+  // Paso 2: confirma con el primer código de la app, activa el MFA y entrega los códigos de recuperación (una sola vez)
+  mfaActivar: async (userId, codigo) => {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) throw new Error('Usuario no encontrado');
+    if (usuario.mfaActivo) throw new Error('La verificación en dos pasos ya está activa');
+    if (!usuario.mfaSecretoPendiente) throw new Error('Primero solicite la configuración de la verificación en dos pasos');
+    const paso = totp.verificarTotp(totp.descifrar(usuario.mfaSecretoPendiente), codigo);
+    if (paso === null) throw new Error('Código incorrecto');
+    const { claros, hashes } = totp.generarCodigosRecuperacion(8);
+    usuario.mfaSecreto = usuario.mfaSecretoPendiente;
+    usuario.mfaSecretoPendiente = null;
+    usuario.mfaActivo = true;
+    usuario.mfaUltimoPaso = paso;
+    usuario.mfaCodigosRecuperacion = hashes;
+    usuario.mfaActivadoEn = new Date();
+    usuario.mfaIntentosFallidos = 0;
+    usuario.mfaBloqueadoHasta = null;
+    await usuario.save();
+    return { codigosRecuperacion: claros };
+  },
+
+  // Verifica el segundo factor al iniciar sesión (código de la app o código de recuperación)
+  mfaVerificarLogin: async (userId, codigo) => {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario || !usuario.mfaActivo || !usuario.mfaSecreto || usuario.estado === 'eliminado' || usuario.estado === 'inactivo') {
+      throw new Error('Código incorrecto');
+    }
+    if (usuario.mfaBloqueadoHasta && new Date(usuario.mfaBloqueadoHasta) > new Date()) {
+      throw new Error('Demasiados intentos fallidos. Intente de nuevo en unos minutos');
+    }
+    const paso = totp.verificarTotp(totp.descifrar(usuario.mfaSecreto), codigo, { ultimoPaso: usuario.mfaUltimoPaso || 0 });
+    if (paso !== null) {
+      usuario.mfaUltimoPaso = paso;
+      usuario.mfaIntentosFallidos = 0;
+      usuario.mfaBloqueadoHasta = null;
+      await usuario.save();
+      return { metodo: 'totp' };
+    }
+    const restantes = totp.consumirCodigoRecuperacion(usuario.mfaCodigosRecuperacion, codigo);
+    if (restantes) {
+      usuario.mfaCodigosRecuperacion = restantes;
+      usuario.mfaIntentosFallidos = 0;
+      usuario.mfaBloqueadoHasta = null;
+      await usuario.save();
+      return { metodo: 'recuperacion', codigosRestantes: restantes.length };
+    }
+    usuario.mfaIntentosFallidos = (usuario.mfaIntentosFallidos || 0) + 1;
+    if (usuario.mfaIntentosFallidos >= MFA_MAX_INTENTOS) {
+      usuario.mfaBloqueadoHasta = new Date(Date.now() + MFA_BLOQUEO_MS);
+      usuario.mfaIntentosFallidos = 0;
+    }
+    await usuario.save();
+    throw new Error('Código incorrecto');
+  },
+
+  // Desactiva el MFA: pide contraseña y un código válido. El administrador no puede desactivarlo.
+  mfaDesactivar: async (userId, password, codigo) => {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) throw new Error('Usuario no encontrado');
+    if (!usuario.mfaActivo) throw new Error('La verificación en dos pasos no está activa');
+    if (esAdministrador(usuario)) throw new Error('El administrador no puede desactivar la verificación en dos pasos');
+    const ok = await bcrypt.compare(password || '', usuario.passwordHash);
+    if (!ok) throw new Error('Contraseña incorrecta');
+    await module.exports.mfaVerificarLogin(userId, codigo);
+    const actual = await Usuario.findById(userId);
+    actual.mfaActivo = false;
+    actual.mfaSecreto = null;
+    actual.mfaSecretoPendiente = null;
+    actual.mfaUltimoPaso = 0;
+    actual.mfaCodigosRecuperacion = [];
+    actual.mfaActivadoEn = null;
+    actual.mfaIntentosFallidos = 0;
+    actual.mfaBloqueadoHasta = null;
+    await actual.save();
+    return { message: 'Verificación en dos pasos desactivada' };
   },
 
   crearUsuario: async (data) => {
@@ -165,6 +275,9 @@ module.exports = {
       estado: usuario.estado,
       fondoFijo: usuario.fondoFijo,
       creadoEn: usuario.creadoEn,
+      rol: usuario.rol,
+      mfaActivo: Boolean(usuario.mfaActivo),
+      esAdmin: esAdministrador(usuario),
     };
   },
 
